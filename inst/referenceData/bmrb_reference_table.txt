@@ -1,0 +1,2225 @@
+Entry_ID:CASno:Field_strength:Solute:Solvent:pH
+bmse000001:10517-44-9:500:1,3-diaminopropane:D2O:7.4
+bmse000001:109-76-2:500:1,3-diaminopropane:D2O:7.4
+bmse000001:54018-94-9:500:1,3-diaminopropane:D2O:7.4
+bmse000003:38559-49-8:400:Deoxyguanosine:D2O:7.4
+bmse000004:58-64-0:500:ADP:D2O:7.4
+bmse000004:84412-16-8:500:ADP:D2O:7.4
+bmse000005:162756-82-3:500:AMP:D2O:7.4
+bmse000005:47286-65-7:500:AMP:D2O:7.4
+bmse000005:47287-97-8:500:AMP:D2O:7.4
+bmse000005:53624-78-5:500:AMP:D2O:7.4
+bmse000005:61-19-8:500:AMP:D2O:7.4
+bmse000005:67583-85-1:500:AMP:D2O:7.4
+bmse000006:10168-83-9:500:ATP:D2O:7.4
+bmse000006:16488-07-6:500:ATP:D2O:7.4
+bmse000006:51569-41-6:500:ATP:D2O:7.4
+bmse000006:56-65-5:500:ATP:D2O:7.4
+bmse000006:71800-44-7:500:ATP:D2O:7.4
+bmse000006:84412-18-0:500:ATP:D2O:7.4
+bmse000008:2595-97-3:500:D-allose:D2O:7.4
+bmse000010:53188-23-1:500:D-fructose:D2O:7.4
+bmse000011:125740-83-2:400:beta-D-Fructose 1,6-bisphosphate:D2O:7.4
+bmse000011:15499-52-2:400:beta-D-Fructose 1,6-bisphosphate:D2O:7.4
+bmse000011:23558-08-9:400:beta-D-Fructose 1,6-bisphosphate:D2O:7.4
+bmse000011:23784-19-2:400:beta-D-Fructose 1,6-bisphosphate:D2O:7.4
+bmse000011:26177-85-5:400:beta-D-Fructose 1,6-bisphosphate:D2O:7.4
+bmse000011:34378-77-3:400:beta-D-Fructose 1,6-bisphosphate:D2O:7.4
+bmse000011:38099-82-0:400:beta-D-Fructose 1,6-bisphosphate:D2O:7.4
+bmse000011:4004-40-4:400:beta-D-Fructose 1,6-bisphosphate:D2O:7.4
+bmse000011:488-69-7:400:beta-D-Fructose 1,6-bisphosphate:D2O:7.4
+bmse000011:6035-52-5:400:beta-D-Fructose 1,6-bisphosphate:D2O:7.4
+bmse000011:6055-82-9:400:beta-D-Fructose 1,6-bisphosphate:D2O:7.4
+bmse000011:77-82-7:400:beta-D-Fructose 1,6-bisphosphate:D2O:7.4
+bmse000012:643-13-0:500:D-Fructose 6-phosphate:D2O:7.4
+bmse000013:59-23-4:500:D-galactose:D2O:7.4
+bmse000015:492-62-6:500:D-Glucose:D2O:7.4
+bmse000017:69-79-4:500:Maltose:D2O:7.4
+bmse000017:73824-72-3:500:Maltose:D2O:7.4
+bmse000017:77072-48-1:500:Maltose:D2O:7.4
+bmse000018:147-74-0:500:D-mannose:D2O:7.4
+bmse000018:3458-28-4:500:D-mannose:D2O:7.4
+bmse000019:348-66-3:500:D-Ornithine:D2O:7.4
+bmse000020:551-68-8:500:D-psicose:D2O:7.4
+bmse000022:3615-56-3:500:D-sorbose:D2O:7.4
+bmse000023:87-81-0:500:D_tagatose:D2O:7.4
+bmse000025:6061-97-8:400:(1R,2S)-1-Hydroxypropane-1,2,3-tricarboxylate:D2O:7.4
+bmse000026:133-56-2:500:D-Xylose:D2O:7.4
+bmse000026:141492-19-5:500:D-Xylose:D2O:7.4
+bmse000026:58-86-6:500:D-Xylose:D2O:7.4
+bmse000027:551-84-8:400:D-Xylulose:D2O:7.4
+bmse000028:115967-49-2:400:L-Alanine:D2O:7.4
+bmse000028:170805-71-7:400:L-Alanine:D2O:7.4
+bmse000028:56-41-7:400:L-Alanine:D2O:7.4
+bmse000028:6898-94-8:400:L-Alanine:D2O:7.4
+bmse000029:142-49-4:500:L-Arginine:D2O:7.4
+bmse000029:7004-12-8:500:L-Arginine:D2O:7.4
+bmse000029:74-79-3:500:L-Arginine:D2O:7.4
+bmse000030:32640-57-6:500:L-Asparagine:D2O:7.4
+bmse000030:328-41-6:500:L-Asparagine:D2O:7.4
+bmse000030:70-47-3:500:L-Asparagine:D2O:7.4
+bmse000030:7006-34-0:500:L-Asparagine:D2O:7.4
+bmse000031:1115-63-5:400:L-Aspartate:D2O:7.4
+bmse000031:14007-45-5:400:L-Aspartate:D2O:7.4
+bmse000031:17090-93-6:400:L-Aspartate:D2O:7.4
+bmse000031:181119-33-5:400:L-Aspartate:D2O:7.4
+bmse000031:2001-89-0:400:L-Aspartate:D2O:7.4
+bmse000031:2068-80-6:400:L-Aspartate:D2O:7.4
+bmse000031:21059-46-1:400:L-Aspartate:D2O:7.4
+bmse000031:3792-50-5:400:L-Aspartate:D2O:7.4
+bmse000031:39162-75-9:400:L-Aspartate:D2O:7.4
+bmse000031:5598-53-8:400:L-Aspartate:D2O:7.4
+bmse000031:56-84-8:400:L-Aspartate:D2O:7.4
+bmse000031:6899-03-2:400:L-Aspartate:D2O:7.4
+bmse000032:372-75-8:500:L-Citrulline:D2O:7.4
+bmse000033:56-88-2:400:L-Cystathionine:D2O:7.4
+bmse000034:4371-52-2:500:L-Cysteine:D2O:7.4
+bmse000034:52-90-4:500:L-Cysteine:D2O:7.4
+bmse000034:7048-04-6:500:L-Cysteine:D2O:7.4
+bmse000035:349-46-2:500:L-Cystine:D2O:12.19
+bmse000036:2438-80-4:400:6-Deoxy-L-galactose:D2O:7.4
+bmse000037:10549-13-0:500:L-glutamic acid:D2O:7.4
+bmse000037:138-15-8:500:L-glutamic acid:D2O:7.4
+bmse000037:138-16-9:500:L-glutamic acid:D2O:7.4
+bmse000037:16690-92-9:500:L-glutamic acid:D2O:7.4
+bmse000037:19238-49-4:500:L-glutamic acid:D2O:7.4
+bmse000037:19473-49-5:500:L-glutamic acid:D2O:7.4
+bmse000037:24595-14-0:500:L-glutamic acid:D2O:7.4
+bmse000037:55695-80-2:500:L-glutamic acid:D2O:7.4
+bmse000037:56-86-0:500:L-glutamic acid:D2O:7.4
+bmse000037:6899-05-4:500:L-glutamic acid:D2O:7.4
+bmse000037:7558-63-6:500:L-glutamic acid:D2O:7.4
+bmse000038:32640-56-5:400:Glutamine:D2O:7.4
+bmse000038:56-85-9:400:Glutamine:D2O:7.4
+bmse000039:150-35-6:500:L-Histidine:D2O:7.4
+bmse000039:155304-24-8:500:L-Histidine:D2O:7.4
+bmse000039:35479-49-3:500:L-Histidine:D2O:7.4
+bmse000039:35558-59-9:500:L-Histidine:D2O:7.4
+bmse000039:45955-20-2:500:L-Histidine:D2O:7.4
+bmse000039:54166-13-1:500:L-Histidine:D2O:7.4
+bmse000039:7006-35-1:500:L-Histidine:D2O:7.4
+bmse000039:71-00-1:500:L-Histidine:D2O:7.4
+bmse000040:498-19-1:400:L-Homoserine:D2O:7.4
+bmse000040:672-15-1:400:L-Homoserine:D2O:7.4
+bmse000041:7004-09-3:500:L-Isoleucine:D2O:7.4
+bmse000041:73-32-5:500:L-Isoleucine:D2O:7.4
+bmse000042:61-90-5:500:L- Leucine:D2O:7.4
+bmse000042:7005-03-0:500:L- Leucine:D2O:7.4
+bmse000043:280114-50-3:500:L-Lysine:D2O:7.4
+bmse000043:48050-57-3:500:L-Lysine:D2O:7.4
+bmse000043:56-87-1:500:L-Lysine:D2O:7.4
+bmse000043:57282-49-2:500:L-Lysine:D2O:7.4
+bmse000043:657-27-2:500:L-Lysine:D2O:7.4
+bmse000043:6899-06-5:500:L-Lysine:D2O:7.4
+bmse000044:24425-78-3:500:L-Methionine:D2O:7.4
+bmse000044:63-68-3:500:L-Methionine:D2O:7.4
+bmse000044:7005-18-7:500:L-Methionine:D2O:7.4
+bmse000045:10549-09-4:500:L-Phenylalanine:D2O:7.4
+bmse000045:3617-44-5:500:L-Phenylalanine:D2O:7.4
+bmse000045:5297-02-9:500:L-Phenylalanine:D2O:7.4
+bmse000045:63-91-2:500:L-Phenylalanine:D2O:7.4
+bmse000045:673-06-3:500:L-Phenylalanine:D2O:7.4
+bmse000045:67675-33-6:500:L-Phenylalanine:D2O:7.4
+bmse000046:41308-42-3:500:DL-Malic Acid:D2O:7.4
+bmse000046:617-48-1:500:DL-Malic Acid:D2O:7.4
+bmse000046:676-46-0:500:DL-Malic Acid:D2O:7.4
+bmse000046:6915-15-7:500:DL-Malic Acid:D2O:7.4
+bmse000047:147-85-3:500:L-Proline:D2O:7.4
+bmse000047:7005-20-1:500:L-Proline:D2O:7.4
+bmse000048:56-45-1:500:L-Serine:D2O:7.4
+bmse000048:6898-95-9:500:L-Serine:D2O:7.4
+bmse000049:13095-55-1:500:L-Threonine:D2O:7.4
+bmse000049:36676-50-3:500:L-Threonine:D2O:7.4
+bmse000049:72-19-5:500:L-Threonine:D2O:7.4
+bmse000050:6912-86-3:500:L-Tryptophan:D2O:7.4
+bmse000050:73-22-3:500:L-Tryptophan:D2O:7.4
+bmse000050:80206-30-0:500:L-Tryptophan:D2O:7.4
+bmse000051:140-43-2:500:L-Tyrosine:D2O:11.15
+bmse000051:1991-85-1:500:L-Tyrosine:D2O:11.15
+bmse000051:46209-14-7:500:L-Tyrosine:D2O:11.15
+bmse000051:55520-40-6:500:L-Tyrosine:D2O:11.15
+bmse000051:60-18-4:500:L-Tyrosine:D2O:11.15
+bmse000052:16872-32-5:500:L-Valine:D2O:7.4
+bmse000052:7004-03-7:500:L-Valine:D2O:7.4
+bmse000052:72-18-4:500:L-Valine:D2O:7.4
+bmse000053:159929-29-0:500:NAD:D2O:7.4
+bmse000053:30429-30-2:500:NAD:D2O:7.4
+bmse000053:53-84-9:500:NAD:D2O:7.4
+bmse000055:22046-90-8:500:NADPH:D2O:8.07
+bmse000055:3545-01-5:500:NADPH:D2O:8.07
+bmse000055:53-57-6:500:NADPH:D2O:8.07
+bmse000056:3615-17-6:400:N-Acetyl-D-mannosamine:D2O:7.4
+bmse000057:131-48-6:400:N-Acetylneuraminate:D2O:7.4
+bmse000058:1492-23-5:400:O-Succinyl-L-homoserine:D2O:7.4
+bmse000059:23095-97-8:400:S-Adenosyl-L-methionine:D2O:7.4
+bmse000059:2613-02-7:400:S-Adenosyl-L-methionine:D2O:7.4
+bmse000059:28378-99-6:400:S-Adenosyl-L-methionine:D2O:7.4
+bmse000059:29908-03-0:400:S-Adenosyl-L-methionine:D2O:7.4
+bmse000059:5134-37-2:400:S-Adenosyl-L-methionine:D2O:7.4
+bmse000059:86522-35-2:400:S-Adenosyl-L-methionine:D2O:7.4
+bmse000059:86866-89-9:400:S-Adenosyl-L-methionine:D2O:7.4
+bmse000060:22051-90-7:500:adenine:D2O:11.6
+bmse000060:42911-33-1:500:adenine:D2O:11.6
+bmse000060:42911-34-2:500:adenine:D2O:11.6
+bmse000060:520-75-2:500:adenine:D2O:11.6
+bmse000060:73-24-5:500:adenine:D2O:11.6
+bmse000061:46946-45-6:500:adenosine:D2O:7.4
+bmse000061:46969-16-8:500:adenosine:D2O:7.4
+bmse000061:58-61-7:500:adenosine:D2O:7.4
+bmse000062:28296-13-1:500:adonitol:D2O:7.4
+bmse000062:488-81-3:500:adonitol:D2O:7.4
+bmse000062:84709-28-4:500:adonitol:D2O:7.4
+bmse000063:306-60-5:500:agmatine:D2O:7.4
+bmse000064:15303-07-8:400:2-Oxoglutarate:D2O:7.4
+bmse000064:17091-15-5:400:2-Oxoglutarate:D2O:7.4
+bmse000064:22202-68-2:400:2-Oxoglutarate:D2O:7.4
+bmse000064:27175-99-1:400:2-Oxoglutarate:D2O:7.4
+bmse000064:305-72-6:400:2-Oxoglutarate:D2O:7.4
+bmse000064:328-50-7:400:2-Oxoglutarate:D2O:7.4
+bmse000064:86248-59-1:400:2-Oxoglutarate:D2O:7.4
+bmse000064:997-43-3:400:2-Oxoglutarate:D2O:7.4
+bmse000065:14641-93-1:500:Lactose:D2O:7.4
+bmse000066:150-13-0:500:4_aminobenzoic_acid:D2O:7.4
+bmse000066:8014-65-1:500:4_aminobenzoic_acid:D2O:7.4
+bmse000067:118-92-3:500:anthranilic acid:D2O:7.4
+bmse000067:14342-65-5:500:anthranilic acid:D2O:7.4
+bmse000067:2099-63-0:500:anthranilic acid:D2O:7.4
+bmse000067:552-37-4:500:anthranilic acid:D2O:7.4
+bmse000067:60613-06-1:500:anthranilic acid:D2O:7.4
+bmse000067:7058-55-1:500:anthranilic acid:D2O:7.4
+bmse000067:7459-95-2:500:anthranilic acid:D2O:7.4
+bmse000067:80206-34-4:500:anthranilic acid:D2O:7.4
+bmse000068:7643-75-6:500:L-arabitol:D2O:7.4
+bmse000069:107-43-7:500:betaine:D2O:7.4
+bmse000069:11042-12-9:500:betaine:D2O:7.4
+bmse000069:24980-93-6:500:betaine:D2O:7.4
+bmse000069:45631-77-4:500:betaine:D2O:7.4
+bmse000069:590-30-7:500:betaine:D2O:7.4
+bmse000069:590-46-5:500:betaine:D2O:7.4
+bmse000070:7418-61-3:400:Betaine aldehyde:D2O:7.4
+bmse000071:11002-78-1:400:3',5'-Cyclic AMP:D2O:7.4
+bmse000071:37839-81-9:400:3',5'-Cyclic AMP:D2O:7.4
+bmse000071:60-92-4:400:3',5'-Cyclic AMP:D2O:7.4
+bmse000072:462-94-2:500:Cadaverine :D2O:7.4
+bmse000073:543-38-4:400:Canavanine:D2O:7.4
+bmse000074:461-06-3:500:D-Carnitine:D2O:7.4
+bmse000075:617-12-9:400:Chorismate:D2O:7.4
+bmse000076:12262-73-6:500:Citrate:D2O:7.4
+bmse000076:245654-34-6:500:Citrate:D2O:7.4
+bmse000076:43136-35-2:500:Citrate:D2O:7.4
+bmse000076:77-92-9:500:Citrate:D2O:7.4
+bmse000077:91-64-5:400:Coumarine:CDCl3:n/a
+bmse000078:57-00-1:500:Creatine:D2O:7.4
+bmse000079:67-07-2:400:Phosphocreatine:D2O:7.4
+bmse000079:922-32-7:400:Phosphocreatine:D2O:7.4
+bmse000080:3395-35-5:400:3,4-dehydro-d/l-proline:D2O:7.4
+bmse000083:110-17-8:400:Fumarate:D2O:7.4
+bmse000084:10101-21-0:400:D-Gluconic acid:D2O:7.4
+bmse000084:10361-31-6:400:D-Gluconic acid:D2O:7.4
+bmse000084:13005-35-1:400:D-Gluconic acid:D2O:7.4
+bmse000084:14906-97-9:400:D-Gluconic acid:D2O:7.4
+bmse000084:22830-45-1:400:D-Gluconic acid:D2O:7.4
+bmse000084:299-27-4:400:D-Gluconic acid:D2O:7.4
+bmse000084:35087-77-5:400:D-Gluconic acid:D2O:7.4
+bmse000084:35984-19-1:400:D-Gluconic acid:D2O:7.4
+bmse000084:3632-91-5:400:D-Gluconic acid:D2O:7.4
+bmse000084:526-95-4:400:D-Gluconic acid:D2O:7.4
+bmse000084:527-07-1:400:D-Gluconic acid:D2O:7.4
+bmse000084:60007-93-4:400:D-Gluconic acid:D2O:7.4
+bmse000084:60816-70-8:400:D-Gluconic acid:D2O:7.4
+bmse000084:6485-39-8:400:D-Gluconic acid:D2O:7.4
+bmse000084:82139-35-3:400:D-Gluconic acid:D2O:7.4
+bmse000086:27133-73-9:400:alpha-D-Glucose-1-phosphate:D2O:7.4
+bmse000086:28875-57-2:400:alpha-D-Glucose-1-phosphate:D2O:7.4
+bmse000086:29698-82-6:400:alpha-D-Glucose-1-phosphate:D2O:7.4
+bmse000086:3616-38-4:400:alpha-D-Glucose-1-phosphate:D2O:7.4
+bmse000086:50319-10-3:400:alpha-D-Glucose-1-phosphate:D2O:7.4
+bmse000086:56401-20-8:400:alpha-D-Glucose-1-phosphate:D2O:7.4
+bmse000086:59-56-3:400:alpha-D-Glucose-1-phosphate:D2O:7.4
+bmse000086:6736-77-2:400:alpha-D-Glucose-1-phosphate:D2O:7.4
+bmse000086:68901-12-2:400:alpha-D-Glucose-1-phosphate:D2O:7.4
+bmse000086:6997-09-7:400:alpha-D-Glucose-1-phosphate:D2O:7.4
+bmse000086:7279-37-0:400:alpha-D-Glucose-1-phosphate:D2O:7.4
+bmse000087:10139-18-1:400:D-Glucose 1,6-bisphosphate:D2O:7.4
+bmse000087:28472-37-9:400:D-Glucose 1,6-bisphosphate:D2O:7.4
+bmse000087:29315-85-3:400:D-Glucose 1,6-bisphosphate:D2O:7.4
+bmse000089:15743-44-9:500:Glycine:D2O:7.4
+bmse000089:17829-66-2:500:Glycine:D2O:7.4
+bmse000089:29728-27-6:500:Glycine:D2O:7.4
+bmse000089:32817-15-5:500:Glycine:D2O:7.4
+bmse000089:33242-26-1:500:Glycine:D2O:7.4
+bmse000089:35947-07-0:500:Glycine:D2O:7.4
+bmse000089:513-29-1:500:Glycine:D2O:7.4
+bmse000089:52955-63-2:500:Glycine:D2O:7.4
+bmse000089:56-40-6:500:Glycine:D2O:7.4
+bmse000089:57678-19-0:500:Glycine:D2O:7.4
+bmse000089:6000-43-7:500:Glycine:D2O:7.4
+bmse000089:6000-44-8:500:Glycine:D2O:7.4
+bmse000089:63183-41-5:500:Glycine:D2O:7.4
+bmse000089:71295-98-2:500:Glycine:D2O:7.4
+bmse000089:7490-95-1:500:Glycine:D2O:7.4
+bmse000089:87867-94-5:500:Glycine:D2O:7.4
+bmse000090:11006-44-3:400:Guanine:D2O:12.0
+bmse000090:15986-36-4:400:Guanine:D2O:12.0
+bmse000090:37432-34-1:400:Guanine:D2O:12.0
+bmse000090:492-33-1:400:Guanine:D2O:12.0
+bmse000090:54435-87-9:400:Guanine:D2O:12.0
+bmse000090:69257-39-2:400:Guanine:D2O:12.0
+bmse000090:73-40-5:400:Guanine:D2O:12.0
+bmse000090:8039-79-0:400:Guanine:D2O:12.0
+bmse000091:118-00-3:500:Guanosine:D2O:11.36
+bmse000091:484-80-0:500:Guanosine:D2O:11.36
+bmse000091:85-30-3:500:Guanosine:D2O:11.36
+bmse000092:114-63-6:400:4-Hydroxybenzoate:D2O:7.4
+bmse000092:16782-08-4:400:4-Hydroxybenzoate:D2O:7.4
+bmse000092:99-96-7:400:4-Hydroxybenzoate:D2O:7.4
+bmse000093:588-30-7:400:trans-3-Hydroxycinnamate:D2O:7.4
+bmse000094:184856-40-4:400:Hypoxanthine:D2O:10.5
+bmse000094:25991-07-5:400:Hypoxanthine:D2O:10.5
+bmse000094:25991-08-6:400:Hypoxanthine:D2O:10.5
+bmse000094:25991-09-7:400:Hypoxanthine:D2O:10.5
+bmse000094:39464-15-8:400:Hypoxanthine:D2O:10.5
+bmse000094:39464-17-0:400:Hypoxanthine:D2O:10.5
+bmse000094:480-99-9:400:Hypoxanthine:D2O:10.5
+bmse000094:6535-89-3:400:Hypoxanthine:D2O:10.5
+bmse000094:68-94-0:400:Hypoxanthine:D2O:10.5
+bmse000095:10030-58-7:400:Erythritol:D2O:7.4
+bmse000095:149-32-6:400:Erythritol:D2O:7.4
+bmse000095:188346-77-2:400:Erythritol:D2O:7.4
+bmse000096:116421-26-2:400:Imidazole:D2O:7.4
+bmse000096:146117-15-9:400:Imidazole:D2O:7.4
+bmse000096:1467-16-9:400:Imidazole:D2O:7.4
+bmse000096:288-32-4:400:Imidazole:D2O:7.4
+bmse000096:5587-42-8:400:Imidazole:D2O:7.4
+bmse000097:120-72-9:400:Indole:CDCl3:n/a
+bmse000098:12712-98-0:400:Inosine:D2O:7.4
+bmse000098:132953-54-9:400:Inosine:D2O:7.4
+bmse000098:28861-88-3:400:Inosine:D2O:7.4
+bmse000098:4181-51-5:400:Inosine:D2O:7.4
+bmse000098:58-63-9:400:Inosine:D2O:7.4
+bmse000099:123897-58-5:400:Mannitol:D2O:7.4
+bmse000099:69-65-8:400:Mannitol:D2O:7.4
+bmse000099:75398-80-0:400:Mannitol:D2O:7.4
+bmse000099:85085-15-0:400:Mannitol:D2O:7.4
+bmse000100:10030-58-7:400:Erythritol:D2O:7.4
+bmse000100:149-32-6:400:Erythritol:D2O:7.4
+bmse000100:188346-77-2:400:Erythritol:D2O:7.4
+bmse000101:3715-29-5:400:3-Methyl-2-oxobutanoic acid:D2O:7.4
+bmse000101:51828-94-5:400:3-Methyl-2-oxobutanoic acid:D2O:7.4
+bmse000101:759-05-7:400:3-Methyl-2-oxobutanoic acid:D2O:7.4
+bmse000102:488-55-1:400:muco-Inositol:D2O:7.4
+bmse000103:53319-35-0:500:Myo-Inositol:D2O:7.4
+bmse000103:87-89-8:500:Myo-Inositol:D2O:7.4
+bmse000104:10361-13-4:400:Nicotinate:D2O:7.4
+bmse000104:123574-58-3:400:Nicotinate:D2O:7.4
+bmse000104:16518-17-5:400:Nicotinate:D2O:7.4
+bmse000104:1976-28-9:400:Nicotinate:D2O:7.4
+bmse000104:28029-53-0:400:Nicotinate:D2O:7.4
+bmse000104:28029-54-1:400:Nicotinate:D2O:7.4
+bmse000104:36321-41-2:400:Nicotinate:D2O:7.4
+bmse000104:3789-96-6:400:Nicotinate:D2O:7.4
+bmse000104:53890-72-5:400:Nicotinate:D2O:7.4
+bmse000104:54-86-4:400:Nicotinate:D2O:7.4
+bmse000104:59-67-6:400:Nicotinate:D2O:7.4
+bmse000104:636-79-3:400:Nicotinate:D2O:7.4
+bmse000104:7069-06-9:400:Nicotinate:D2O:7.4
+bmse000104:823-77-8:400:Nicotinate:D2O:7.4
+bmse000104:99148-57-9:400:Nicotinate:D2O:7.4
+bmse000105:94292-33-8:400:Nicotine:D2O:7.4
+bmse000106:144-62-7:400:Oxalate:D2O:7.4
+bmse000106:216451-38-6:400:Oxalate:D2O:7.4
+bmse000106:63504-28-9:400:Oxalate:D2O:7.4
+bmse000106:97993-78-7:400:Oxalate:D2O:7.4
+bmse000107:73-89-2:400:Phosphoenolpyruvate:D2O:7.4
+bmse000108:126-49-8:400:Prephenate:D2O:7.4
+bmse000109:110-60-1:500:Putrescine:D2O:7.4
+bmse000110:66-72-8:400:Pyridoxal:D2O:7.4
+bmse000111:52064-48-9:400:Pyridoxal phosphate:D2O:7.4
+bmse000111:52441-27-7:400:Pyridoxal phosphate:D2O:7.4
+bmse000111:54-47-7:400:Pyridoxal phosphate:D2O:7.4
+bmse000112:1892-67-7:500:Pyruvate:D2O:7.4
+bmse000112:127-17-3:500:Pyruvate:D2O:7.4
+bmse000113:488-59-5:400:scyllo-Inositol:D2O:7.4
+bmse000114:138-59-0:400:Shikimate:D2O:7.4
+bmse000115:15060-73-8:500:D-Sorbitol:D2O:7.4
+bmse000115:36134-87-9:500:D-Sorbitol:D2O:7.4
+bmse000115:3959-53-3:500:D-Sorbitol:D2O:7.4
+bmse000115:50-70-4:500:D-Sorbitol:D2O:7.4
+bmse000115:63800-20-4:500:D-Sorbitol:D2O:7.4
+bmse000115:75398-79-7:500:D-Sorbitol:D2O:7.4
+bmse000115:8013-15-8:500:D-Sorbitol:D2O:7.4
+bmse000115:8014-89-9:500:D-Sorbitol:D2O:7.4
+bmse000115:8036-93-9:500:D-Sorbitol:D2O:7.4
+bmse000115:8042-39-5:500:D-Sorbitol:D2O:7.4
+bmse000115:8045-74-7:500:D-Sorbitol:D2O:7.4
+bmse000115:8046-05-7:500:D-Sorbitol:D2O:7.4
+bmse000115:98201-93-5:500:D-Sorbitol:D2O:7.4
+bmse000116:124-20-9:500:Spermidine:D2O:7.4
+bmse000117:115-04-8:400:Spermine:D2O:10.8
+bmse000117:71-44-3:400:Spermine:D2O:10.8
+bmse000118:110-15-6:400:succinic acid:D2O:7.4
+bmse000119:100405-08-1:500:Sucrose:D2O:7.4
+bmse000119:104242-10-6:500:Sucrose:D2O:7.4
+bmse000119:131932-12-2:500:Sucrose:D2O:7.4
+bmse000119:146054-35-5:500:Sucrose:D2O:7.4
+bmse000119:146187-04-4:500:Sucrose:D2O:7.4
+bmse000119:151756-02-4:500:Sucrose:D2O:7.4
+bmse000119:220376-22-7:500:Sucrose:D2O:7.4
+bmse000119:29253-78-9:500:Sucrose:D2O:7.4
+bmse000119:29764-06-5:500:Sucrose:D2O:7.4
+bmse000119:30027-72-6:500:Sucrose:D2O:7.4
+bmse000119:47167-52-2:500:Sucrose:D2O:7.4
+bmse000119:47185-09-1:500:Sucrose:D2O:7.4
+bmse000119:47257-91-0:500:Sucrose:D2O:7.4
+bmse000119:50857-68-6:500:Sucrose:D2O:7.4
+bmse000119:51909-69-4:500:Sucrose:D2O:7.4
+bmse000119:57-50-1:500:Sucrose:D2O:7.4
+bmse000119:64533-66-0:500:Sucrose:D2O:7.4
+bmse000119:65545-99-5:500:Sucrose:D2O:7.4
+bmse000119:75398-84-4:500:Sucrose:D2O:7.4
+bmse000119:76056-38-7:500:Sucrose:D2O:7.4
+bmse000119:78654-77-0:500:Sucrose:D2O:7.4
+bmse000119:80165-03-3:500:Sucrose:D2O:7.4
+bmse000119:8027-47-:500:Sucrose:D2O:7.4
+bmse000120:107-35-7:500:Taurine:D2O:7.4
+bmse000120:91105-79-2:500:Taurine:D2O:7.4
+bmse000121:2319-57-5:400:l-(-) threitol:D2O:7.4
+bmse000123:138-46-5:500:4-Hydroxyproline:D2O:7.4
+bmse000123:17210-41-2:500:4-Hydroxyproline:D2O:7.4
+bmse000123:21105-75-9:500:4-Hydroxyproline:D2O:7.4
+bmse000123:24784-87-0:500:4-Hydroxyproline:D2O:7.4
+bmse000123:51-35-4:500:4-Hydroxyproline:D2O:7.4
+bmse000123:54733-36-7:500:4-Hydroxyproline:D2O:7.4
+bmse000124:140-10-3:400:trans-Cinnamate:D2O:7.4
+bmse000125:99-20-7:500:D-Trehalose:D2O:7.4
+bmse000126:13154-20-6:400:Urate:D2O:12.0
+bmse000126:33278-42-1:400:Urate:D2O:12.0
+bmse000126:34318-07-5:400:Urate:D2O:12.0
+bmse000126:42911-25-1:400:Urate:D2O:12.0
+bmse000126:42911-27-3:400:Urate:D2O:12.0
+bmse000126:42911-28-4:400:Urate:D2O:12.0
+bmse000126:530-13-2:400:Urate:D2O:12.0
+bmse000126:69-93-2:400:Urate:D2O:12.0
+bmse000127:16819-86-6:400:Xanthine:D2O:10.5
+bmse000127:28522-58-9:400:Xanthine:D2O:10.5
+bmse000127:33669-67-9:400:Xanthine:D2O:10.5
+bmse000127:42911-15-9:400:Xanthine:D2O:10.5
+bmse000127:6050-36-8:400:Xanthine:D2O:10.5
+bmse000127:6053-41-4:400:Xanthine:D2O:10.5
+bmse000127:69-89-6:400:Xanthine:D2O:10.5
+bmse000128:146-80-5:400:Xanthosine:D2O:10.5
+bmse000129:12426-00-5:400:Xylitol:D2O:7.4
+bmse000129:37191-59-6:400:Xylitol:D2O:7.4
+bmse000129:7313-55-5:400:Xylitol:D2O:7.4
+bmse000129:75398-81-1:400:Xylitol:D2O:7.4
+bmse000129:84709-42-2:400:Xylitol:D2O:7.4
+bmse000129:87-99-0:400:Xylitol:D2O:7.4
+bmse000130:85-87-0:400:Pyridoxamine:D2O:7.4
+bmse000131:529-96-4:400:Pyridoxamine phosphate:D2O:7.4
+bmse000131:951-83-7:400:Pyridoxamine phosphate:D2O:7.4
+bmse000132:306-08-1:400:Homovanillate:D2O:7.4
+bmse000133:55-22-1:400:Isonicotinic acid:D2O:7.4
+bmse000134:58-54-8:400:Ethacrynic acid:D2O:7.4
+bmse000134:6500-81-8:400:Ethacrynic acid:D2O:7.4
+bmse000135:108-80-5:400:Cyanuric acid:D2O:7.4
+bmse000135:134016-52-7:400:Cyanuric acid:D2O:7.4
+bmse000135:2624-17-1:400:Cyanuric acid:D2O:7.4
+bmse000135:3047-33-4:400:Cyanuric acid:D2O:7.4
+bmse000135:36452-21-8:400:Cyanuric acid:D2O:7.4
+bmse000135:40580-20-9:400:Cyanuric acid:D2O:7.4
+bmse000135:504-19-8:400:Cyanuric acid:D2O:7.4
+bmse000137:50976-31-3:400:Itaconate:D2O:7.4
+bmse000137:5363-69-9:400:Itaconate:D2O:7.4
+bmse000137:97-65-4:400:Itaconate:D2O:7.4
+bmse000138:23315-16-4:500:Cellobiose:D2O:7.4
+bmse000138:528-50-7:500:Cellobiose:D2O:7.4
+bmse000139:29883-15-6:400:Amygdalin:D2O:7.4
+bmse000140:528-16-5:400:D-Glucuronate:D2O:7.4
+bmse000141:2782-07-2:400:D-Galactono-1,4-lactone:D2O:7.4
+bmse000142:870-77-9:400:1-Propanaminium, 2-(acetoxy)-3-carboxy-N,N,N-trimethyl-, hydroxide, inner salt, (+-)- (9CI):D2O:7.4
+bmse000143:51867-83-5:400:N-(3-Amino-4-chlorophenyl)acetamide:D2O:7.4
+bmse000144:96-26-4:400:Glycerone:D2O:7.4
+bmse000145:2490-97-3:500:n-acetyl-L- glutamine:D2O:7.4
+bmse000145:30703-24-3:500:n-acetyl-L- glutamine:D2O:7.4
+bmse000145:7577-60-8:500:n-acetyl-L- glutamine:D2O:7.4
+bmse000146:26239-55-4:400:Carbamoylmethylaminodiacetic acid:D2O:7.4
+bmse000147:83-07-8:400:1,5-Dimethyl-2-phenyl-4-aminopyrazoline:D2O:7.4
+bmse000148:108-56-5:400:Diethyl oxalacetate:D2O:7.4
+bmse000150:7400-08-0:400:4-Coumarate:D2O:7.4
+bmse000151:2255-14-3:400:alpha-D-Galactose 1-phosphate:D2O:7.4
+bmse000152:535-83-1:400:N-Methylnicotinate:D2O:7.4
+bmse000152:60388-20-7:400:N-Methylnicotinate:D2O:7.4
+bmse000152:6138-41-6:400:N-Methylnicotinate:D2O:7.4
+bmse000153:34236-06-1:400:(1)-(3-Amino-3-carboxypropyl)dimethylsulphonium iodide:D2O:7.4
+bmse000154:2038-03-1:400:2-Morpholinoethylamine:D2O:7.4
+bmse000155:15231-31-9:500:Creatinine:D2O:7.4
+bmse000155:45514-66-7:500:Creatinine:D2O:7.4
+bmse000155:60-27-5:500:Creatinine:D2O:7.4
+bmse000155:82016-55-5:500:Creatinine:D2O:7.4
+bmse000156:51298-31-8:400:Trimethylacetyl phosphate:D2O:7.4
+bmse000156:5927-18-4:400:Trimethylacetyl phosphate:D2O:7.4
+bmse000157:97-69-8:400:2-Acetamidopropionic acid:D2O:7.4
+bmse000158:12693-39-9:500:Uridine:D2O:7.4
+bmse000158:58-96-8:500:Uridine:D2O:7.4
+bmse000158:68184-15-6:500:Uridine:D2O:7.4
+bmse000159:107-95-9:500:beta-alanine:D2O:7.4
+bmse000159:16690-93-0:500:beta-alanine:D2O:7.4
+bmse000159:36321-40-1:500:beta-alanine:D2O:7.4
+bmse000159:39748-53-3:500:beta-alanine:D2O:7.4
+bmse000159:87867-95-6:500:beta-alanine:D2O:7.4
+bmse000160:107-97-1:400:Sarcosine:D2O:7.4
+bmse000160:4316-73-8:400:Sarcosine:D2O:7.4
+bmse000160:637-96-7:400:Sarcosine:D2O:7.4
+bmse000161:300-85-6:500:3-Hydroxybutyrate:D2O:7.4
+bmse000161:625-71-8:500:3-Hydroxybutyrate:D2O:7.4
+bmse000162:70-26-8:400:L-Ornithine:D2O:7.4
+bmse000162:7006-33-9:400:L-Ornithine:D2O:7.4
+bmse000163:31281-59-1:400:N-Acetyl-alpha-D-glucosamine 1-phosphate:D2O:7.4
+bmse000166:526-91-0:400:D-Xylonate:D2O:7.4
+bmse000167:1336-18-1:400:(R,R)-Tartaric acid:D2O:7.4
+bmse000167:8014-54-8:400:(R,R)-Tartaric acid:D2O:7.4
+bmse000167:8059-77-6:400:(R,R)-Tartaric acid:D2O:7.4
+bmse000167:87-69-4:400:(R,R)-Tartaric acid:D2O:7.4
+bmse000168:66-23-9:400:Acetylcholine chloride:D2O:7.4
+bmse000168:51-84-3:400:Acetylcholine chloride:D2O:7.4
+bmse000169:3211-76-5:400:(S)-2-Amino-4-(methylseleno)butanoic acid:D2O:7.4
+bmse000170:10421-65-5:500:L(-)-Glutathione, oxidized:D2O:7.4
+bmse000170:121-24-4:500:L(-)-Glutathione, oxidized:D2O:7.4
+bmse000170:27025-41-8:500:L(-)-Glutathione, oxidized:D2O:7.4
+bmse000171:18108-22-0:400:(Aminophenylmethyl)phosphonic acid:D2O:7.4
+bmse000172:2922-83-0:400:L-Kynurenine:D2O:7.4
+bmse000173:501-94-0:400:4-Hydroxyphenylethanol:D2O:7.4
+bmse000174:4368-83-6:400:5-Acetamido-2-nitrobenzoic acid:D2O:7.4
+bmse000175:131-99-7:400:IMP:D2O:7.4
+bmse000175:138240-72-9:400:IMP:D2O:7.4
+bmse000175:485-83-6:400:IMP:D2O:7.4
+bmse000176:14068-53-2:400:1,3,4-THIADIAZOLE, 2-AMINO-5-ETHYL-:D2O:7.4
+bmse000177:2338-19-4:400:Indole-3-acetate:D2O:7.4
+bmse000177:54692-39-6:400:Indole-3-acetate:D2O:7.4
+bmse000177:6305-45-9:400:Indole-3-acetate:D2O:7.4
+bmse000177:87-51-4:400:Indole-3-acetate:D2O:7.4
+bmse000178:86-55-5:400:1-Naphthoic acid:D2O:7.4
+bmse000179:557-28-8:400:Propanoate:D2O:7.4
+bmse000179:79-09-4:400:Propanoate:D2O:7.4
+bmse000180:118511-36-7:400:Cytosine:D2O:7.4
+bmse000180:14987-28-1:400:Cytosine:D2O:7.4
+bmse000180:26661-23-4:400:Cytosine:D2O:7.4
+bmse000180:504-05-2:400:Cytosine:D2O:7.4
+bmse000180:66322-75-6:400:Cytosine:D2O:7.4
+bmse000180:71-30-7:400:Cytosine:D2O:7.4
+bmse000182:129940-97-2:400:Ascorbate:D2O:7.4
+bmse000182:134-03-2:400:Ascorbate:D2O:7.4
+bmse000182:14536-17-5:400:Ascorbate:D2O:7.4
+bmse000182:30208-61-8:400:Ascorbate:D2O:7.4
+bmse000182:50-81-7:400:Ascorbate:D2O:7.4
+bmse000182:50976-75-5:400:Ascorbate:D2O:7.4
+bmse000182:56172-55-5:400:Ascorbate:D2O:7.4
+bmse000182:56533-05-2:400:Ascorbate:D2O:7.4
+bmse000182:57304-74-2:400:Ascorbate:D2O:7.4
+bmse000182:57606-40-3:400:Ascorbate:D2O:7.4
+bmse000182:89924-69-6:400:Ascorbate:D2O:7.4
+bmse000183:110-15-6:500:Succinic acid:D2O:7.4
+bmse000184:29796-42-7:500:Glycerol:D2O:7.4
+bmse000184:30049-52-6:500:Glycerol:D2O:7.4
+bmse000184:37228-54-9:500:Glycerol:D2O:7.4
+bmse000184:56-81-5:500:Glycerol:D2O:7.4
+bmse000184:75398-78-6:500:Glycerol:D2O:7.4
+bmse000184:78630-16-7:500:Glycerol:D2O:7.4
+bmse000184:8013-25-0:500:Glycerol:D2O:7.4
+bmse000185:70-18-8:500:Glutathione reduced:D2O:7.4
+bmse000187:144104-68-7:500:Uracil:D2O:7.4
+bmse000187:42910-77-0:500:Uracil:D2O:7.4
+bmse000187:4433-21-0:500:Uracil:D2O:7.4
+bmse000187:4433-24-3:500:Uracil:D2O:7.4
+bmse000187:66-22-8:500:Uracil:D2O:7.4
+bmse000187:766-19-8:500:Uracil:D2O:7.4
+bmse000188:16426-39-4:400:Udp acetylglucosamine:D2O:7.4
+bmse000188:28508-02-3:400:Udp acetylglucosamine:D2O:7.4
+bmse000188:528-04-1:400:Udp acetylglucosamine:D2O:7.4
+bmse000188:5547-44-4:400:Udp acetylglucosamine:D2O:7.4
+bmse000188:83332-40-5:400:Udp acetylglucosamine:D2O:7.4
+bmse000189:3616-42-0:400:D-Glucosamine 6-phosphate:D2O:7.4
+bmse000190:4395-95-3:500:Cytidine:D2O:7.4
+bmse000190:65-46-3:500:Cytidine:D2O:7.4
+bmse000191:64-19-7:400:Acetate:D2O:7.4
+bmse000191:77671-22-8:400:Acetate:D2O:7.4
+bmse000193:57-03-4:400:sn-Glycerol 3-phosphate:D2O:7.4
+bmse000193:626-73-3:400:sn-Glycerol 3-phosphate:D2O:7.4
+bmse000193:927-20-8:400:sn-Glycerol 3-phosphate:D2O:7.4
+bmse000194:3054-36-2:400:1-ARGININE GLUTAMATE:D2O:7.4
+bmse000194:4320-30-3:400:1-ARGININE GLUTAMATE:D2O:7.4
+bmse000194:91250-27-0:400:1-ARGININE GLUTAMATE:D2O:7.4
+bmse000194:94601-78-2:400:1-ARGININE GLUTAMATE:D2O:7.4
+bmse000195:6205-08-9:400:N-Acetylornithine:D2O:7.4
+bmse000196:6082-04-8:400:Methyl-N-acetylglucosamine:D2O:7.4
+bmse000198:2464-13-3:400:6-Phospho-D-gluconate:D2O:7.4
+bmse000198:921-62-0:400:6-Phospho-D-gluconate:D2O:7.4
+bmse000199:498-23-7:400:2-Methylmaleate:D2O:7.4
+bmse000200:451-13-8:400:Homogentisate:D2O:7.4
+bmse000201:59-01-8:400:Kanamycin A:D2O:7.4
+bmse000202:7365-45-9:500:HEPES:D2O:7.4
+bmse000202:75277-39-3:500:HEPES:D2O:7.4
+bmse000203:141-53-7:400:Formate:D2O:7.4
+bmse000203:15843-02-4:400:Formate:D2O:7.4
+bmse000203:15907-03-6:400:Formate:D2O:7.4
+bmse000203:27115-36-2:400:Formate:D2O:7.4
+bmse000203:3349-06-2:400:Formate:D2O:7.4
+bmse000203:3495-35-0:400:Formate:D2O:7.4
+bmse000203:3495-36-1:400:Formate:D2O:7.4
+bmse000203:4464-23-7:400:Formate:D2O:7.4
+bmse000203:540-69-2:400:Formate:D2O:7.4
+bmse000203:544-17-2:400:Formate:D2O:7.4
+bmse000203:544-18-3:400:Formate:D2O:7.4
+bmse000203:544-19-4:400:Formate:D2O:7.4
+bmse000203:556-63-8:400:Formate:D2O:7.4
+bmse000203:557-39-1:400:Formate:D2O:7.4
+bmse000203:557-41-5:400:Formate:D2O:7.4
+bmse000203:590-29-4:400:Formate:D2O:7.4
+bmse000203:592-89-2:400:Formate:D2O:7.4
+bmse000203:63182-21-8:400:Formate:D2O:7.4
+bmse000203:64-18-6:400:Formate:D2O:7.4
+bmse000203:68134-59-8:400:Formate:D2O:7.4
+bmse000203:68310-83-8:400:Formate:D2O:7.4
+bmse000203:70179-79-2:400:Formate:D2O:7.4
+bmse000203:7056-83-9:400:Formate:D2O:7.4
+bmse000203:7360-53-4:400:Formate:D2O:7.4
+bmse000203:8006-93-7:400:Formate:D2O:7.4
+bmse000203:811-54-1:400:Formate:D2O:7.4
+bmse000204:4151-19-3:400:D-Ribose 5-phosphate:D2O:7.4
+bmse000204:4300-28-1:400:D-Ribose 5-phosphate:D2O:7.4
+bmse000205:102029-88-9:400:N-acetyl-D-glucosamine-6-phosphate:D2O:7.4
+bmse000206:58-08-2:400:Caffeine:D2O:7.4
+bmse000206:71701-02-5:400:Caffeine:D2O:7.4
+bmse000206:95789-13-2:400:Caffeine:D2O:7.4
+bmse000207:343-94-2:400:Tryptamine:D2O:7.4
+bmse000207:34685-69-3:400:Tryptamine:D2O:7.4
+bmse000207:61-54-1:400:Tryptamine:D2O:7.4
+bmse000208:26811-96-1:500:Lactic Acid:D2O:7.4
+bmse000209:13594-51-9:400:D-Citrulline:D2O:7.4
+bmse000210:2564-35-4:400:dGTP:D2O:7.4
+bmse000211:541-15-1:400:Levocarnitine:D2O:7.4
+bmse000211:7634-98-2:400:Levocarnitine:D2O:7.4
+bmse000212:110-16-7:400:Maleic acid:D2O:7.4
+bmse000216:25990-10-7:400:D-Galacturonate:D2O:7.4
+bmse000216:37331-21-8:400:D-Galacturonate:D2O:7.4
+bmse000216:9046-38-2:400:D-Galacturonate:D2O:7.4
+bmse000219:18970-62-2:400:Pyridine-2,3-dicarboxylate:D2O:7.4
+bmse000219:87314-99-6:400:Pyridine-2,3-dicarboxylate:D2O:7.4
+bmse000219:89-00-9:400:Pyridine-2,3-dicarboxylate:D2O:7.4
+bmse000220:103-82-2:400:Phenylacetic acid:D2O:7.4
+bmse000220:114-70-5:400:Phenylacetic acid:D2O:7.4
+bmse000220:13005-36-2:400:Phenylacetic acid:D2O:7.4
+bmse000220:52009-49-1:400:Phenylacetic acid:D2O:7.4
+bmse000220:7188-16-1:400:Phenylacetic acid:D2O:7.4
+bmse000221:512-69-6:400:Raffinose:D2O:7.4
+bmse000222:56-45-1:400:Serine:D2O:7.4
+bmse000222:6898-95-9:400:Serine:D2O:7.4
+bmse000223:100-02-7:400:4-Nitrophenol:D2O:7.4
+bmse000223:22098-38-0:400:4-Nitrophenol:D2O:7.4
+bmse000223:57936-22-8:400:4-Nitrophenol:D2O:7.4
+bmse000223:64047-79-6:400:4-Nitrophenol:D2O:7.4
+bmse000223:64047-80-9:400:4-Nitrophenol:D2O:7.4
+bmse000223:64047-81-0:400:4-Nitrophenol:D2O:7.4
+bmse000223:64047-82-1:400:4-Nitrophenol:D2O:7.4
+bmse000223:64047-83-2:400:4-Nitrophenol:D2O:7.4
+bmse000223:64070-86-6:400:4-Nitrophenol:D2O:7.4
+bmse000223:824-78-2:400:4-Nitrophenol:D2O:7.4
+bmse000224:20230-89-1:400:Trimethylamine:D2O:7.4
+bmse000224:2840-24-6:400:Trimethylamine:D2O:7.4
+bmse000224:4558-12-7:400:Trimethylamine:D2O:7.4
+bmse000224:593-81-7:400:Trimethylamine:D2O:7.4
+bmse000224:75-50-3:400:Trimethylamine:D2O:7.4
+bmse000225:367-47-5:400:Glyceraldehyde:D2O:7.4
+bmse000225:56-82-6:400:Glyceraldehyde:D2O:7.4
+bmse000226:146-14-5:400:FAD:D2O:7.4
+bmse000226:16426-55-4:400:FAD:D2O:7.4
+bmse000227:56846-45-8:400:Biotin:D2O:7.4
+bmse000228:25990-10-7:400:D-Galacturonate:D2O:7.4
+bmse000228:37331-21-8:400:D-Galacturonate:D2O:7.4
+bmse000228:9046-38-2:400:D-Galacturonate:D2O:7.4
+bmse000230:1335-57-5:400:D-Glucono-1,5-lactone:D2O:7.4
+bmse000230:4253-68-3:400:D-Glucono-1,5-lactone:D2O:7.4
+bmse000230:71033-49-3:400:D-Glucono-1,5-lactone:D2O:7.4
+bmse000230:90-80-2:400:D-Glucono-1,5-lactone:D2O:7.4
+bmse000231:134-61-2:400:N-Acetyl-D-glucosamine:D2O:7.4
+bmse000231:173382-53-1:400:N-Acetyl-D-glucosamine:D2O:7.4
+bmse000231:7132-76-5:400:N-Acetyl-D-glucosamine:D2O:7.4
+bmse000231:7512-17-6:400:N-Acetyl-D-glucosamine:D2O:7.4
+bmse000231:98632-70-3:400:N-Acetyl-D-glucosamine:D2O:7.4
+bmse000232:9005-79-2:400:Glycogen:D2O:7.4
+bmse000233:585-99-9:400:Melibiose:D2O:7.4
+bmse000235:1128-23-0:400:L-Gulono-1,4-lactone:D2O:7.4
+bmse000236:338-69-2:400:D-Alanine:D2O:7.4
+bmse000237:3105-95-1:400:L-Pipecolate:D2O:7.4
+bmse000238:97-67-6:400:(S)-Malate:D2O:7.4
+bmse000239:87-73-0:400:D-Glucarate:D2O:7.4
+bmse000240:10094-58-3:400:Stachyose:D2O:7.4
+bmse000240:470-55-3:400:Stachyose:D2O:7.4
+bmse000241:1118-68-9:400:N,N-Dimethylglycine:D2O:7.4
+bmse000241:17647-86-8:400:N,N-Dimethylglycine:D2O:7.4
+bmse000241:18319-88-5:400:N,N-Dimethylglycine:D2O:7.4
+bmse000241:2491-06-7:400:N,N-Dimethylglycine:D2O:7.4
+bmse000242:107-36-8:400:2-Hydroxyethanesulfonate:D2O:7.4
+bmse000242:1561-99-5:400:2-Hydroxyethanesulfonate:D2O:7.4
+bmse000242:1562-00-1:400:2-Hydroxyethanesulfonate:D2O:7.4
+bmse000242:51694-03-2:400:2-Hydroxyethanesulfonate:D2O:7.4
+bmse000242:57267-78-4:400:2-Hydroxyethanesulfonate:D2O:7.4
+bmse000243:51-67-2:500:Tyramine:D2O:7.4
+bmse000244:35902-13-7:400:Thymidine:D2O:7.4
+bmse000244:50-89-5:400:Thymidine:D2O:7.4
+bmse000245:1932-50-9:400:Glycolate:D2O:7.4
+bmse000245:25904-89-6:400:Glycolate:D2O:7.4
+bmse000245:2836-32-0:400:Glycolate:D2O:7.4
+bmse000245:35249-89-9:400:Glycolate:D2O:7.4
+bmse000245:39663-84-8:400:Glycolate:D2O:7.4
+bmse000245:79-14-1:400:Glycolate:D2O:7.4
+bmse000246:305-84-0:400:Carnosine:D2O:7.4
+bmse000246:7683-28-5:400:Carnosine:D2O:7.4
+bmse000247:3416-24-8:400:D-Glucosamine:D2O:7.4
+bmse000247:2351-15-7:400:D-Glucosamine:D2O:7.4
+bmse000247:58-87-7:400:D-Glucosamine:D2O:7.4
+bmse000247:58267-75-7:400:D-Glucosamine:D2O:7.4
+bmse000248:96-31-1:400:1,3-DIMETHYLUREA:D2O:7.4
+bmse000249:13031-60-2:400:GABA methyl ester:D2O:7.4
+bmse000249:3251-07-8:400:GABA methyl ester:D2O:7.4
+bmse000250:653-63-4:400:dAMP:D2O:7.4
+bmse000250:75688-15-2:400:dAMP:D2O:7.4
+bmse000250:87578-08-3:400:dAMP:D2O:7.4
+bmse000250:29576-96-3:400:dAMP:D2O:7.4
+bmse000250:2922-74-9:400:dAMP:D2O:7.4
+bmse000252:7681-06-3:400:Salicylate:D2O:7.4
+bmse000252:8052-31-1:400:Salicylate:D2O:7.4
+bmse000252:69-72-7:400:Salicylate:D2O:7.4
+bmse000253:2793-06-8:400:dADP:D2O:7.4
+bmse000254:15978-08-2:400:D-Fructose 1-phosphate:D2O:7.4
+bmse000255:132-06-9:400:ITP:D2O:7.4
+bmse000256:50-00-0:400:Formaldehyde:D2O:7.4
+bmse000256:8005-38-7:400:Formaldehyde:D2O:7.4
+bmse000256:112068-71-0:400:Formaldehyde:D2O:7.4
+bmse000256:8013-13-6:400:Formaldehyde:D2O:7.4
+bmse000256:8006-07-3:400:Formaldehyde:D2O:7.4
+bmse000257:22251-85-0:400:FMN:D2O:7.4
+bmse000257:146-17-8:400:FMN:D2O:7.4
+bmse000257:130-40-5:400:FMN:D2O:7.4
+bmse000257:6184-17-4:400:FMN:D2O:7.4
+bmse000258:141-46-8:400:Glycolaldehyde:D2O:7.4
+bmse000259:123-08-0:400:4-Hydroxybenzaldehyde:D2O:7.4
+bmse000260:1094-61-7:400:Nicotinamide D-ribonucleotide:D2O:7.4
+bmse000261:590-54-5:400:Acetyl phosphate:D2O:7.4
+bmse000262:156-39-8:400:3-(4-Hydroxyphenyl)pyruvate:D2O:7.4
+bmse000263:53-59-8:400:NADP+:D2O:7.4
+bmse000263:27678-67-7:400:NADP+:D2O:7.4
+bmse000263:10213-33-9:400:NADP+:D2O:7.4
+bmse000263:162195-92-8:400:NADP+:D2O:7.4
+bmse000263:25158-33-2:400:NADP+:D2O:7.4
+bmse000264:32348-90-6:400:4-Nitrophenyl phosphate:D2O:7.4
+bmse000264:4264-83-9:400:4-Nitrophenyl phosphate:D2O:7.4
+bmse000264:330-13-2:400:4-Nitrophenyl phosphate:D2O:7.4
+bmse000264:54306-27-3:400:4-Nitrophenyl phosphate:D2O:7.4
+bmse000264:32348-91-7:400:4-Nitrophenyl phosphate:D2O:7.4
+bmse000265:3316-09-4:400:4-Nitrocatechol:D2O:7.4
+bmse000266:58-98-0:400:UDP:D2O:7.4
+bmse000267:23296-41-5:400:Formamide:D2O:7.4
+bmse000267:75-12-7:400:Formamide:D2O:7.4
+bmse000269:10326-41-7:400:(R)-Lactate:D2O:7.4
+bmse000270:2577-83-5:400:GDP:D2O:7.4
+bmse000270:146-91-8:400:GDP:D2O:7.4
+bmse000271:4151-41-1:400:CoA:D2O:7.4
+bmse000271:16541-21-2:400:CoA:D2O:7.4
+bmse000271:85-61-0:400:CoA:D2O:7.4
+bmse000271:153-46-8:400:CoA:D2O:7.4
+bmse000272:63-38-7:400:CDP:D2O:7.4
+bmse000273:1783-96-6:400:D-Aspartate:D2O:7.4
+bmse000274:59-43-8:400:Thiamin:D2O:7.4
+bmse000275:79082-92-1:400:D-Fructose 2,6-bisphosphate:D2O:7.4
+bmse000276:9007-33-4:500:Ethanolamine:D2O:7.4
+bmse000276:141-43-5:500:Ethanolamine:D2O:7.4
+bmse000277:65-47-4:400:CTP:D2O:7.4
+bmse000278:4151-19-3:400:D-Ribulose 5-phosphate:D2O:7.4
+bmse000278:4300-28-1:400:D-Ribulose 5-phosphate:D2O:7.4
+bmse000279:104-98-3:400:Urocanate:D2O:7.4
+bmse000280:81795-92-8:400:UMP:D2O:7.4
+bmse000280:58-97-9:400:UMP:D2O:7.4
+bmse000280:53624-79-6:400:UMP:D2O:7.4
+bmse000281:37321-14-5:400:Nicotinamide:D2O:7.4
+bmse000281:123574-63-0:400:Nicotinamide:D2O:7.4
+bmse000281:78731-47-2:400:Nicotinamide:D2O:7.4
+bmse000281:98-92-0:400:Nicotinamide:D2O:7.4
+bmse000282:302-72-7:500:DL-alanine:D2O:7.4
+bmse000283:65-86-1:400:Orotate:D2O:7.4
+bmse000283:6784-70-9:400:Orotate:D2O:7.4
+bmse000284:100-47-0:400:Benzonitrile:D2O:7.4
+bmse000285:67-48-1:500:Choline:D2O:7.4
+bmse000285:62-49-7:500:Choline:D2O:7.4
+bmse000285:139741-81-4:500:Choline:D2O:7.4
+bmse000286:98-86-2:400:Acetophenone:D2O:7.4
+bmse000287:79-83-4:400:Pantothenate:D2O:7.4
+bmse000287:3563-85-7:400:Pantothenate:D2O:7.4
+bmse000288:65-23-6:400:Pyridoxine:D2O:7.4
+bmse000288:58-56-0:400:Pyridoxine:D2O:7.4
+bmse000289:979-92-0:400:S-Adenosyl-L-homocysteine:D2O:7.4
+bmse000289:75899-14-8:400:S-Adenosyl-L-homocysteine:D2O:7.4
+bmse000290:50356-25-7:400:Phenol:D2O:7.4
+bmse000290:8002-07-1:400:Phenol:D2O:7.4
+bmse000290:108-95-2:400:Phenol:D2O:7.4
+bmse000290:14534-23-7:400:Phenol:D2O:7.4
+bmse000290:139-02-6:400:Phenol:D2O:7.4
+bmse000291:1464-42-2:400:Selenomethionine:D2O:7.4
+bmse000291:2578-28-1:400:Selenomethionine:D2O:7.4
+bmse000292:2616-64-0:400:UDPglucuronate:D2O:7.4
+bmse000292:3545-73-1:400:UDPglucuronate:D2O:7.4
+bmse000292:5918-40-1:400:UDPglucuronate:D2O:7.4
+bmse000292:14520-48-0:400:UDPglucuronate:D2O:7.4
+bmse000292:30329-32-9:400:UDPglucuronate:D2O:7.4
+bmse000293:8027-02-9:400:Hydroquinone:D2O:7.4
+bmse000293:57534-13-1:400:Hydroquinone:D2O:7.4
+bmse000293:123-31-9:400:Hydroquinone:D2O:7.4
+bmse000294:67-56-1:400:Methanol:D2O:7.4
+bmse000294:54841-71-3:400:Methanol:D2O:7.4
+bmse000295:63-39-8:400:UTP:D2O:7.4
+bmse000296:365-07-1:400:dTMP:D2O:7.4
+bmse000297:8000-16-6:400:Ethanol:D2O:7.4
+bmse000297:64-17-5:400:Ethanol:D2O:7.4
+bmse000297:8024-45-1:400:Ethanol:D2O:7.4
+bmse000297:121182-78-3:400:Ethanol:D2O:7.4
+bmse000298:367-47-5:400:D-Glyceraldehyde:D2O:7.4
+bmse000298:453-17-8:400:D-Glyceraldehyde:D2O:7.4
+bmse000299:33609-88-0:400:Folate:D2O:7.4
+bmse000299:59-30-3:400:Folate:D2O:7.4
+bmse000299:6484-89-5:400:Folate:D2O:7.4
+bmse000299:36653-55-1:400:Folate:D2O:7.4
+bmse000300:8013-63-6:400:Benzoate:D2O:7.4
+bmse000300:65-85-0:400:Benzoate:D2O:7.4
+bmse000302:4254-16-4:500:1,2-Propanediol:D2O:7.4
+bmse000302:57-55-6:500:1,2-Propanediol:D2O:7.4
+bmse000302:63625-56-9:500:1,2-Propanediol:D2O:7.4
+bmse000302:58858-91-6:500:1,2-Propanediol:D2O:7.4
+bmse000302:190913-75-8:500:1,2-Propanediol:D2O:7.4
+bmse000302:4254-15-3:500:1,2-Propanediol:D2O:7.4
+bmse000303:504-63-2:500:1,3-Propanediol:D2O:7.4
+bmse000303:757125-93-2:500:1,3-Propanediol:D2O:7.4
+bmse000304:106-51-4:500:1,4-BENZOQUINONE:D2O:7.4
+bmse000304:19052-63-2:500:1,4-BENZOQUINONE:D2O:7.4
+bmse000304:3225-29-4:500:1,4-BENZOQUINONE:D2O:7.4
+bmse000304:51226-74-5:500:1,4-BENZOQUINONE:D2O:7.4
+bmse000304:54560-36-0:500:1,4-BENZOQUINONE:D2O:7.4
+bmse000305:1674-56-2:500:1-amino-2-propanol:D2O:7.4
+bmse000305:78-96-6:500:1-amino-2-propanol:D2O:7.4
+bmse000306:36413-60-2:500:Quinic acid:D2O:7.4
+bmse000306:77-95-2:500:Quinic acid:D2O:7.4
+bmse000307:1936-63-6:500:2-Amino-1-phenylethanol:D2O:7.4
+bmse000307:1477-64-1:500:2-Amino-1-phenylethanol:D2O:7.4
+bmse000307:7568-93-6:500:2-Amino-1-phenylethanol:D2O:7.4
+bmse000307:73-59-6:500:2-Amino-1-phenylethanol:D2O:7.4
+bmse000308:1071-23-4:500:2-Aminoethyl dihydrogen phosphate:D2O:7.4
+bmse000309:2041-14-7:500:2-aminoethylphosphonic acid:D2O:7.4
+bmse000310:51-19-4:500:2-Aminophenol:D2O:7.4
+bmse000310:95-55-6:500:2-Aminophenol:D2O:7.4
+bmse000311:30811-80-4:500:Cytidine-5'-monophosphate (batch compound from sigma):D2O:7.4
+bmse000311:63-37-6:500:Cytidine-5'-monophosphate (batch compound from sigma):D2O:7.4
+bmse000311:162756-87-8:500:Cytidine-5'-monophosphate (batch compound from sigma):D2O:7.4
+bmse000311:293738-08-6:500:Cytidine-5'-monophosphate (batch compound from sigma):D2O:7.4
+bmse000311:55679-92-0:500:Cytidine-5'-monophosphate (batch compound from sigma):D2O:7.4
+bmse000311:84-52-6:500:Cytidine-5'-monophosphate (batch compound from sigma):D2O:7.4
+bmse000312:1203-85-6:500:(+)-6-aminopenicillanic acid:D2O:7.4
+bmse000312:551-16-6:500:(+)-6-aminopenicillanic acid:D2O:7.4
+bmse000314:533-48-2:500:d-desthiobiotin:D2O:7.4
+bmse000315:138-52-3:500:D-(-)-Salicin:D2O:7.4
+bmse000315:30370-90-2:500:D-(-)-Salicin:D2O:7.4
+bmse000316:51028-73-0:500:(-)-Epinephrine:D2O:7.4
+bmse000316:51-43-4:500:(-)-Epinephrine:D2O:7.4
+bmse000317:77-06-5:500:Gibberellic acid:D2O:7.4
+bmse000317:16202-20-3:500:Gibberellic acid:D2O:7.4
+bmse000317:7121-55-3:500:Gibberellic acid:D2O:7.4
+bmse000317:1405-96-5:500:Gibberellic acid:D2O:7.4
+bmse000317:58915-44-9:500:Gibberellic acid:D2O:7.4
+bmse000317:125-67-7:500:Gibberellic acid:D2O:7.4
+bmse000318:530-59-6:500:sinapic acid:D2O:7.4
+bmse000318:7362-37-0:500:sinapic acid:D2O:7.4
+bmse000319:3715-31-9:500:(+-)-3-Methyl-2-oxopentanoic acid:D2O:7.4
+bmse000319:1460-34-0:500:(+-)-3-Methyl-2-oxopentanoic acid:D2O:7.4
+bmse000320:951-78-0:500:2'-Deoxyuridine:D2O:7.4
+bmse000321:548-93-6:500:3-Hydroxyanthranilic acid:D2O:7.4
+bmse000322:59-92-7:500:3,4-Dihydroxy-L-phenylalanine:D2O:7.4
+bmse000323:3992-42-5:500:2'-Deoxycytidine:D2O:7.4
+bmse000324:99-06-9:500:3-hydroxybenzoic acid:D2O:7.4
+bmse000325:600-18-0:500:2-ketobutyric acid:D2O:7.4
+bmse000326:490-79-9:500:2,5-DIHYDROXYBENZOIC ACID:D2O:7.4
+bmse000326:4955-90-2:500:2,5-DIHYDROXYBENZOIC ACID:D2O:7.4
+bmse000327:300-39-0:500:3,5-Diiodo-L-tyrosine:D2O:7.4
+bmse000327:66-02-4:500:3,5-Diiodo-L-tyrosine:D2O:7.4
+bmse000328:99-50-3:500:3,4-Dihydroxybenzoic acid:D2O:7.4
+bmse000329:102-32-9:500:3,4-Dihydroxyphenylacetic acid:D2O:7.4
+bmse000330:88-14-2:500:2-Furoic acid:D2O:7.4
+bmse000331:495-78-3:500:3-(2-Hydroxyphenyl)propionic acid:D2O:7.4
+bmse000332:7250-60-4:500:2-Chlorobenzoic acid:D2O:7.4
+bmse000332:118-91-2:500:2-Chlorobenzoic acid:D2O:7.4
+bmse000333:462-88-4:500:3-Ureidopropionic acid:D2O:7.4
+bmse000334:488-17-5:500:3-Methylcatechol:D2O:7.4
+bmse000335:503-49-1:500:3-Hydroxy-3-methylglutaric acid:D2O:7.4
+bmse000336:13673-92-2:500:3,5-dichlorocatechol:D2O:7.4
+bmse000337:70-78-0:500:3-Iodo-L-tyrosine:D2O:7.4
+bmse000338:54641-21-3:500:2-Hydroxyisocaproic acid:D2O:7.4
+bmse000338:10303-64-7:500:2-Hydroxyisocaproic acid:D2O:7.4
+bmse000338:26671-68-1:500:2-Hydroxyisocaproic acid:D2O:7.4
+bmse000338:498-36-2:500:2-Hydroxyisocaproic acid:D2O:7.4
+bmse000339:621-37-4:500:3-hydroxyphenylacetic acid:D2O:7.4
+bmse000340:28805-76-7:500:gamma-Aminobutyric acid:D2O:7.4
+bmse000340:56-12-2:500:gamma-Aminobutyric acid:D2O:7.4
+bmse000341:5006-66-6:500:6-Hydroxynicotinic acid:D2O:7.4
+bmse000341:4588-15-2:500:6-Hydroxynicotinic acid:D2O:7.4
+bmse000342:5988-19-2:500:L-Dihydroorotic acid:D2O:7.4
+bmse000343:52447-63-9:500:vanillin:D2O:7.4
+bmse000343:121-33-5:500:vanillin:D2O:7.4
+bmse000343:8014-42-4:500:vanillin:D2O:7.4
+bmse000344:463-00-3:500:4-Guanidinobutyric acid:D2O:7.4
+bmse000345:12124-87-7:500:Valeric acid:D2O:7.4
+bmse000345:109-52-4:500:Valeric acid:D2O:7.4
+bmse000345:556-38-7:500:Valeric acid:D2O:7.4
+bmse000345:42739-38-8:500:Valeric acid:D2O:7.4
+bmse000345:70268-41-6:500:Valeric acid:D2O:7.4
+bmse000345:6106-41-8:500:Valeric acid:D2O:7.4
+bmse000345:19455-21-1:500:Valeric acid:D2O:7.4
+bmse000346:16564-27-5:500:Barbituric acid:D2O:7.4
+bmse000346:32267-40-6:500:Barbituric acid:D2O:7.4
+bmse000346:160336-60-7:500:Barbituric acid:D2O:7.4
+bmse000346:154254-45-2:500:Barbituric acid:D2O:7.4
+bmse000346:1194-23-6:500:Barbituric acid:D2O:7.4
+bmse000346:51159-18-3:500:Barbituric acid:D2O:7.4
+bmse000346:117491-80-2:500:Barbituric acid:D2O:7.4
+bmse000346:158217-19-7:500:Barbituric acid:D2O:7.4
+bmse000346:20964-57-2:500:Barbituric acid:D2O:7.4
+bmse000346:223674-02-0:500:Barbituric acid:D2O:7.4
+bmse000346:42910-84-9:500:Barbituric acid:D2O:7.4
+bmse000346:118738-52-6:500:Barbituric acid:D2O:7.4
+bmse000346:63896-95-7:500:Barbituric acid:D2O:7.4
+bmse000346:4390-16-3:500:Barbituric acid:D2O:7.4
+bmse000346:53853-41-1:500:Barbituric acid:D2O:7.4
+bmse000346:67-52-7:500:Barbituric acid:D2O:7.4
+bmse000347:583-17-5:500:trans-2-Hydroxycinnamic acid:D2O:7.4
+bmse000347:614-60-8:500:trans-2-Hydroxycinnamic acid:D2O:7.4
+bmse000348:144-90-1:500:DL-3-aminoisobutyric acid:D2O:7.4
+bmse000348:10569-72-9:500:DL-3-aminoisobutyric acid:D2O:7.4
+bmse000349:84-21-9:500:Adenosine-3'-monophosphate:D2O:7.4
+bmse000350:108-39-4:500:m-Cresol:D2O:7.4
+bmse000351:70248-25-8:500:Hexanoic acid:D2O:7.4
+bmse000351:142-62-1:500:Hexanoic acid:D2O:7.4
+bmse000352:31571-69-4:500:DL-threo-beta-Methylaspartate:D2O:7.4
+bmse000352:6667-60-3:500:DL-threo-beta-Methylaspartate:D2O:7.4
+bmse000353:692-04-6:500:Nepsilon-Acetyl-L-lysine:D2O:7.4
+bmse000354:111-16-0:500:Pimelic acid:D2O:7.4
+bmse000355:8042-97-5:500:4-METHYL-5-THIAZOLEETHANOL:D2O:7.4
+bmse000355:137-00-8:500:4-METHYL-5-THIAZOLEETHANOL:D2O:7.4
+bmse000356:100-09-4:500:p-Anisic_acid:D2O:7.4
+bmse000356:1335-08-6:500:p-Anisic_acid:D2O:7.4
+bmse000357:14351-66-7:500:pyrrole-2-carboxylic acid:D2O:7.4
+bmse000357:13463-98-4:500:pyrrole-2-carboxylic acid:D2O:7.4
+bmse000357:6798-76-1:500:pyrrole-2-carboxylic acid:D2O:7.4
+bmse000357:66104-40-3:500:pyrrole-2-carboxylic acid:D2O:7.4
+bmse000357:23250-44-4:500:pyrrole-2-carboxylic acid:D2O:7.4
+bmse000357:10248-55-2:500:pyrrole-2-carboxylic acid:D2O:7.4
+bmse000357:67816-10-8:500:pyrrole-2-carboxylic acid:D2O:7.4
+bmse000357:66104-41-4:500:pyrrole-2-carboxylic acid:D2O:7.4
+bmse000357:514-10-3:500:pyrrole-2-carboxylic acid:D2O:7.4
+bmse000357:72452-62-1:500:pyrrole-2-carboxylic acid:D2O:7.4
+bmse000358:140627-31-2:500:chlorohydroquinone:D2O:7.4
+bmse000358:68103-34-4:500:chlorohydroquinone:D2O:7.4
+bmse000358:134900-92-8:500:chlorohydroquinone:D2O:7.4
+bmse000358:615-67-8:500:chlorohydroquinone:D2O:7.4
+bmse000359:828-01-3:500:D-3-Phenyllactic acid:D2O:7.4
+bmse000360:59826-67-4:400:2-chloroethanol:D2O:7.4
+bmse000360:107-07-3:400:2-chloroethanol:D2O:7.4
+bmse000362:927-74-2:500:3-butyn-1-ol:D2O:7.4
+bmse000363:107-19-7:500:Propargyl alcohol:D2O:7.4
+bmse000364:99155-61-0:500:5-hydroxyindole-3-acetic acid:D2O:7.4
+bmse000364:54-16-0:500:5-hydroxyindole-3-acetic acid:D2O:7.4
+bmse000364:1321-73-9:500:5-hydroxyindole-3-acetic acid:D2O:7.4
+bmse000364:113303-91-6:500:5-hydroxyindole-3-acetic acid:D2O:7.4
+bmse000365:497-76-7:500:arbutin:D2O:7.4
+bmse000366:31797-85-0:500:beta-carotene:CDCl3:N/A
+bmse000366:116-32-5:500:beta-carotene:CDCl3:N/A
+bmse000366:7235-40-7:500:beta-carotene:CDCl3:N/A
+bmse000367:79-11-8:500:Chloroacetic Acid:D2O:7.4
+bmse000367:3926-62-3:500:Chloroacetic Acid:D2O:7.4
+bmse000368:1609-93-4:400:cis-3-chloroacrylic acid:D2O:7.4
+bmse000368:2345-61-1:400:cis-3-chloroacrylic acid:D2O:7.4
+bmse000369:95123-47-0:500:cis-3-hexen-1-ol:D2O:7.4
+bmse000369:928-96-1:500:cis-3-hexen-1-ol:D2O:7.4
+bmse000370:334-48-5:500:decanoic acid:CDCl3:n/a
+bmse000370:15773-52-1:500:decanoic acid:CDCl3:n/a
+bmse000370:52627-73-3:500:decanoic acid:CDCl3:n/a
+bmse000371:61791-46-6:500:diethanolamine:D2O:7.4
+bmse000371:111-42-2:500:diethanolamine:D2O:7.4
+bmse000372:105-60-2:500:epsilon-caprolactam:D2O:7.4
+bmse000373:503-74-2:500:isovaleric-acid:D2O:7.4
+bmse000373:92634-50-9:500:isovaleric-acid:D2O:7.4
+bmse000374:79-63-0:500:lanosterol:CDCl3:N/A
+bmse000375:14073-97-3:500:L-menthone:CDCl3:n/a
+bmse000375:21060-23-1:500:L-menthone:CDCl3:n/a
+bmse000375:10458-14-7:500:L-menthone:CDCl3:n/a
+bmse000377:71750-39-5:500:Phenethylamine:D2O:7.4
+bmse000377:503-74-2:500:Phenethylamine:D2O:7.4
+bmse000377:156-28-5:500:Phenethylamine:D2O:7.4
+bmse000377:5471-08-9:500:Phenethylamine:D2O:7.4
+bmse000377:64-04-0:500:Phenethylamine:D2O:7.4
+bmse000378:68937-72-4:500:suberic acid:D2O:7.4
+bmse000378:505-48-6:500:suberic acid:D2O:7.4
+bmse000379:102-71-6:500:triethanolamine:D2O:7.4
+bmse000380:498-40-8:500:L-Cysteic acid:D2O:7.4
+bmse000380:13100-82-8:500:L-Cysteic acid:D2O:7.4
+bmse000381:599-04-2:500:(R)-(-)-Pantolactone:D2O:7.4
+bmse000382:7728-87-2:500:N-Acetyl-L-glutamic acid:D2O:7.4
+bmse000382:1188-37-0:500:N-Acetyl-L-glutamic acid:D2O:7.4
+bmse000383:4502-00-5:500:4-Methyl-2-oxovaleric acid:D2O:7.4
+bmse000383:816-66-0:500:4-Methyl-2-oxovaleric acid:D2O:7.4
+bmse000383:51828-95-6:500:4-Methyl-2-oxovaleric acid:D2O:7.4
+bmse000384:352-97-6:500:Guanidineacetic acid:D2O:7.4
+bmse000385:12385-08-9:500:Pyrocatechol:D2O:7.4
+bmse000385:120-80-9:500:Pyrocatechol:D2O:7.4
+bmse000386:141-82-2:500:Malonic acid:D2O:7.4
+bmse000387:327-97-9:500:Chlorogenic acid:D2O:7.4
+bmse000387:202650-88-2:500:Chlorogenic acid:D2O:7.4
+bmse000388:156-57-0:500:Cysteamine:D2O:7.4
+bmse000388:93965-19-6:500:Cysteamine:D2O:7.4
+bmse000388:27761-19-9:500:Cysteamine:D2O:7.4
+bmse000388:60-23-1:500:Cysteamine:D2O:7.4
+bmse000388:3037-04-5:500:Cysteamine:D2O:7.4
+bmse000388:16904-32-8:500:Cysteamine:D2O:7.4
+bmse000388:139720-70-0:500:Cysteamine:D2O:7.4
+bmse000388:42954-15-4:500:Cysteamine:D2O:7.4
+bmse000389:149-91-7:500:Gallic acid:D2O:7.4
+bmse000390:2623-91-8:500:DL-2-Aminobutyric acid:D2O:7.4
+bmse000390:2835-81-6:500:DL-2-Aminobutyric acid:D2O:7.4
+bmse000391:72845-50-2:500:Phthalic acid:D2O:7.4
+bmse000391:88-99-3:500:Phthalic acid:D2O:7.4
+bmse000392:79-06-1:500:Acrylamide:D2O:7.4
+bmse000394:1319-82-0:500:6-Aminohexanoic acid:D2O:7.4
+bmse000394:93208-38-9:500:6-Aminohexanoic acid:D2O:7.4
+bmse000394:87867-96-7:500:6-Aminohexanoic acid:D2O:7.4
+bmse000394:60-32-2:500:6-Aminohexanoic acid:D2O:7.4
+bmse000395:1878-66-6:500:4-Chlorophenylacetate:D2O:7.4
+bmse000396:68579-60-2:500:alpha-((Methylamino)methyl)benzyl alcohol:D2O:7.4
+bmse000397:4241-59-2:500:DL-Methionine sulfoxide:D2O:7.4
+bmse000397:454-41-1:500:DL-Methionine sulfoxide:D2O:7.4
+bmse000397:62697-73-8:500:DL-Methionine sulfoxide:D2O:7.4
+bmse000398:516-05-2:500:Methylmalonic acid:D2O:7.4
+bmse000399:407-41-0:500:O-Phospho-L-serine:D2O:7.4
+bmse000400:594-45-6:500:ETHANESULFONIC ACID:D2O:7.4
+bmse000401:14289-34-0:500:DL-alpha,epsilon-Diaminopimelic acid:D2O:7.4
+bmse000401:17121-19-6:500:DL-alpha,epsilon-Diaminopimelic acid:D2O:7.4
+bmse000401:583-93-7:500:DL-alpha,epsilon-Diaminopimelic acid:D2O:7.4
+bmse000401:922-54-3:500:DL-alpha,epsilon-Diaminopimelic acid:D2O:7.4
+bmse000402:156-54-7:500:Butyric acid:D2O:7.4
+bmse000402:107-92-6:500:Butyric acid:D2O:7.4
+bmse000403:1948-31-8:500:Ala-Ala:D2O:7.4
+bmse000404:51-41-2:500:(-)-Norepinephrine:D2O:7.4
+bmse000405:108-94-1:500:Cyclohexanone:D2O:7.4
+bmse000405:11119-77-0:500:Cyclohexanone:D2O:7.4
+bmse000405:9003-41-2:500:Cyclohexanone:D2O:7.4
+bmse000405:9075-99-4:500:Cyclohexanone:D2O:7.4
+bmse000406:68937-69-9:500:Glutaric acid:D2O:7.4
+bmse000406:68603-87-2:500:Glutaric acid:D2O:7.4
+bmse000406:8065-59-6:500:Glutaric acid:D2O:7.4
+bmse000406:110-94-1:500:Glutaric acid:D2O:7.4
+bmse000407:185532-71-2:500:Benzyl alcohol:D2O:7.4
+bmse000407:1336-27-2:500:Benzyl alcohol:D2O:7.4
+bmse000407:100-51-6:500:Benzyl alcohol:D2O:7.4
+bmse000408:583-10-8:500:Hippuric acid:D2O:7.4
+bmse000408:532-93-4:500:Hippuric acid:D2O:7.4
+bmse000408:21251-67-2:500:Hippuric acid:D2O:7.4
+bmse000408:532-94-5:500:Hippuric acid:D2O:7.4
+bmse000408:66407-11-2:500:Hippuric acid:D2O:7.4
+bmse000408:140480-84-8:500:Hippuric acid:D2O:7.4
+bmse000408:495-69-2:500:Hippuric acid:D2O:7.4
+bmse000409:1821-52-9:500:dl-Indole-3-lactic acid:D2O:7.4
+bmse000409:832-97-3:500:dl-Indole-3-lactic acid:D2O:7.4
+bmse000410:13593-94-7:500:Kynurenic acid:D2O:7.4
+bmse000410:492-27-3:500:Kynurenic acid:D2O:7.4
+bmse000411:5157-09-5:500:L-Norleucine:D2O:7.4
+bmse000411:327-57-1:500:L-Norleucine:D2O:7.4
+bmse000412:119-84-6:500:Dihydrocoumarin:D2O:7.4
+bmse000412:1341-36-2:500:Dihydrocoumarin:D2O:7.4
+bmse000413:529-64-6:500:Tropic acid:D2O:7.4
+bmse000413:552-63-6:500:Tropic acid:D2O:7.4
+bmse000413:28845-94-5:500:Tropic acid:D2O:7.4
+bmse000414:99-94-5:500:p-Toluic acid:D2O:7.4
+bmse000414:2420-97-5:500:p-Toluic acid:D2O:7.4
+bmse000414:23292-93-5:500:p-Toluic acid:D2O:7.4
+bmse000414:67874-52-6:500:p-Toluic acid:D2O:7.4
+bmse000415:26982-54-7:500:Resorcinol:D2O:7.4
+bmse000415:6025-45-2:500:Resorcinol:D2O:7.4
+bmse000415:108-46-3:500:Resorcinol:D2O:7.4
+bmse000416:928-04-1:500:Acetylenedicarboxylic acid:D2O:7.4
+bmse000416:142-45-0:500:Acetylenedicarboxylic acid:D2O:7.4
+bmse000417:93-10-7:500:quinaldic acid:D2O:7.4
+bmse000417:16907-79-2:500:quinaldic acid:D2O:7.4
+bmse000418:4408-78-0:500:Phosphonoacetic acid:D2O:7.4
+bmse000418:7230-09-3:500:Phosphonoacetic acid:D2O:7.4
+bmse000418:36983-81-0:500:Phosphonoacetic acid:D2O:7.4
+bmse000419:660-88-8:500:5-Aminovaleric aci:D2O:7.4
+bmse000419:627-95-2:500:5-Aminovaleric aci:D2O:7.4
+bmse000420:2138-22-9:500:4-Chlorocatechol:D2O:7.4
+bmse000421:554-01-8:500:5-METHYLCYTOSINE:D2O:7.4
+bmse000422:458-36-6:500:4-Hydroxy-3-methoxycinnamaldehyde:D2O:7.4
+bmse000423:997-55-7:500:N-acetyl-L-aspartic acid:D2O:7.4
+bmse000424:25666-61-9:500:Adipic acid:D2O:7.4
+bmse000424:22322-28-7:500:Adipic acid:D2O:7.4
+bmse000424:7486-38-6:500:Adipic acid:D2O:7.4
+bmse000424:3385-41-9:500:Adipic acid:D2O:7.4
+bmse000424:124-04-9:500:Adipic acid:D2O:7.4
+bmse000424:7486-39-7:500:Adipic acid:D2O:7.4
+bmse000424:23311-84-4:500:Adipic acid:D2O:7.4
+bmse000425:504-07-4:500:Dihydrouracil:D2O:7.4
+bmse000426:1184-78-7:500:Trimethylamine N-oxide:D2O:7.4
+bmse000427:122-78-1:500:phenylacetaldehyde:D2O:7.4
+bmse000429:542-32-5:500:DL-2-Aminoadipic acid:D2O:7.4
+bmse000430:6681-97-6:500:DL-HOMOCYSTEINE:D2O:7.4
+bmse000430:454-28-4:500:DL-HOMOCYSTEINE:D2O:7.4
+bmse000430:454-29-5:500:DL-HOMOCYSTEINE:D2O:7.4
+bmse000431:108-93-0:500:Cyclohexanol:D2O:7.4
+bmse000432:15598-34-2:500:Pyridine:D2O:7.4
+bmse000432:85404-19-9:500:Pyridine:D2O:7.4
+bmse000432:18820-82-1:500:Pyridine:D2O:7.4
+bmse000432:163392-20-9:500:Pyridine:D2O:7.4
+bmse000432:152758-95-7:500:Pyridine:D2O:7.4
+bmse000432:85404-20-2:500:Pyridine:D2O:7.4
+bmse000432:6999-00-4:500:Pyridine:D2O:7.4
+bmse000432:32001-55-1:500:Pyridine:D2O:7.4
+bmse000432:628-13-7:500:Pyridine:D2O:7.4
+bmse000432:45410-39-7:500:Pyridine:D2O:7.4
+bmse000432:62301-32-0:500:Pyridine:D2O:7.4
+bmse000432:543-54-4:500:Pyridine:D2O:7.4
+bmse000432:110-86-1:500:Pyridine:D2O:7.4
+bmse000432:82005-06-9:500:Pyridine:D2O:7.4
+bmse000433:95-48-7:500:o-Cresol:D2O:7.4
+bmse000433:67674-51-5:500:o-Cresol:D2O:7.4
+bmse000433:4549-72-8:500:o-Cresol:D2O:7.4
+bmse000433:3235-09-4:500:o-Cresol:D2O:7.4
+bmse000434:66-23-9:500:Acetylcholine:D2O:7.4
+bmse000434:51-84-3:500:Acetylcholine:D2O:7.4
+bmse000435:1724-02-3:500:Glutaconic acid:D2O:7.4
+bmse000435:628-48-8:500:Glutaconic acid:D2O:7.4
+bmse000436:26638-03-9:500:Guaiacol:D2O:7.4
+bmse000436:90-05-1:500:Guaiacol:D2O:7.4
+bmse000437:58308-55-7:500:Allantoin:D2O:7.4
+bmse000437:37305-69-4:500:Allantoin:D2O:7.4
+bmse000437:97-59-6:500:Allantoin:D2O:7.4
+bmse000437:5377-33-3:500:Allantoin:D2O:7.4
+bmse000438:3686-66-6:500:4-Chlorobenzoic acid:D2O:7.4
+bmse000438:74-11-3:500:4-Chlorobenzoic acid:D2O:7.4
+bmse000438:15516-76-4:500:4-Chlorobenzoic acid:D2O:7.4
+bmse000439:19455-20-0:500:Isobutyric acid:D2O:7.4
+bmse000439:533-90-4:500:Isobutyric acid:D2O:7.4
+bmse000439:79-31-2:500:Isobutyric acid:D2O:7.4
+bmse000439:996-30-5:500:Isobutyric acid:D2O:7.4
+bmse000439:22228-82-6:500:Isobutyric acid:D2O:7.4
+bmse000440:6165-14-6:500:D-Glucosaminic acid:D2O:7.4
+bmse000441:14191-95-8:500:4-Hydroxyphenylacetonitrile:D2O:7.4
+bmse000442:1190-49-4:500:L-homocitrulline:D2O:7.4
+bmse000443:4433-40-3:500:5-(Hydroxymethyl)uracil:D2O:7.4
+bmse000444:498-00-0:500:4-hydroxy-3-methoxybenzyl alcohol:D2O:7.4
+bmse000445:81-13-0:500:D-Panthenol:D2O:7.4
+bmse000446:71-23-8:500:propanol:D2O:7.4
+bmse000447:5593-70-4:500:butanol:D2O:7.4
+bmse000447:14254-05-8:500:butanol:D2O:7.4
+bmse000447:71-36-3:500:butanol:D2O:7.4
+bmse000449:332-80-9:500:N(pai)-Methyl-L-histidine:D2O:7.4
+bmse000450:348-67-4:500:D-Methionine:D2O:7.4
+bmse000451:108-91-8:500:Cyclohexylamine:D2O:7.4
+bmse000451:143247-75-0:500:Cyclohexylamine:D2O:7.4
+bmse000451:157973-60-9:500:Cyclohexylamine:D2O:7.4
+bmse000452:300-84-5:500:Hypotaurine:D2O:7.4
+bmse000453:16649-79-9:500:Ureidosuccinic acid:D2O:7.4
+bmse000453:923-37-5:500:Ureidosuccinic acid:D2O:7.4
+bmse000454:120-73-0:500:purine:D2O:7.4
+bmse000455:156-38-7:500:4-Hydroxyphenylacetic acid:D2O:7.4
+bmse000457:4350-09-8:500:5-Hydroxy-L-tryptophan:D2O:7.4
+bmse000458:1319-77-3:500:p-Cresol:D2O:7.4
+bmse000458:1121-70-6:500:p-Cresol:D2O:7.4
+bmse000458:72269-62-6:500:p-Cresol:D2O:7.4
+bmse000458:106-44-5:500:p-Cresol:D2O:7.4
+bmse000459:1135-24-6:500:Ferulic acid:D2O:7.4
+bmse000459:97274-61-8:500:Ferulic acid:D2O:7.4
+bmse000460:557-24-4:500:Maleamic acid:D2O:7.4
+bmse000461:106-48-9:500:4-Chlorophenol:D2O:7.4
+bmse000461:1193-00-6:500:4-Chlorophenol:D2O:7.4
+bmse000461:1121-74-0:500:4-Chlorophenol:D2O:7.4
+bmse000462:63084-98-0:500:4-Aminophenol:D2O:7.4
+bmse000462:52985-09-8:500:4-Aminophenol:D2O:7.4
+bmse000462:51-78-5:500:4-Aminophenol:D2O:7.4
+bmse000462:123-30-8:500:4-Aminophenol:D2O:7.4
+bmse000463:3588-17-8:500:trans-trans-Muconic acid:D2O:7.4
+bmse000463:505-70-4:500:trans-trans-Muconic acid:D2O:7.4
+bmse000464:14992-62-2:500:Acetyl-L-carnitine:D2O:7.4
+bmse000466:5699-54-7:500:DL-beta-leucine:D2O:7.4
+bmse000467:107-29-9:500:Acetaldehyde oxime mixture:D2O:7.4
+bmse000468:3025-96-5:500:4-Acetamidobutyric acid:D2O:7.4
+bmse000469:1792-81-0:500:cis-1,2-cyclohexanediol:D2O:7.4
+bmse000469:931-17-9:500:cis-1,2-cyclohexanediol:D2O:7.4
+bmse000470:108-19-0:500:biuret:D2O:7.4
+bmse000471:298-12-4:500:Glyoxylic acid:D2O:7.4
+bmse000472:68-96-2:500:17-alpha-hydroxyprogesterone:CDCl3:N/A
+bmse000473:526-55-6:500:3-(2-hydroxyethyl)indole:CDCl3:n/a
+bmse000474:107-86-8:500:3-methylcrotonaldehyde:D2O:7.4
+bmse000475:452-86-8:500:4-methylcatechol:D2O:7.4
+bmse000476:145-13-1:500:5-pregnen-3-beta-ol-20-one:CDCl3:n/a
+bmse000477:83-46-5:500:beta-sitosterol:CDCl3:n/a
+bmse000478:79-63-0:500:Lanosterol:CDCl3:N/A
+bmse000479:10172-89-1:500:N-acetyl-D-Phenyl alanine:D2O:7.4
+bmse000480:111-65-9:500:Octane:CDCl3:n/a
+bmse000480:31372-91-5:500:Octane:CDCl3:n/a
+bmse000481:122-79-2:500:Phenyl Acetate:CDCl3:n/a
+bmse000482:8023-13-0:500:Progesterone:CDCl3:n/a
+bmse000482:753497-20-0:500:Progesterone:CDCl3:n/a
+bmse000482:8012-32-6:500:Progesterone:CDCl3:n/a
+bmse000482:57-83-0:500:Progesterone:CDCl3:n/a
+bmse000482:257630-50-5:500:Progesterone:CDCl3:n/a
+bmse000483:4042-36-8:500:Pyroglutamate:D2O:7.4
+bmse000484:111-02-4:500:squalene:CDCl3:n/a
+bmse000485:68937-76-8:500:Stearic Acid:CDCl3:n/a
+bmse000485:57-11-4:500:Stearic Acid:CDCl3:n/a
+bmse000485:609343-71-7:500:Stearic Acid:CDCl3:n/a
+bmse000486:121-34-6:500:vanillic acid:D2O:7.4
+bmse000487:36653-82-4:500:1-Hexadecanol:CDCl3:n/a
+bmse000487:67762-30-5:500:1-Hexadecanol:CDCl3:n/a
+bmse000487:36311-34-9:500:1-Hexadecanol:CDCl3:n/a
+bmse000488:771-51-7:500:3-indoleacetonitrile:CDCl3:n/a
+bmse000489:566-88-1:500:5-alpha-cholestan-3-one:CDCl3:n/a
+bmse000490:566-65-4:500:5-alpha-pregnane-3,20-dione(allo):CDCl3:n/a
+bmse000491:1686-14-2:500:alpha-pinene-oxide:CDCl3:n/a
+bmse000491:74525-43-2:500:alpha-pinene-oxide:CDCl3:n/a
+bmse000492:59-02-9:500:(+)alpha-tocopherol:CDCl3:N/A
+bmse000492:10191-41-0:500:(+)alpha-tocopherol:CDCl3:N/A
+bmse000493:502-44-3:500:Epsilon-caprolactone:CDCl3:n/a
+bmse000494:57-87-4:500:Ergosterol:CDCl3:n/a
+bmse000496:83-33-0:400:Indanone:CDCl3:n/a
+bmse000497:60-33-3:500:Linoleic Acid:CDCl3:N/A
+bmse000498:15356-60-2:500:(1S,2S,5R)-(+)-neomenthol:CDCl3:n/a
+bmse000498:89-78-1:500:(1S,2S,5R)-(+)-neomenthol:CDCl3:n/a
+bmse000499:67762-36-1:500:Nonanoic Acid:CDCl3:n/a
+bmse000499:112-05-0:500:Nonanoic Acid:CDCl3:n/a
+bmse000500:99-49-0:500:(R)-(-)-Carvone:CDCl3:n/a
+bmse000500:6485-40-1:500:(R)-(-)-Carvone:CDCl3:n/a
+bmse000501:79-81-2:500:Retinyl palmitate:CDCl3:n/a
+bmse000502:68937-74-6:400:Octanoic Acid:CDCl3:n/a
+bmse000502:124-07-2:400:Octanoic Acid:CDCl3:n/a
+bmse000503:99-87-6:400:p-cymene:CDCl3:n/a
+bmse000503:4939-75-7:400:p-cymene:CDCl3:n/a
+bmse000504:69073-38-7:400:Terpinolene:CDCl3:n/a
+bmse000504:586-62-9:400:Terpinolene:CDCl3:n/a
+bmse000505:185532-73-4:400:4-isopropylbenzyl alcohol:CDCl3:n/a
+bmse000505:536-60-7:400:4-isopropylbenzyl alcohol:CDCl3:n/a
+bmse000506:92-52-4:400:biphenyl:CDCl3:n/a
+bmse000506:72931-46-5:400:biphenyl:CDCl3:n/a
+bmse000506:56481-93-7:400:biphenyl:CDCl3:n/a
+bmse000507:1406-16-2:500:cholecalciferol:CDCl3:n/a
+bmse000507:67-97-0:500:cholecalciferol:CDCl3:n/a
+bmse000508:122-03-2:400:cuminaldehyde:CDCl3:n/a
+bmse000509:14622-13-0:400:Dodecanoic acid:CDCl3:n/a
+bmse000509:4696-56-4:400:Dodecanoic acid:CDCl3:n/a
+bmse000509:7632-48-6:400:Dodecanoic acid:CDCl3:n/a
+bmse000509:629-25-4:400:Dodecanoic acid:CDCl3:n/a
+bmse000509:15337-60-7:400:Dodecanoic acid:CDCl3:n/a
+bmse000509:4040-48-6:400:Dodecanoic acid:CDCl3:n/a
+bmse000509:10124-65-9:400:Dodecanoic acid:CDCl3:n/a
+bmse000509:143-07-7:400:Dodecanoic acid:CDCl3:n/a
+bmse000509:8045-27-0:400:Dodecanoic acid:CDCl3:n/a
+bmse000509:8000-62-2:400:Dodecanoic acid:CDCl3:n/a
+bmse000509:203714-07-2:400:Dodecanoic acid:CDCl3:n/a
+bmse000509:2437-23-2:400:Dodecanoic acid:CDCl3:n/a
+bmse000510:8017-28-5:500:ergocalciferol:CDCl3:n/a
+bmse000510:50-14-6:500:ergocalciferol:CDCl3:n/a
+bmse000510:31316-19-5:500:ergocalciferol:CDCl3:n/a
+bmse000510:7489-18-1:500:ergocalciferol:CDCl3:n/a
+bmse000511:56-54-2:500:quinidine:CDCl3:n/a
+bmse000513:637-88-7:500:1,4-cyclohexanedione:CDCl3:n/a
+bmse000514:615-13-4:500:2-Indanone:CDCl3:n/a
+bmse000515:89-95-2:500:2-methylbenzyl alcohol:CDCl3:n/a
+bmse000516:83-34-1:500:3-methylindole:CDCl3:n/a
+bmse000517:90-98-2:500:4,4-dichlorobenzophenone:CDCl3:n/a
+bmse000518:99-91-2:500:4-chloroacetophenone:CDCl3:n/a
+bmse000519:80868-58-2:500:(+)-4-cholesten-3-one:CDCl3:n/a
+bmse000519:601-57-0:500:(+)-4-cholesten-3-one:CDCl3:n/a
+bmse000520:185532-77-8:500:4-methylbenzyl alcohol:CDCl3:n/a
+bmse000520:589-18-4:500:4-methylbenzyl alcohol:CDCl3:n/a
+bmse000521:486-25-9:500:9_fluorenone:CDCl3:n/a
+bmse000522:382-45-6:500:adrenosterone:CDCl3:n/a
+bmse000523:8024-53-1:500:eucalyptol:CDCl3:n/a
+bmse000523:8024-52-0:500:eucalyptol:CDCl3:n/a
+bmse000523:10458-11-4:500:eucalyptol:CDCl3:n/a
+bmse000523:470-82-6:500:eucalyptol:CDCl3:n/a
+bmse000524:84987-80-4:500:fluorene:CDCl3:n/a
+bmse000524:2299-68-5:500:fluorene:CDCl3:n/a
+bmse000524:86-73-7:500:fluorene:CDCl3:n/a
+bmse000525:6894-38-8:500:jasmonic acid:CDCl3:n/a
+bmse000526:68411-84-7:500:o-xylene:CDCl3:n/a
+bmse000526:95-47-6:500:o-xylene:CDCl3:n/a
+bmse000526:1330-20-7:500:o-xylene:CDCl3:n/a
+bmse000527:104-87-0:500:p-tolualdehyde:CDCl3:n/a
+bmse000528:481-16-3:500:stigmasterol:CDCl3:n/a
+bmse000529:80-75-1:500:11-alpha-hydroxyprogesterone:CDCl3:n/a
+bmse000530:119-64-2:500:1,2,3,4-tetrahydronaphthalene:CDCl3:n/a
+bmse000530:68412-24-8:500:1,2,3,4-tetrahydronaphthalene:CDCl3:n/a
+bmse000531:78900-94-4:500:1-methylnaphthalene:CDCl3:n/a
+bmse000531:90-12-0:500:1-methylnaphthalene:CDCl3:n/a
+bmse000532:30678-61-6:500:1-naphthaldehyde:CDCl3:n/a
+bmse000532:66-77-3:500:1-naphthaldehyde:CDCl3:n/a
+bmse000534:564-94-3:500:(1R)-(-)-myrtenal:CDCl3:n/a
+bmse000534:57526-63-3:500:(1R)-(-)-myrtenal:CDCl3:n/a
+bmse000534:23727-16-4:500:(1R)-(-)-myrtenal:CDCl3:n/a
+bmse000535:64-85-7:500:21-hydroxyprogesterone:CDCl3:n/a
+bmse000536:505-57-7:500:2-hexenal:CDCl3:n/a
+bmse000536:6728-26-3:500:2-hexenal:CDCl3:n/a
+bmse000537:91-57-6:400:2-methylnaphthalene:CDCl3:n/a
+bmse000538:118-71-8:400:3-hydroxy-2-methyl-4-pyrone:CDCl3:n/a
+bmse000539:4385-35-7:400:3-isochromanone:CDCl3:n/a
+bmse000540:587-03-1:500:3-methylbenzyl alcohol:CDCl3:n/a
+bmse000541:80-97-7:500:5-alpha-cholestan-3-beta-ol:CDCl3:n/a
+bmse000541:29466-38-4:500:5-alpha-cholestan-3-beta-ol:CDCl3:n/a
+bmse000542:1077-28-7:400:alpha-lipoic acid:CDCl3:n/a
+bmse000542:62-46-4:400:alpha-lipoic acid:CDCl3:n/a
+bmse000543:53-41-8:500:androsterone:acetone:n/a
+bmse000544:601-34-3:500:cholesteryl palmitate:CDCl3:n/a
+bmse000545:68411-76-7:500:cyclohexane:CDCl3:n/a
+bmse000545:110-82-7:500:cyclohexane:CDCl3:n/a
+bmse000545:25012-93-5:500:cyclohexane:CDCl3:n/a
+bmse000547:78656-14-1:500:delta-tocopherol:CDCl3:n/a
+bmse000547:37816-35-6:500:delta-tocopherol:CDCl3:n/a
+bmse000547:16698-36-5:500:delta-tocopherol:CDCl3:n/a
+bmse000547:119-13-1:500:delta-tocopherol:CDCl3:n/a
+bmse000548:132-64-9:400:dibenzofuran:CDCl3:n/a
+bmse000548:214827-48-2:400:dibenzofuran:CDCl3:n/a
+bmse000549:37242-41-4:500:estrone:CDCl3:n/a
+bmse000549:53-16-7:500:estrone:CDCl3:n/a
+bmse000550:106-30-9:400:ethyl heptanoate:CDCl3:n/a
+bmse000552:620-23-5:500:m-tolualdehyde:CDCl3:n/a
+bmse000553:68092-47-7:400:m-toluic acid:CDCl3:n/a
+bmse000553:68092-45-5:400:m-toluic acid:CDCl3:n/a
+bmse000553:68092-46-6:400:m-toluic acid:CDCl3:n/a
+bmse000553:99-04-7:400:m-toluic acid:CDCl3:n/a
+bmse000554:108-38-3:500:m-xylene:CDCl3:n/a
+bmse000554:68908-87-2:500:m-xylene:CDCl3:n/a
+bmse000555:111957-74-5:500:myrtenol:CDCl3:n/a
+bmse000555:19250-18-1:500:myrtenol:CDCl3:n/a
+bmse000555:6712-78-3:500:myrtenol:CDCl3:n/a
+bmse000555:515-00-4:500:myrtenol:CDCl3:n/a
+bmse000556:529-20-4:500:o-tolualdehyde:CDCl3:n/a
+bmse000557:118-90-1:500:o-toluic acid:CDCl3:n/a
+bmse000557:25567-10-6:500:o-toluic acid:CDCl3:n/a
+bmse000558:1002-84-2:400:pentadecanoic acid:CDCl3:n/a
+bmse000559:536-59-4:400:(s)-(-)-perillyl alcohol:CDCl3:n/a
+bmse000559:18457-55-1:400:(s)-(-)-perillyl alcohol:CDCl3:n/a
+bmse000560:85-01-8:500:phenanthrene:CDCl3:n/a
+bmse000562:5300-03-8:500:retinoic acid:CDCl3:n/a
+bmse000562:302-79-4:500:retinoic acid:CDCl3:n/a
+bmse000563:112-37-8:400:undecanoic acid:CDCl3:n/a
+bmse000564:1689-64-1:400:9-hydroxyfluorene:CDCl3:n/a
+bmse000566:621-71-6:500:glyceryl tridecanoate:CDCl3:n/a
+bmse000567:79-94-7:500:tetrabromobisphenol A:CDCl3:n/a
+bmse000568:107-06-2:400:1,2-dichloroethane:CDCl3:n/a
+bmse000569:498-07-7:500:1,6-anhydro-beta-d-glucose:D2O:7.4
+bmse000571:6064-63-7:500:2-hydroxyhexanoic acid:D2O:7.4
+bmse000572:617-73-2:500:2-hydroxyoctanoic acid:D2O:7.4
+bmse000573:17119-15-2:400:3-hydroxymandelic acid:D2O:7.4
+bmse000574:66872-74-0:500:3-methyl-2-oxopentanoic acid:D2O:7.4
+bmse000575:626-51-7:500:3-methylglutaric acid:D2O:7.4
+bmse000576:2478-38-8:500:acetosyringone:DMSO:n/a
+bmse000577:486-56-6:500:(-)-cotinine:D2O:7.4
+bmse000578:601-75-2:500:ethylmalonic acid:D2O:7.4
+bmse000579:1071-46-1:500:monoethyl malonate:D2O:7.4
+bmse000580:1501-27-5:500:mono-methyl glutarate:D2O:7.4
+bmse000581:541-47-9:500:3-methyl-2-butenoic acid:D2O:7.4
+bmse000582:123-08-0:500:p-hydroxybenzaldehyde:DMSO:n/a
+bmse000583:99-96-7:500:4-hydroxybenzoic acid:DMSO:n/a
+bmse000584:498-02-2:500:acetovanillone:DMSO:n/a
+bmse000585:2305-13-7:500:dihydroconiferyl alcohol:DMSO:n/a
+bmse000587:1135-24-6:500:ferulic acid:DMSO:n/a
+bmse000587:97274-61-8:500:ferulic acid:DMSO:n/a
+bmse000588:704-15-4:500:gly-pro:D2O:7.4
+bmse000589:20733-94-2:500:methyl sinapate:DMSO:n/a
+bmse000590:57-10-3:400:palmitic acid:CDCl3:n/a
+bmse000591:7400-08-0:500:p-coumaric acid:DMSO:n/a
+bmse000591:501-98-4:500:p-coumaric acid:DMSO:n/a
+bmse000592:3690-05-9:500:p-coumaryl alcohol:DMSO:n/a
+bmse000593:99-93-4:500:p-hydroxyacetophenone:DMSO:n/a
+bmse000594:530-59-6:500:sinapinic acid:DMSO:n/a
+bmse000595:134-96-3:500:syringaldehyde:DMSO:n/a
+bmse000597:52447-63-9:500:vanillin:DMSO:n/a
+bmse000597:121-33-5:500:vanillin:DMSO:n/a
+bmse000597:8014-42-4:500:vanillin:DMSO:n/a
+bmse000598:68-96-2:500:17-alpha-hydroxyprogesterone:CDCl3:n/a
+bmse000599:185532-73-4:400:4-isopropylbenzyl alcohol:CDCl3:n/a
+bmse000599:536-60-7:400:4-isopropylbenzyl alcohol:CDCl3:n/a
+bmse000600:59-02-9:500:(+)alpha-tocopherol:CDCl3:n/a
+bmse000600:10191-41-0:500:(+)alpha-tocopherol:CDCl3:n/a
+bmse000601:458-36-6:500:coniferaldehyde:DMSO:n/a
+bmse000602:458-35-5:500:coniferyl alcohol:DMSO:n/a
+bmse000604:60-33-3:500:Linoleic Acid:CDCl3:n/a
+bmse000605:3943-97-3:500:methyl 4-coumarate:DMSO:n/a
+bmse000606:4206-58-0:500:sinapaldehyde:DMSO:n/a
+bmse000607:530-57-4:500:syringic acid:DMSO:n/a
+bmse000607:64887-60-1:500:syringic acid:DMSO:n/a
+bmse000608:531-29-3:500:coniferin:DMSO:n/a
+bmse000609:2309-07-1:500:methyl ferulate:DMSO:n/a
+bmse000610:543-24-8:400:n-acetylglycine:D2O:7.4
+bmse000612:537-33-7:500:sinapyl alcohol:DMSO:n/a
+bmse000613:118-34-3:500:syringin:DMSO:n/a
+bmse000614:118-34-3:500:vanillic acid:DMSO:n/a
+bmse000614:121-34-6:500:vanillic acid:DMSO:n/a
+bmse000615:5657-19-2:500:2-furoylglycine:D2O:7.4
+bmse000617:90-27-7:500:2-phenylbutyric acid:D2O:7.4
+bmse000618:537-73-5:500:3-hydroxy-4-methoxycinnamic acid:D2O:7.4
+bmse000620:45848-87-1:500:3-methylsalicylic acid:D2O:7.4
+bmse000622:100-54-9:500:3-pyridinecarbonitrile:D2O:7.4
+bmse000623:623-05-2:500:4-hydroxybenzyl alcohol:D2O:7.4
+bmse000624:50-85-1:500:4-methylsalicylic acid:D2O:7.4
+bmse000625:646-07-1:500:4-methylvaleric acid:CDCl3:n/a
+bmse000626:608-07-1:500:5_methoxytryptamine:DMSO:N/A
+bmse000627:635-65-4:500:bilirubin:DMSO:n/a
+bmse000628:67306-03-0:500:cis-fenpropimorph:DMSO:n/a
+bmse000629:32462-30-9:500:L-4-hydroxyphenylglycine:D2O:7.4
+bmse000630:766-93-8:500:N-cyclohexylformamide:D2O:7.4
+bmse000631:27530-80-9:500:O-phospho-DL-threonine:D2O:7.4
+bmse000632:123-43-3:500:sulfoacetic acid:D2O:7.4
+bmse000634:50-29-3:500:4,4-DDT:benzene:n/a
+bmse000635:122-88-3:500:4-chlorophenoxyacetic acid:D2O:7.4
+bmse000636:500-98-1:500:phenylacetylglycine:D2O:7.4
+bmse000637:4408-78-0:500:phosphonoacetic acid:D2O:7.4
+bmse000638:18031-40-8:400:(S)-(-)-perillaldehyde:CDCl3:n/a
+bmse000640:93-76-5:400:2,4,5-trichlorophenoxyacetic acid:benzene:n/a
+bmse000641:462-88-4:400:3-ureidopropionic acid:DMSO:N/A
+bmse000642:50-28-2:400:beta-Estradiol:acetone:n/a
+bmse000643:112-79-8:400:elaidic acid:methanol:7.4
+bmse000643:2027-47-6:400:elaidic acid:methanol:7.4
+bmse000644:360-65-6:400:glycodesoxycholic acid:methanol:n/a
+bmse000645:487-89-8:400:indole-3-carboxaldehyde:DMSO:n/a
+bmse000646:35656-49-6:400:indole-3-pyruvic acid:methanol:n/a
+bmse000647:75-07-0:400:metaldehyde:CDCl3:n/a
+bmse000648:20283-92-5:400:rosmarinic acid:methanol:n/a
+bmse000649:51-55-8:500:atropine:D2O:7.4
+bmse000650:81-25-4:500:cholic acid:D2O:7.4
+bmse000651:475-31-0:500:glycocholic acid:D2O:7.4
+bmse000654:18069-17-5:500:2-methylglutaric acid:D2O:7.4
+bmse000656:420-04-2:500:cyanamide:D2O:7.4
+bmse000657:139-05-9:500:N-cyclohexylsulfamic acid:D2O:7.4
+bmse000657:100-88-9:500:N-cyclohexylsulfamic acid:D2O:7.4
+bmse000658:500-98-1:500:phenylacetylglycine:D2O:7.4
+bmse000659:60-12-8:500:2-phenylethanol:D2O:7.4
+bmse000660:4408-78-0:500:phosphonoacetic acid:D2O:7.4
+bmse000661:824-69-1:500:2,5-dichlorohydroquinone:acetone:n/a
+bmse000662:536-66-3:500:4-isopropylbenzoic acid:ethanol:n/a
+bmse000663:53-06-5:500:cortisone:acetone:n/a
+bmse000665:53-43-0:500:trans_dehydroandrosterone:acetone:n/a
+bmse000666:86-74-8:500:carbazole:CDCl3:n/a
+bmse000667:98-55-5:500:alpha_terpineol:acetone:n/a
+bmse000667:10482-56-1:500:alpha_terpineol:acetone:n/a
+bmse000668:55-21-0:500:benzamide:ethanol:n/a
+bmse000669:50-22-6:500:corticosterone:acetone:n/a
+bmse000670:99-93-4:500:4_hydroxyacetophenone:ethanol:n/a
+bmse000671:162011-90-7:500:2,2-bis(4-chlorophenyl)ethanol:benzene:n/a
+bmse000671:2642-82-2:500:2,2-bis(4-chlorophenyl)ethanol:benzene:n/a
+bmse000672:50-84-0:500:2,4-Dichlorobenzoic acid:benzene:n/a
+bmse000673:583-78-8:500:2,5-dichlorophenol:benzene:n/a
+bmse000674:87-65-0:500:2,6-dichlorophenol:benzene:n/a
+bmse000675:501-52-0:500:hydrocinnamic acid:benzene:n/a
+bmse000676:98-95-3:500:nitrobenzene:acetone:n/a
+bmse000677:90-02-8:500:salicylaldehyde:benzene:N/A
+bmse000678:88-06-2:500:2,4,6-trichlorophenol:ethanol:n/a
+bmse000679:66-99-9:500:2-naphthaldehyde:acetone:n/a
+bmse000680:1078-61-1:500:3,4-dihydroxyhydrocinnamate:ethanol:n/a
+bmse000681:123-07-9:500:4-ethylphenol:benzene:n/a
+bmse000682:93-40-3:500:homoveratric acid:ethanol:n/a
+bmse000683:1592-38-7:500:2-naphthalenemethanol:ethanol:n/a
+bmse000684:775-01-9:500:DL-3,4-dihydroxymandelic acid:CDCl3:n/a
+bmse000685:35656-49-6:500:indole-3-pyruvic acid:ethanol:n/a
+bmse000686:434-13-9:500:lithocholic acid:ethanol:n/a
+bmse000687:57105-39-2:500:N-(3-indolylacetyl)-L-alanine:ethanol:n/a
+bmse000688:31519-22-9:500:1,4-dihydroxy-2-naphthanoic acid:ethanol:n/a
+bmse000689:86-48-6:500:1-hydroxy-2-naphthoic acid:ethanol:n/a
+bmse000690:4780-79-4:500:1_naphthalenemethanol:ethanol:n/a
+bmse000691:120-83-2:500:2,4-dichlorophenol:benzene:n/a
+bmse000692:3177-80-8:500:2-amino-3-methoxybenzoic acid:ethanol:n/a
+bmse000694:110885-75-1:500:5-methoxy-3-indoleacetic acid:ethanol:n/a
+bmse000694:3471-31-6:500:5-methoxy-3-indoleacetic acid:ethanol:n/a
+bmse000695:884-33-3:500:benzylsuccinic acid:ethanol:n/a
+bmse000697:87-86-5:500:pentachlorophenol:ethanol:n/a
+bmse000700:506-13-8:500:16-hydroxyhexadecanoic acid:ethanol:n/a
+bmse000701:1821-12-1:500:4-phenylbutyric acid:ethanol:n/a
+bmse000703:55-10-7:500:4-hydroxy-3-methoxymandelic acid:D2O:7.4
+bmse000704:94-41-7:500:chalcone:benzene:n/a
+bmse000705:585-84-2:500:cis-aconitic acid:D2O:7.4
+bmse000706:1115-65-7:500:L-cysteinesulfinic acid:D2O:7.4
+bmse000707:2497-02-1:500:N-acetyl-histidine:D2O:7.4
+bmse000709:68-12-2:500:N,N-dimethylformamide:benzene:n/a
+bmse000711:74-79-3:500:L-arginine:D2O:7.4
+bmse000711:7004-12-8:500:L-arginine:D2O:7.4
+bmse000711:142-49-4:500:L-arginine:D2O:7.4
+bmse000713:23052-80-4:500:2-amino-3-phosphonopropionic acid:D2O:7.4
+bmse000714:1484-80-6:500:2-ethylpiperidine:D2O:7.4
+bmse000715:614-75-5:500:2-hydroxyphenylacetic acid:D2O:7.4
+bmse000716:82-76-8:500:8-anilino-1-naphthalenesulfonic acid:D2O:7.4
+bmse000717:6899-10-1:500:cetyl-trimethyl-ammonium:D2O:7.4
+bmse000718:10061-01-5:500:cis-1,3-dichloropropene:CDCl3:n/a
+bmse000719:156-74-1:500:decamethonium:D2O:7.4
+bmse000720:10041-19-7:500:dioctyl sulfosuccinate:acetone:n/a
+bmse000722:106-89-8:500:epichlorohydrin:benzene:n/a
+bmse000724:348-54-9:500:o-fluoroaniline:D2O:7.4
+bmse000725:5787-28-0:500:sec-butylbenzene:acetone:n/a
+bmse000725:135-98-8:500:sec-butylbenzene:acetone:n/a
+bmse000726:121-57-3:500:sulfanilic acid:D2O:7.4
+bmse000727:80-59-1:500:trans-2,3-dimethylacrylic acid:D2O:7.4
+bmse000729:75853-18-8:500:2,3-difluorobenzyl alcohol:methanol:n/a
+bmse000730:597-43-3:500:2,2-dimethylsuccinic acid:D2O:7.4
+bmse000731:39935-49-4:500:3-deazauridine:D2O:7.4
+bmse000732:5417-84-5:500:6-ethylmercaptopurine:methanol:n/a
+bmse000733:641-81-6:500:apocholic acid:D2O:7.4
+bmse000734:117-83-9:500:bis(2-butoxyethyl)phthalate:acetone:n/a
+bmse000736:122-46-3:500:3-methylphenylacetate:D2O:7.4
+bmse000737:544-63-8:500:myristic acid:CDCl3:n/a
+bmse000738:598-50-5:500:N-methylurea:D2O:7.4
+bmse000739:456-22-4:500:p-fluorobenzoic acid:D2O:7.4
+bmse000740:523-92-2:500:D-pinitol:D2O:7.4
+bmse000741:4226-18-0:500:N-methyl-L-aspartic acid:D2O:7.4
+bmse000742:122-59-8:500:phenoxyacetic acid:D2O:7.4
+bmse000743:611-73-4:500:phenylglyoxylic acid:D2O:7.4
+bmse000744:64422-25-9:500:Histamine:D2O:7.4
+bmse000744:51-45-6:500:Histamine:D2O:7.4
+bmse000744:924364-91-0:500:Histamine:D2O:7.4
+bmse000745:156-86-5:500:Homoarginine:D2O:7.4
+bmse000745:13094-78-5:500:Homoarginine:D2O:7.4
+bmse000746:498-24-8:500:Mesaconic acid:D2O:7.4
+bmse000747:31112-62-6:500:Metrizamide:D2O:7.4
+bmse000748:120-89-8:500:Parabanic acid:D2O:7.4
+bmse000749:1164-98-3:500:21-Hydroxypregnenolone:CDCl3:n/a
+bmse000750:87-28-5:500:2-Hydroxyethyl salicylate:CDCl3:n/a
+bmse000751:82-02-0:500:khellin:CDCl3:n/a
+bmse000752:329-98-6:500:Phenylmethanesulfonyl fluoride:CDCl3:n/a
+bmse000753:503027-85-8:500:Polyoxyethylene 23 lauryl ether:CDCl3:n/a
+bmse000753:8027-11-0:500:Polyoxyethylene 23 lauryl ether:CDCl3:n/a
+bmse000753:183117-57-9:500:Polyoxyethylene 23 lauryl ether:CDCl3:n/a
+bmse000753:86727-31-3:500:Polyoxyethylene 23 lauryl ether:CDCl3:n/a
+bmse000753:869893-21-0:500:Polyoxyethylene 23 lauryl ether:CDCl3:n/a
+bmse000753:1334-72-1:500:Polyoxyethylene 23 lauryl ether:CDCl3:n/a
+bmse000753:148498-91-3:500:Polyoxyethylene 23 lauryl ether:CDCl3:n/a
+bmse000753:942439-95-4:500:Polyoxyethylene 23 lauryl ether:CDCl3:n/a
+bmse000753:234761-83-2:500:Polyoxyethylene 23 lauryl ether:CDCl3:n/a
+bmse000753:384842-79-9:500:Polyoxyethylene 23 lauryl ether:CDCl3:n/a
+bmse000753:3055-99-0:500:Polyoxyethylene 23 lauryl ether:CDCl3:n/a
+bmse000753:53026-66-7:500:Polyoxyethylene 23 lauryl ether:CDCl3:n/a
+bmse000753:152206-24-1:500:Polyoxyethylene 23 lauryl ether:CDCl3:n/a
+bmse000753:147398-17-2:500:Polyoxyethylene 23 lauryl ether:CDCl3:n/a
+bmse000753:54351-54-1:500:Polyoxyethylene 23 lauryl ether:CDCl3:n/a
+bmse000753:9015-55-8:500:Polyoxyethylene 23 lauryl ether:CDCl3:n/a
+bmse000753:798544-27-1:500:Polyoxyethylene 23 lauryl ether:CDCl3:n/a
+bmse000753:6540-99-4:500:Polyoxyethylene 23 lauryl ether:CDCl3:n/a
+bmse000753:124401-71-4:500:Polyoxyethylene 23 lauryl ether:CDCl3:n/a
+bmse000753:87296-34-2:500:Polyoxyethylene 23 lauryl ether:CDCl3:n/a
+bmse000753:39316-02-4:500:Polyoxyethylene 23 lauryl ether:CDCl3:n/a
+bmse000753:56590-57-9:500:Polyoxyethylene 23 lauryl ether:CDCl3:n/a
+bmse000753:9002-92-0:500:Polyoxyethylene 23 lauryl ether:CDCl3:n/a
+bmse000753:71636-71-0:500:Polyoxyethylene 23 lauryl ether:CDCl3:n/a
+bmse000753:56093-86-8:500:Polyoxyethylene 23 lauryl ether:CDCl3:n/a
+bmse000753:348616-52-4:500:Polyoxyethylene 23 lauryl ether:CDCl3:n/a
+bmse000753:266678-04-0:500:Polyoxyethylene 23 lauryl ether:CDCl3:n/a
+bmse000753:101008-55-3:500:Polyoxyethylene 23 lauryl ether:CDCl3:n/a
+bmse000753:137736-73-3:500:Polyoxyethylene 23 lauryl ether:CDCl3:n/a
+bmse000753:64772-19-6:500:Polyoxyethylene 23 lauryl ether:CDCl3:n/a
+bmse000753:191546-41-5:500:Polyoxyethylene 23 lauryl ether:CDCl3:n/a
+bmse000753:39316-41-1:500:Polyoxyethylene 23 lauryl ether:CDCl3:n/a
+bmse000753:106254-08-4:500:Polyoxyethylene 23 lauryl ether:CDCl3:n/a
+bmse000753:14675-38-8:500:Polyoxyethylene 23 lauryl ether:CDCl3:n/a
+bmse000753:186762-97-0:500:Polyoxyethylene 23 lauryl ether:CDCl3:n/a
+bmse000753:176596-95-5:500:Polyoxyethylene 23 lauryl ether:CDCl3:n/a
+bmse000753:69344-85-0:500:Polyoxyethylene 23 lauryl ether:CDCl3:n/a
+bmse000753:106856-65-9:500:Polyoxyethylene 23 lauryl ether:CDCl3:n/a
+bmse000753:53241-34-2:500:Polyoxyethylene 23 lauryl ether:CDCl3:n/a
+bmse000753:777931-72-3:500:Polyoxyethylene 23 lauryl ether:CDCl3:n/a
+bmse000753:56939-70-9:500:Polyoxyethylene 23 lauryl ether:CDCl3:n/a
+bmse000753:37343-87-6:500:Polyoxyethylene 23 lauryl ether:CDCl3:n/a
+bmse000753:359786-16-6:500:Polyoxyethylene 23 lauryl ether:CDCl3:n/a
+bmse000753:1341-05-5:500:Polyoxyethylene 23 lauryl ether:CDCl3:n/a
+bmse000753:141875-75-4:500:Polyoxyethylene 23 lauryl ether:CDCl3:n/a
+bmse000753:221642-91-7:500:Polyoxyethylene 23 lauryl ether:CDCl3:n/a
+bmse000753:61373-94-2:500:Polyoxyethylene 23 lauryl ether:CDCl3:n/a
+bmse000753:201746-17-0:500:Polyoxyethylene 23 lauryl ether:CDCl3:n/a
+bmse000753:875119-83-8:500:Polyoxyethylene 23 lauryl ether:CDCl3:n/a
+bmse000753:86547-02-6:500:Polyoxyethylene 23 lauryl ether:CDCl3:n/a
+bmse000753:106254-09-5:500:Polyoxyethylene 23 lauryl ether:CDCl3:n/a
+bmse000753:62229-27-0:500:Polyoxyethylene 23 lauryl ether:CDCl3:n/a
+bmse000753:234764-37-5:500:Polyoxyethylene 23 lauryl ether:CDCl3:n/a
+bmse000753:57244-90-3:500:Polyoxyethylene 23 lauryl ether:CDCl3:n/a
+bmse000753:50815-86-6:500:Polyoxyethylene 23 lauryl ether:CDCl3:n/a
+bmse000753:504414-58-8:500:Polyoxyethylene 23 lauryl ether:CDCl3:n/a
+bmse000753:935753-05-2:500:Polyoxyethylene 23 lauryl ether:CDCl3:n/a
+bmse000753:234761-82-1:500:Polyoxyethylene 23 lauryl ether:CDCl3:n/a
+bmse000753:234761-81-0:500:Polyoxyethylene 23 lauryl ether:CDCl3:n/a
+bmse000753:9079-21-4:500:Polyoxyethylene 23 lauryl ether:CDCl3:n/a
+bmse000753:148093-10-1:500:Polyoxyethylene 23 lauryl ether:CDCl3:n/a
+bmse000753:51426-13-2:500:Polyoxyethylene 23 lauryl ether:CDCl3:n/a
+bmse000753:122779-58-2:500:Polyoxyethylene 23 lauryl ether:CDCl3:n/a
+bmse000753:55892-94-9:500:Polyoxyethylene 23 lauryl ether:CDCl3:n/a
+bmse000753:31798-98-8:500:Polyoxyethylene 23 lauryl ether:CDCl3:n/a
+bmse000753:101840-74-8:500:Polyoxyethylene 23 lauryl ether:CDCl3:n/a
+bmse000753:459409-03-1:500:Polyoxyethylene 23 lauryl ether:CDCl3:n/a
+bmse000753:362661-71-0:500:Polyoxyethylene 23 lauryl ether:CDCl3:n/a
+bmse000753:12789-47-8:500:Polyoxyethylene 23 lauryl ether:CDCl3:n/a
+bmse000753:55599-84-3:500:Polyoxyethylene 23 lauryl ether:CDCl3:n/a
+bmse000753:102329-60-2:500:Polyoxyethylene 23 lauryl ether:CDCl3:n/a
+bmse000753:54398-17-3:500:Polyoxyethylene 23 lauryl ether:CDCl3:n/a
+bmse000753:66048-74-6:500:Polyoxyethylene 23 lauryl ether:CDCl3:n/a
+bmse000753:102342-03-0:500:Polyoxyethylene 23 lauryl ether:CDCl3:n/a
+bmse000753:138100-08-0:500:Polyoxyethylene 23 lauryl ether:CDCl3:n/a
+bmse000753:50815-85-5:500:Polyoxyethylene 23 lauryl ether:CDCl3:n/a
+bmse000753:176235-62-4:500:Polyoxyethylene 23 lauryl ether:CDCl3:n/a
+bmse000753:11106-34-6:500:Polyoxyethylene 23 lauryl ether:CDCl3:n/a
+bmse000753:903524-77-6:500:Polyoxyethylene 23 lauryl ether:CDCl3:n/a
+bmse000753:61710-38-1:500:Polyoxyethylene 23 lauryl ether:CDCl3:n/a
+bmse000753:71932-08-6:500:Polyoxyethylene 23 lauryl ether:CDCl3:n/a
+bmse000753:189388-50-9:500:Polyoxyethylene 23 lauryl ether:CDCl3:n/a
+bmse000753:942929-81-9:500:Polyoxyethylene 23 lauryl ether:CDCl3:n/a
+bmse000753:37231-23-5:500:Polyoxyethylene 23 lauryl ether:CDCl3:n/a
+bmse000753:39363-77-4:500:Polyoxyethylene 23 lauryl ether:CDCl3:n/a
+bmse000754:17598-02-6:500:Precocene 1:CDCl3:n/a
+bmse000755:56172-67-9:500:Procyclidine:CDCl3:n/a
+bmse000755:77-37-2:500:Procyclidine:CDCl3:n/a
+bmse000755:107661-03-0:500:Procyclidine:CDCl3:n/a
+bmse000756:892-21-7:500:3-Nitrofluoranthene:CDCl3:n/a
+bmse000757:50-67-9:500:5_hydroxytryptamine:D2O:7.4
+bmse000758:484-20-8:500:5-Methoxypsoralen:CDCl3:n/a
+bmse000760:156-86-5:500:Homoarginine:D2O:7.4
+bmse000760:13094-78-5:500:Homoarginine:D2O:7.4
+bmse000761:498-24-8:500:Mesaconic acid:D2O:7.4
+bmse000762:59-99-4:500:neostigmine:D2O:7.4
+bmse000762:51-60-5:500:neostigmine:D2O:7.4
+bmse000763:6833-84-7:500:nonactin:CDCl3:n/a
+bmse000766:88-21-1:500:orthanilic acid:D2O:7.4
+bmse000767:471-25-0:500:Propiolic acid:D2O:7.4
+bmse000768:90-01-7:500:saligenin:D2O:7.4
+bmse000769:940-69-2:500:alpha-Lipoamide:methanol:n/a
+bmse000770:1464-44-4:500:Phenyl beta-D-glucoside:methanol:n/a
+bmse000771:89-05-4:500:Pyromellitic acid:methanol:n/a
+bmse000772:89-73-6:500:Salicylhydroxamic Acid:methanol:n/a
+bmse000773:112-24-3:500:triethylenetetramine:D2O:7.4
+bmse000774:512-56-1:500:Trimethyl Phosphate:D2O:7.4
+bmse000775:5813-86-5:500:3-Methoxybenzamide:methanol:n/a
+bmse000776:584-85-0:500:L-Anserine:D2O:7.4
+bmse000777:126-73-8:500:Tributyl Phosphate:benzene:n/a
+bmse000778:99-85-4:500:gamma-terpinene:CDCl3:n/a
+bmse000779:364-62-5:500:Metoclopramide:methanol:7.4
+bmse000780:75-58-1:500:Tetramethylammonium :D2O:7.4
+bmse000780:51-92-3:500:Tetramethylammonium :D2O:7.4
+bmse000780:75-57-0:500:Tetramethylammonium :D2O:7.4
+bmse000781:62-55-5:500:thioacetamide:D2O:7.4
+bmse000789:15231-31-9:500:Creatinine:D2O:6.836
+bmse000789:45514-66-7:500:Creatinine:D2O:6.836
+bmse000789:60-27-5:500:Creatinine:D2O:6.836
+bmse000789:82016-55-5:500:Creatinine:D2O:6.836
+bmse000790:116421-26-2:500:Imidazole:D2O:7.074
+bmse000790:146117-15-9:500:Imidazole:D2O:7.074
+bmse000790:1467-16-9:500:Imidazole:D2O:7.074
+bmse000790:288-32-4:500:Imidazole:D2O:7.074
+bmse000790:5587-42-8:500:Imidazole:D2O:7.074
+bmse000791:492-62-6:500:alpha-D-Glucose:D2O:8.202
+bmse000792:7365-45-9:500:HEPES:D2O:4.986
+bmse000792:75277-39-3:500:HEPES:D2O:4.986
+bmse000793:6860-47-5:500:1,4-D-xylobiose:D2O:7.4
+bmse000796:10517-44-9:700:1,3-diaminopropane:D2O:7.4
+bmse000796:109-76-2:700:1,3-diaminopropane:D2O:7.4
+bmse000796:54018-94-9:700:1,3-diaminopropane:D2O:7.4
+bmse000797:492-62-6:700:D-Glucose:D2O:7.4
+bmse000798:69-79-4:700:Maltose:D2O:7.4
+bmse000798:73824-72-3:700:Maltose:D2O:7.4
+bmse000798:77072-48-1:700:Maltose:D2O:7.4
+bmse000799:551-68-8:700:D-psicose:D2O:7.4
+bmse000800:372-75-8:700:L-Citrulline:D2O:7.4
+bmse000801:15303-07-8:700:2-Oxoglutarate:D2O:7.4
+bmse000801:17091-15-5:700:2-Oxoglutarate:D2O:7.4
+bmse000801:22202-68-2:700:2-Oxoglutarate:D2O:7.4
+bmse000801:27175-99-1:700:2-Oxoglutarate:D2O:7.4
+bmse000801:305-72-6:700:2-Oxoglutarate:D2O:7.4
+bmse000801:328-50-7:700:2-Oxoglutarate:D2O:7.4
+bmse000801:86248-59-1:700:2-Oxoglutarate:D2O:7.4
+bmse000801:997-43-3:700:2-Oxoglutarate:D2O:7.4
+bmse000802:7643-75-6:700:L-arabitol:D2O:7.4
+bmse000803:15060-73-8:700:D-Sorbitol:D2O:7.4
+bmse000803:36134-87-9:700:D-Sorbitol:D2O:7.4
+bmse000803:3959-53-3:700:D-Sorbitol:D2O:7.4
+bmse000803:50-70-4:700:D-Sorbitol:D2O:7.4
+bmse000803:63800-20-4:700:D-Sorbitol:D2O:7.4
+bmse000803:75398-79-7:700:D-Sorbitol:D2O:7.4
+bmse000803:8013-15-8:700:D-Sorbitol:D2O:7.4
+bmse000803:8014-89-9:700:D-Sorbitol:D2O:7.4
+bmse000803:8036-93-9:700:D-Sorbitol:D2O:7.4
+bmse000803:8042-39-5:700:D-Sorbitol:D2O:7.4
+bmse000803:8045-74-7:700:D-Sorbitol:D2O:7.4
+bmse000803:8046-05-7:700:D-Sorbitol:D2O:7.4
+bmse000803:98201-93-5:700:D-Sorbitol:D2O:7.4
+bmse000804:100405-08-1:700:Sucrose:D2O:7.4
+bmse000804:104242-10-6:700:Sucrose:D2O:7.4
+bmse000804:131932-12-2:700:Sucrose:D2O:7.4
+bmse000804:146054-35-5:700:Sucrose:D2O:7.4
+bmse000804:146187-04-4:700:Sucrose:D2O:7.4
+bmse000804:151756-02-4:700:Sucrose:D2O:7.4
+bmse000804:220376-22-7:700:Sucrose:D2O:7.4
+bmse000804:29253-78-9:700:Sucrose:D2O:7.4
+bmse000804:29764-06-5:700:Sucrose:D2O:7.4
+bmse000804:30027-72-6:700:Sucrose:D2O:7.4
+bmse000804:47167-52-2:700:Sucrose:D2O:7.4
+bmse000804:47185-09-1:700:Sucrose:D2O:7.4
+bmse000804:47257-91-0:700:Sucrose:D2O:7.4
+bmse000804:50857-68-6:700:Sucrose:D2O:7.4
+bmse000804:51909-69-4:700:Sucrose:D2O:7.4
+bmse000804:57-50-1:700:Sucrose:D2O:7.4
+bmse000804:64533-66-0:700:Sucrose:D2O:7.4
+bmse000804:65545-99-5:700:Sucrose:D2O:7.4
+bmse000804:75398-84-4:700:Sucrose:D2O:7.4
+bmse000804:76056-38-7:700:Sucrose:D2O:7.4
+bmse000804:78654-77-0:700:Sucrose:D2O:7.4
+bmse000804:80165-03-3:700:Sucrose:D2O:7.4
+bmse000804:8027-47-:700:Sucrose:D2O:7.4
+bmse000805:107-35-7:700:Taurine:D2O:7.4
+bmse000805:91105-79-2:700:Taurine:D2O:7.4
+bmse000806:10421-65-5:700:L(-)-Glutathione, oxidized:D2O:7.4
+bmse000806:121-24-4:700:L(-)-Glutathione, oxidized:D2O:7.4
+bmse000806:27025-41-8:700:L(-)-Glutathione, oxidized:D2O:7.4
+bmse000807:29796-42-7:700:Glycerol:D2O:7.4
+bmse000807:30049-52-6:700:Glycerol:D2O:7.4
+bmse000807:37228-54-9:700:Glycerol:D2O:7.4
+bmse000807:56-81-5:700:Glycerol:D2O:7.4
+bmse000807:75398-78-6:700:Glycerol:D2O:7.4
+bmse000807:78630-16-7:700:Glycerol:D2O:7.4
+bmse000807:8013-25-0:700:Glycerol:D2O:7.4
+bmse000808:2595-97-3:700:D-allose:D2O:7.4
+bmse000809:56-45-1:700:L-Serine:D2O:7.4
+bmse000809:6898-95-9:700:L-Serine:D2O:7.4
+bmse000810:13095-55-1:700:L-Threonine:D2O:7.4
+bmse000810:36676-50-3:700:L-Threonine:D2O:7.4
+bmse000810:72-19-5:700:L-Threonine:D2O:7.4
+bmse000811:16872-32-5:700:L-Valine:D2O:7.4
+bmse000811:7004-03-7:700:L-Valine:D2O:7.4
+bmse000811:72-18-4:700:L-Valine:D2O:7.4
+bmse000812:306-60-5:700:agmatine:D2O:7.4
+bmse000813:14641-93-1:700:Lactose:D2O:7.4
+bmse000814:110-60-1:700:Putrescine:D2O:7.4
+bmse000815:99-20-7:700:D-Trehalose:D2O:7.4
+bmse000816:12693-39-9:700:Uridine:D2O:7.4
+bmse000816:58-96-8:700:Uridine:D2O:7.4
+bmse000816:68184-15-6:700:Uridine:D2O:7.4
+bmse000817:64-19-7:700:Acetate:D2O:7.4
+bmse000817:77671-22-8:700:Acetate:D2O:7.4
+bmse000818:26811-96-1:700:Lactic Acid:D2O:7.4
+bmse000819:107-36-8:700:2-Hydroxyethanesulfonate:D2O:7.4
+bmse000819:1561-99-5:700:2-Hydroxyethanesulfonate:D2O:7.4
+bmse000819:1562-00-1:700:2-Hydroxyethanesulfonate:D2O:7.4
+bmse000819:51694-03-2:700:2-Hydroxyethanesulfonate:D2O:7.4
+bmse000819:57267-78-4:700:2-Hydroxyethanesulfonate:D2O:7.4
+bmse000820:28805-76-7:700:gamma-Aminobutyric acid:D2O:7.4
+bmse000820:56-12-2:700:gamma-Aminobutyric acid:D2O:7.4
+bmse000821:4042-36-8:700:Pyroglutamate:D2O:7.4
+bmse000823:6860-47-5:700:1,4-D-xylobiose:D2O:7.4
+bmse000824:902-04-5:500:2'-Deoxyguanosine 5'-monophosphate:D2O:7.4
+bmse000825:60-35-5:500:acetamide:D2O:7.4
+bmse000826:75-05-8:500:acetonitrile:D2O:7.4
+bmse000826:54841-72-4:500:acetonitrile:D2O:7.4
+bmse000827:644-90-6:500:DL-2-Aminocaprylic acid:D2O:11.59
+bmse000827:2187-07-7:500:DL-2-Aminocaprylic acid:D2O:11.59
+bmse000828:144-90-1:500:DL-3-Aminoisobutyric acid:D2O:7.4
+bmse000830:1946-82-3:500:Nalpha-Acetyl-L-lysine:D2O:7.4
+bmse000831:533-73-3:500:1,2,4-Benzenetriol:D2O:7.4
+bmse000832:7235-40-7:500:beta-carotene:CDCl3:n/a
+bmse000833:83-44-3:500:deoxycholic acid:methanol:n/a
+bmse000833:115349-14-9:500:deoxycholic acid:methanol:n/a
+bmse000834:106-42-3:500:p-xylene:CDCl3:n/a
+bmse000835:69771-31-9:500:2-chloro-4-ethylamino-6-isopropylamino-S-triazine:DMSO:n/a
+bmse000835:12797-72-7:500:2-chloro-4-ethylamino-6-isopropylamino-S-triazine:DMSO:n/a
+bmse000835:11121-31-6:500:2-chloro-4-ethylamino-6-isopropylamino-S-triazine:DMSO:n/a
+bmse000835:39400-72-1:500:2-chloro-4-ethylamino-6-isopropylamino-S-triazine:DMSO:n/a
+bmse000835:1912-24-9:500:2-chloro-4-ethylamino-6-isopropylamino-S-triazine:DMSO:n/a
+bmse000835:93616-39-8:500:2-chloro-4-ethylamino-6-isopropylamino-S-triazine:DMSO:n/a
+bmse000835:12040-45-8:500:2-chloro-4-ethylamino-6-isopropylamino-S-triazine:DMSO:n/a
+bmse000836:83-73-8:500:Iodoquinol:CDCl3:n/a
+bmse000837:1792-81-0:500:cis-1,2-Cyclohexanediol:CDCl3:n/a
+bmse000837:931-17-9:500:cis-1,2-Cyclohexanediol:CDCl3:n/a
+bmse000839:89-82-7:500:(+)-Pulegone:CDCl3:n/a
+bmse000840:141-84-4:500:rhodanine:methanol:n/a
+bmse000841:120-82-1:500:1,2,4-Trichlorobenzene:CDCl3:n/a
+bmse000841:63697-18-7:500:1,2,4-Trichlorobenzene:CDCl3:n/a
+bmse000842:488-93-7:500:3-Furoic acid:CDCl3:n/a
+bmse000843:824-42-0:500:3-Methylsalicylaldehyde:CDCl3:n/a
+bmse000844:823271-95-0:500:Isoprene:methanol:n/a
+bmse000844:78006-92-5:500:Isoprene:methanol:n/a
+bmse000844:78-79-5:500:Isoprene:methanol:n/a
+bmse000845:72-54-8:500:4,4'-DDD:CDCl3:n/a
+bmse000846:68988-18-1:500:Phthalic acid diethyl ester:CDCl3:n/a
+bmse000846:84-66-2:500:Phthalic acid diethyl ester:CDCl3:n/a
+bmse000847:1852-04-6:500:undecanedioic acid:methanol:n/a
+bmse000847:138950-82-0:500:undecanedioic acid:methanol:n/a
+bmse000848:527-72-0:500:2-Thiophenecarboxylic acid:CDCl3:n/a
+bmse000851:124-13-0:500:octanal:methanol:n/a
+bmse000852:593-39-5:500:Petroselinic acid:methanol:n/a
+bmse000853:143-57-7:500:Protoveratrine:methanol:n/a
+bmse000853:11016-42-5:500:Protoveratrine:methanol:n/a
+bmse000853:1360-61-8:500:Protoveratrine:methanol:n/a
+bmse000854:10168-83-9:600:ATP:D2O:7.4
+bmse000854:16488-07-6:600:ATP:D2O:7.4
+bmse000854:51569-41-6:600:ATP:D2O:7.4
+bmse000854:56-65-5:600:ATP:D2O:7.4
+bmse000854:71800-44-7:600:ATP:D2O:7.4
+bmse000854:84412-18-0:600:ATP:D2O:7.4
+bmse000855:492-62-6:600:D-Glucose:D2O:7.4
+bmse000856:29796-42-7:600:Glycerol:D2O:7.4
+bmse000856:30049-52-6:600:Glycerol:D2O:7.4
+bmse000856:37228-54-9:600:Glycerol:D2O:7.4
+bmse000856:56-81-5:600:Glycerol:D2O:7.4
+bmse000856:75398-78-6:600:Glycerol:D2O:7.4
+bmse000856:78630-16-7:600:Glycerol:D2O:7.4
+bmse000856:8013-25-0:600:Glycerol:D2O:7.4
+bmse000857:64-19-7:600:Acetate:D2O:7.4
+bmse000857:77671-22-8:600:Acetate:D2O:7.4
+bmse000858:372-75-8:600:L-Citrulline:D2O:7.4
+bmse000859:13095-55-1:600:L-Threonine:D2O:7.4
+bmse000859:36676-50-3:600:L-Threonine:D2O:7.4
+bmse000859:72-19-5:600:L-Threonine:D2O:7.4
+bmse000860:16872-32-5:600:L-Valine:D2O:7.4
+bmse000860:7004-03-7:600:L-Valine:D2O:7.4
+bmse000860:72-18-4:600:L-Valine:D2O:7.4
+bmse000861:22051-90-7:600:adenine:D2O:11.6
+bmse000861:42911-33-1:600:adenine:D2O:11.6
+bmse000861:42911-34-2:600:adenine:D2O:11.6
+bmse000861:520-75-2:600:adenine:D2O:11.6
+bmse000861:73-24-5:600:adenine:D2O:11.6
+bmse000862:110-60-1:600:Putrescine:D2O:7.4
+bmse000863:107-35-7:600:Taurine:D2O:7.4
+bmse000863:91105-79-2:600:Taurine:D2O:7.4
+bmse000864:12693-39-9:600:Uridine:D2O:7.4
+bmse000864:58-96-8:600:Uridine:D2O:7.4
+bmse000864:68184-15-6:600:Uridine:D2O:7.4
+bmse000865:87-81-0:600:D_tagatose:D2O:7.4
+bmse000866:7004-09-3:600:L-Isoleucine:D2O:7.4
+bmse000866:73-32-5:600:L-Isoleucine:D2O:7.4
+bmse000867:56-45-1:600:L-Serine:D2O:7.4
+bmse000867:6898-95-9:600:L-Serine:D2O:7.4
+bmse000868:6912-86-3:600:L-Tryptophan:D2O:7.4
+bmse000868:73-22-3:600:L-Tryptophan:D2O:7.4
+bmse000868:80206-30-0:600:L-Tryptophan:D2O:7.4
+bmse000869:7643-75-6:600:L-arabitol:D2O:7.4
+bmse000870:51-67-2:600:Tyramine:D2O:7.4
+bmse000871:28805-76-7:600:gamma-Aminobutyric acid:D2O:7.4
+bmse000871:56-12-2:600:gamma-Aminobutyric acid:D2O:7.4
+bmse000872:10517-44-9:600:1,3-diaminopropane:D2O:7.4
+bmse000872:109-76-2:600:1,3-diaminopropane:D2O:7.4
+bmse000872:54018-94-9:600:1,3-diaminopropane:D2O:7.4
+bmse000873:162756-82-3:600:AMP:D2O:7.4
+bmse000873:47286-65-7:600:AMP:D2O:7.4
+bmse000873:47287-97-8:600:AMP:D2O:7.4
+bmse000873:53624-78-5:600:AMP:D2O:7.4
+bmse000873:61-19-8:600:AMP:D2O:7.4
+bmse000873:67583-85-1:600:AMP:D2O:7.4
+bmse000874:147-74-0:600:D-mannose:D2O:7.4
+bmse000874:3458-28-4:600:D-mannose:D2O:7.4
+bmse000875:1115-63-5:600:L-Aspartate:D2O:7.4
+bmse000875:14007-45-5:600:L-Aspartate:D2O:7.4
+bmse000875:17090-93-6:600:L-Aspartate:D2O:7.4
+bmse000875:181119-33-5:600:L-Aspartate:D2O:7.4
+bmse000875:2001-89-0:600:L-Aspartate:D2O:7.4
+bmse000875:2068-80-6:600:L-Aspartate:D2O:7.4
+bmse000875:21059-46-1:600:L-Aspartate:D2O:7.4
+bmse000875:3792-50-5:600:L-Aspartate:D2O:7.4
+bmse000875:39162-75-9:600:L-Aspartate:D2O:7.4
+bmse000875:5598-53-8:600:L-Aspartate:D2O:7.4
+bmse000875:56-84-8:600:L-Aspartate:D2O:7.4
+bmse000875:6899-03-2:600:L-Aspartate:D2O:7.4
+bmse000876:99-20-7:600:D-Trehalose:D2O:7.4
+bmse000877:7365-45-9:600:HEPES:D2O:7.4
+bmse000877:75277-39-3:600:HEPES:D2O:7.4
+bmse000878:4042-36-8:600:Pyroglutamate:D2O:7.4
+bmse000879:902-04-5:600:2'-Deoxyguanosine 5'-monophosphate:D2O:7.4
+bmse000880:1852-04-6:600:undecanedioic acid:methanol:n/a
+bmse000880:138950-82-0:600:undecanedioic acid:methanol:n/a
+bmse000881:582-60-5:600:5,6-Dimethylbenzimidazole:CD3OD:n/a
+bmse000882:147-74-0:700:D-mannose:D2O:7.4
+bmse000882:3458-28-4:700:D-mannose:D2O:7.4
+bmse000883:87-81-0:700:D_tagatose:D2O:7.4
+bmse000884:7004-09-3:700:L-Isoleucine:D2O:7.4
+bmse000884:73-32-5:700:L-Isoleucine:D2O:7.4
+bmse000885:56-45-1:700:L-Serine:D2O:7.4
+bmse000885:6898-95-9:700:L-Serine:D2O:7.4
+bmse000886:28296-13-1:700:adonitol:D2O:7.4
+bmse000886:488-81-3:700:adonitol:D2O:7.4
+bmse000886:84709-28-4:700:adonitol:D2O:7.4
+bmse000887:150-13-0:700:4_aminobenzoic_acid:D2O:7.4
+bmse000887:8014-65-1:700:4_aminobenzoic_acid:D2O:7.4
+bmse000888:12712-98-0:700:Inosine:D2O:7.4
+bmse000888:132953-54-9:700:Inosine:D2O:7.4
+bmse000888:28861-88-3:700:Inosine:D2O:7.4
+bmse000888:4181-51-5:700:Inosine:D2O:7.4
+bmse000888:58-63-9:700:Inosine:D2O:7.4
+bmse000889:23315-16-4:700:Cellobiose:D2O:7.4
+bmse000889:528-50-7:700:Cellobiose:D2O:7.4
+bmse000890:7365-45-9:700:HEPES:D2O:7.4
+bmse000890:75277-39-3:700:HEPES:D2O:7.4
+bmse000891:51-67-2:700:Tyramine:D2O:7.4
+bmse000895:60-35-5:700:acetamide:D2O:7.4
+bmse000896:75-05-8:700:acetonitrile:D2O:7.4
+bmse000896:54841-72-4:700:acetonitrile:D2O:7.4
+bmse000897:348-66-3:600:D-Ornithine:D2O:7.4
+bmse000898:133-56-2:600:D-Xylose:D2O:7.4
+bmse000898:141492-19-5:600:D-Xylose:D2O:7.4
+bmse000898:58-86-6:600:D-Xylose:D2O:7.4
+bmse000899:142-49-4:600:L-Arginine:D2O:7.4
+bmse000899:7004-12-8:600:L-Arginine:D2O:7.4
+bmse000899:74-79-3:600:L-Arginine:D2O:7.4
+bmse000900:10549-09-4:600:L-Phenylalanine:D2O:7.4
+bmse000900:3617-44-5:600:L-Phenylalanine:D2O:7.4
+bmse000900:5297-02-9:600:L-Phenylalanine:D2O:7.4
+bmse000900:63-91-2:600:L-Phenylalanine:D2O:7.4
+bmse000900:673-06-3:600:L-Phenylalanine:D2O:7.4
+bmse000900:67675-33-6:600:L-Phenylalanine:D2O:7.4
+bmse000901:53319-35-0:600:Myo-Inositol:D2O:7.4
+bmse000901:87-89-8:600:Myo-Inositol:D2O:7.4
+bmse000902:53188-23-1:600:D-fructose:D2O:7.4
+bmse000903:3615-56-3:600:D-sorbose:D2O:7.4
+bmse000904:41308-42-3:600:DL-Malic Acid:D2O:7.4
+bmse000904:617-48-1:600:DL-Malic Acid:D2O:7.4
+bmse000904:676-46-0:600:DL-Malic Acid:D2O:7.4
+bmse000904:6915-15-7:600:DL-Malic Acid:D2O:7.4
+bmse000905:300-85-6:600:3-Hydroxybutyrate:D2O:7.4
+bmse000905:625-71-8:600:3-Hydroxybutyrate:D2O:7.4
+bmse000906:10421-65-5:600:L(-)-Glutathione, oxidized:D2O:7.4
+bmse000906:121-24-4:600:L(-)-Glutathione, oxidized:D2O:7.4
+bmse000906:27025-41-8:600:L(-)-Glutathione, oxidized:D2O:7.4
+bmse000907:2004-06-0:500:6-Chloropurine riboside:DMSO:n/a
+bmse000907:5399-87-1:500:6-Chloropurine riboside:DMSO:n/a
+bmse000908:474-25-9:500:Chenodeoxycholic acid:acetone:n/a
+bmse000909:51-61-6:500:Dopamine:DMSO:n/a
+bmse000911:27070-47-9:500:tetrahydrobiopterin:DMSO:n/a
+bmse000911:17528-72-2:500:tetrahydrobiopterin:DMSO:n/a
+bmse000911:62989-33-7:500:tetrahydrobiopterin:DMSO:n/a
+bmse000912:32640-57-6:600:L-Asparagine:D2O:7.4
+bmse000912:328-41-6:600:L-Asparagine:D2O:7.4
+bmse000912:70-47-3:600:L-Asparagine:D2O:7.4
+bmse000912:7006-34-0:600:L-Asparagine:D2O:7.4
+bmse000913:10549-13-0:600:L-glutamic acid:D2O:7.4
+bmse000913:138-15-8:600:L-glutamic acid:D2O:7.4
+bmse000913:138-16-9:600:L-glutamic acid:D2O:7.4
+bmse000913:16690-92-9:600:L-glutamic acid:D2O:7.4
+bmse000913:19238-49-4:600:L-glutamic acid:D2O:7.4
+bmse000913:19473-49-5:600:L-glutamic acid:D2O:7.4
+bmse000913:24595-14-0:600:L-glutamic acid:D2O:7.4
+bmse000913:55695-80-2:600:L-glutamic acid:D2O:7.4
+bmse000913:56-86-0:600:L-glutamic acid:D2O:7.4
+bmse000913:6899-05-4:600:L-glutamic acid:D2O:7.4
+bmse000913:7558-63-6:600:L-glutamic acid:D2O:7.4
+bmse000914:280114-50-3:600:L-Lysine:D2O:7.4
+bmse000914:48050-57-3:600:L-Lysine:D2O:7.4
+bmse000914:56-87-1:600:L-Lysine:D2O:7.4
+bmse000914:57282-49-2:600:L-Lysine:D2O:7.4
+bmse000914:657-27-2:600:L-Lysine:D2O:7.4
+bmse000914:6899-06-5:600:L-Lysine:D2O:7.4
+bmse000915:24425-78-3:600:L-Methionine:D2O:7.4
+bmse000915:63-68-3:600:L-Methionine:D2O:7.4
+bmse000915:7005-18-7:600:L-Methionine:D2O:7.4
+bmse000916:150-13-0:600:4_aminobenzoic_acid:D2O:7.4
+bmse000916:8014-65-1:600:4_aminobenzoic_acid:D2O:7.4
+bmse000917:118-92-3:600:anthranilic acid:D2O:7.4
+bmse000917:14342-65-5:600:anthranilic acid:D2O:7.4
+bmse000917:2099-63-0:600:anthranilic acid:D2O:7.4
+bmse000917:552-37-4:600:anthranilic acid:D2O:7.4
+bmse000917:60613-06-1:600:anthranilic acid:D2O:7.4
+bmse000917:7058-55-1:600:anthranilic acid:D2O:7.4
+bmse000917:7459-95-2:600:anthranilic acid:D2O:7.4
+bmse000917:80206-34-4:600:anthranilic acid:D2O:7.4
+bmse000918:100405-08-1:600:Sucrose:D2O:7.4
+bmse000918:104242-10-6:600:Sucrose:D2O:7.4
+bmse000918:131932-12-2:600:Sucrose:D2O:7.4
+bmse000918:146054-35-5:600:Sucrose:D2O:7.4
+bmse000918:146187-04-4:600:Sucrose:D2O:7.4
+bmse000918:151756-02-4:600:Sucrose:D2O:7.4
+bmse000918:220376-22-7:600:Sucrose:D2O:7.4
+bmse000918:29253-78-9:600:Sucrose:D2O:7.4
+bmse000918:29764-06-5:600:Sucrose:D2O:7.4
+bmse000918:30027-72-6:600:Sucrose:D2O:7.4
+bmse000918:47167-52-2:600:Sucrose:D2O:7.4
+bmse000918:47185-09-1:600:Sucrose:D2O:7.4
+bmse000918:47257-91-0:600:Sucrose:D2O:7.4
+bmse000918:50857-68-6:600:Sucrose:D2O:7.4
+bmse000918:51909-69-4:600:Sucrose:D2O:7.4
+bmse000918:57-50-1:600:Sucrose:D2O:7.4
+bmse000918:64533-66-0:600:Sucrose:D2O:7.4
+bmse000918:65545-99-5:600:Sucrose:D2O:7.4
+bmse000918:75398-84-4:600:Sucrose:D2O:7.4
+bmse000918:76056-38-7:600:Sucrose:D2O:7.4
+bmse000918:78654-77-0:600:Sucrose:D2O:7.4
+bmse000918:80165-03-3:600:Sucrose:D2O:7.4
+bmse000918:8027-47-:600:Sucrose:D2O:7.4
+bmse000919:142-49-4:600:L-Arginine:D2O:7.4
+bmse000919:7004-12-8:600:L-Arginine:D2O:7.4
+bmse000919:74-79-3:600:L-Arginine:D2O:7.4
+bmse000920:61-90-5:600:L- Leucine:D2O:7.4
+bmse000920:7005-03-0:600:L- Leucine:D2O:7.4
+bmse000921:10549-09-4:600:L-Phenylalanine:D2O:7.4
+bmse000921:3617-44-5:600:L-Phenylalanine:D2O:7.4
+bmse000921:5297-02-9:600:L-Phenylalanine:D2O:7.4
+bmse000921:63-91-2:600:L-Phenylalanine:D2O:7.4
+bmse000921:673-06-3:600:L-Phenylalanine:D2O:7.4
+bmse000921:67675-33-6:600:L-Phenylalanine:D2O:7.4
+bmse000922:53319-35-0:600:Myo-Inositol:D2O:7.4
+bmse000922:87-89-8:600:Myo-Inositol:D2O:7.4
+bmse000923:51-48-9:500:L-Thyroxine:DMSO:n/a
+bmse000924:75319-47-0:500:Miconazole:DMSO:n/a
+bmse000924:22916-47-8:500:Miconazole:DMSO:n/a
+bmse000925:586-96-9:500:nitrosobenzene:CDCl3:n/a
+bmse000926:373-49-9:500:Palmitoleic acid:CDCl3:n/a
+bmse000927:81-24-3:500:Taurocholic acid:DMSO:n/a
+bmse000928:93196-73-7:500:thiram:CDCl3:n/a
+bmse000928:12680-62-5:500:thiram:CDCl3:n/a
+bmse000928:66173-72-6:500:thiram:CDCl3:n/a
+bmse000928:12680-07-8:500:thiram:CDCl3:n/a
+bmse000928:137-26-8:500:thiram:CDCl3:n/a
+bmse000928:56645-31-9:500:thiram:CDCl3:n/a
+bmse000928:39456-80-9:500:thiram:CDCl3:n/a
+bmse000929:554-52-9:500:3-Methoxytyramine:D2O:7.4
+bmse000930:82-82-6:500:4-Pyridoxic acid:D2O:7.4
+bmse000930:524-07-2:500:4-Pyridoxic acid:D2O:7.4
+bmse000931:2387-71-5:500:Argininosuccinic acid:D2O:7.4
+bmse000932:5652-28-8:500:3-Phosphono-DL-alanine:D2O:7.4
+bmse000933:51-61-6:500:Dopamine:D2O:7.4
+bmse000935:58-64-0:600:ADP:D2O:7.4
+bmse000935:84412-16-8:600:ADP:D2O:7.4
+bmse000936:306-60-5:600:agmatine:D2O:7.4
+bmse000937:15303-07-8:600:2-Oxoglutarate:D2O:7.4
+bmse000937:17091-15-5:600:2-Oxoglutarate:D2O:7.4
+bmse000937:22202-68-2:600:2-Oxoglutarate:D2O:7.4
+bmse000937:27175-99-1:600:2-Oxoglutarate:D2O:7.4
+bmse000937:305-72-6:600:2-Oxoglutarate:D2O:7.4
+bmse000937:328-50-7:600:2-Oxoglutarate:D2O:7.4
+bmse000937:86248-59-1:600:2-Oxoglutarate:D2O:7.4
+bmse000937:997-43-3:600:2-Oxoglutarate:D2O:7.4
+bmse000938:14641-93-1:600:Lactose:D2O:7.4
+bmse000939:23315-16-4:600:Cellobiose:D2O:7.4
+bmse000939:528-50-7:600:Cellobiose:D2O:7.4
+bmse000940:144104-68-7:600:Uracil:D2O:7.4
+bmse000940:42910-77-0:600:Uracil:D2O:7.4
+bmse000940:4433-21-0:600:Uracil:D2O:7.4
+bmse000940:4433-24-3:600:Uracil:D2O:7.4
+bmse000940:66-22-8:600:Uracil:D2O:7.4
+bmse000940:766-19-8:600:Uracil:D2O:7.4
+bmse000941:12795-04-9:500:Boric acid:D2O:7.3
+bmse000941:30698-98-7:500:Boric acid:D2O:7.3
+bmse000941:10043-35-3:500:Boric acid:D2O:7.3
+bmse000942:890-38-0:500:2'-Deoxyinosine:D2O:7.4
+bmse000943:28052-84-8:500:5-Methoxy-DL-tryptophan:D2O:7.4
+bmse000944:141-97-9:500:Ethyl acetoacetate:CDCl3:n/a
+bmse000945:525-82-6:500:Flavone:CDCl3:n/a
+bmse000946:69-79-4:600:Maltose:D2O:7.4
+bmse000946:73824-72-3:600:Maltose:D2O:7.4
+bmse000946:77072-48-1:600:Maltose:D2O:7.4
+bmse000947:147-85-3:600:L-Proline:D2O:7.4
+bmse000947:7005-20-1:600:L-Proline:D2O:7.4
+bmse000948:107-43-7:600:betaine:D2O:7.4
+bmse000948:11042-12-9:600:betaine:D2O:7.4
+bmse000948:24980-93-6:600:betaine:D2O:7.4
+bmse000948:45631-77-4:600:betaine:D2O:7.4
+bmse000948:590-30-7:600:betaine:D2O:7.4
+bmse000948:590-46-5:600:betaine:D2O:7.4
+bmse000949:461-06-3:600:D-Carnitine:D2O:7.4
+bmse000950:57-00-1:600:Creatine:D2O:7.4
+bmse000951:124-20-9:600:Spermidine:D2O:7.4
+bmse000952:70-18-8:600:Glutathione reduced:D2O:7.4
+bmse000953:67-48-1:600:Choline:D2O:7.4
+bmse000953:62-49-7:600:Choline:D2O:7.4
+bmse000953:139741-81-4:600:Choline:D2O:7.4
+bmse000955:124-20-9:700:Spermidine:D2O:7.4
+bmse000956:70-18-8:700:Glutathione reduced:D2O:7.4
+bmse000957:660-88-8:700:5-Aminovaleric aci:D2O:7.4
+bmse000957:627-95-2:700:5-Aminovaleric aci:D2O:7.4
+bmse000958:554-52-9:700:3-Methoxytyramine:D2O:7.4
+bmse000959:2387-71-5:700:Argininosuccinic acid:D2O:7.4
+bmse000961:1256-86-6:500:cholesteryl sulfate:DMSO:n/a
+bmse000962:1194-98-5:500:Gentisaldehyde:CD3OD:n/a
+bmse000963:1195-92-2:500:(+)-Limonene oxide:CDCl3:n/a
+bmse000964:11022-64-3:500:Ocimene:CDCl3:n/a
+bmse000964:1856-63-9:500:Ocimene:CDCl3:n/a
+bmse000964:3779-61-1:500:Ocimene:CDCl3:n/a
+bmse000964:11009-78-2:500:Ocimene:CDCl3:n/a
+bmse000964:13877-91-3:500:Ocimene:CDCl3:n/a
+bmse000965:551-68-8:600:D-psicose:D2O:7.4
+bmse000966:138-46-5:600:4-Hydroxyproline:D2O:7.4
+bmse000966:17210-41-2:600:4-Hydroxyproline:D2O:7.4
+bmse000966:21105-75-9:600:4-Hydroxyproline:D2O:7.4
+bmse000966:24784-87-0:600:4-Hydroxyproline:D2O:7.4
+bmse000966:51-35-4:600:4-Hydroxyproline:D2O:7.4
+bmse000966:54733-36-7:600:4-Hydroxyproline:D2O:7.4
+bmse000967:107-95-9:600:beta-alanine:D2O:7.4
+bmse000967:16690-93-0:600:beta-alanine:D2O:7.4
+bmse000967:36321-40-1:600:beta-alanine:D2O:7.4
+bmse000967:39748-53-3:600:beta-alanine:D2O:7.4
+bmse000967:87867-95-6:600:beta-alanine:D2O:7.4
+bmse000968:110-15-6:600:Succinic acid:D2O:7.4
+bmse000969:4395-95-3:600:Cytidine:D2O:7.4
+bmse000969:65-46-3:600:Cytidine:D2O:7.4
+bmse000970:111-87-5:500:1-Octanol:CDCl3:n/a
+bmse000971:123-00-2:500:3-Morpholinopropylamine:CDCl3:n/a
+bmse000972:123-72-8:500:Butyraldehyde:CDCl3:n/a
+bmse000973:6937-16-2:500:Ethyl 4-aminobutyrate:CDCl3:n/a
+bmse000974:120-29-6:500:Tropine:CDCl3:n/a
+bmse000974:28390-68-3:500:Tropine:CDCl3:n/a
+bmse000975:4371-52-2:600:L-Cysteine:D2O:7.4
+bmse000975:52-90-4:600:L-Cysteine:D2O:7.4
+bmse000975:7048-04-6:600:L-Cysteine:D2O:7.4
+bmse000976:150-35-6:600:L-Histidine:D2O:7.4
+bmse000976:155304-24-8:600:L-Histidine:D2O:7.4
+bmse000976:35479-49-3:600:L-Histidine:D2O:7.4
+bmse000976:35558-59-9:600:L-Histidine:D2O:7.4
+bmse000976:45955-20-2:600:L-Histidine:D2O:7.4
+bmse000976:54166-13-1:600:L-Histidine:D2O:7.4
+bmse000976:7006-35-1:600:L-Histidine:D2O:7.4
+bmse000976:71-00-1:600:L-Histidine:D2O:7.4
+bmse000977:15743-44-9:600:Glycine:D2O:7.4
+bmse000977:17829-66-2:600:Glycine:D2O:7.4
+bmse000977:29728-27-6:600:Glycine:D2O:7.4
+bmse000977:32817-15-5:600:Glycine:D2O:7.4
+bmse000977:33242-26-1:600:Glycine:D2O:7.4
+bmse000977:35947-07-0:600:Glycine:D2O:7.4
+bmse000977:513-29-1:600:Glycine:D2O:7.4
+bmse000977:52955-63-2:600:Glycine:D2O:7.4
+bmse000977:56-40-6:600:Glycine:D2O:7.4
+bmse000977:57678-19-0:600:Glycine:D2O:7.4
+bmse000977:6000-43-7:600:Glycine:D2O:7.4
+bmse000977:6000-44-8:600:Glycine:D2O:7.4
+bmse000977:63183-41-5:600:Glycine:D2O:7.4
+bmse000977:71295-98-2:600:Glycine:D2O:7.4
+bmse000977:7490-95-1:600:Glycine:D2O:7.4
+bmse000977:87867-94-5:600:Glycine:D2O:7.4
+bmse000978:12712-98-0:600:Inosine:D2O:7.4
+bmse000978:132953-54-9:600:Inosine:D2O:7.4
+bmse000978:28861-88-3:600:Inosine:D2O:7.4
+bmse000978:4181-51-5:600:Inosine:D2O:7.4
+bmse000978:58-63-9:600:Inosine:D2O:7.4
+bmse000979:26811-96-1:600:Lactic Acid:D2O:7.4
+bmse000980:111-87-5:600:1-Octanol:CDCl3:n/a
+bmse000981:123-00-2:600:3-Morpholinopropylamine:CDCl3:n/a
+bmse000982:3237-44-3:500:2-Isopropylmalic acid:D2O:7.4
+bmse000983:66638-22-0:500:O-Acetyl-L-serine:D2O:7.4
+bmse000983:5147-00-2:500:O-Acetyl-L-serine:D2O:7.4
+bmse000985:4250-77-5:500:6-Hydroxyflavanone:DMSO:n/a
+bmse000986:305-01-1:500:Esculetin:DMSO:n/a
+bmse000987:127-31-1:500:Fludrocortisone:DMSO:n/a
+bmse000988:525-57-5:500:Harmalol:DMSO:n/a
+bmse000989:84-79-7:500:lapachol:DMSO:n/a
+bmse000990:660-88-8:500:5-Aminovaleric acid:D2O:7.4
+bmse000990:627-95-2:500:5-Aminovaleric acid:D2O:7.4
+bmse000991:58-64-0:700:ADP:D2O:7.4
+bmse000991:84412-16-8:700:ADP:D2O:7.4
+bmse000992:162756-82-3:700:AMP:D2O:7.4
+bmse000992:47286-65-7:700:AMP:D2O:7.4
+bmse000992:47287-97-8:700:AMP:D2O:7.4
+bmse000992:53624-78-5:700:AMP:D2O:7.4
+bmse000992:61-19-8:700:AMP:D2O:7.4
+bmse000992:67583-85-1:700:AMP:D2O:7.4
+bmse000993:10168-83-9:700:ATP:D2O:7.4
+bmse000993:16488-07-6:700:ATP:D2O:7.4
+bmse000993:51569-41-6:700:ATP:D2O:7.4
+bmse000993:56-65-5:700:ATP:D2O:7.4
+bmse000993:71800-44-7:700:ATP:D2O:7.4
+bmse000993:84412-18-0:700:ATP:D2O:7.4
+bmse000994:115967-49-2:700:L-Alanine:D2O:7.4
+bmse000994:170805-71-7:700:L-Alanine:D2O:7.4
+bmse000994:56-41-7:700:L-Alanine:D2O:7.4
+bmse000994:6898-94-8:700:L-Alanine:D2O:7.4
+bmse000995:22051-90-7:700:adenine:D2O:11.6
+bmse000995:42911-33-1:700:adenine:D2O:11.6
+bmse000995:42911-34-2:700:adenine:D2O:11.6
+bmse000995:520-75-2:700:adenine:D2O:11.6
+bmse000995:73-24-5:700:adenine:D2O:11.6
+bmse000996:46946-45-6:700:adenosine:D2O:7.4
+bmse000996:46969-16-8:700:adenosine:D2O:7.4
+bmse000996:58-61-7:700:adenosine:D2O:7.4
+bmse000997:107-43-7:700:betaine:D2O:7.4
+bmse000997:11042-12-9:700:betaine:D2O:7.4
+bmse000997:24980-93-6:700:betaine:D2O:7.4
+bmse000997:45631-77-4:700:betaine:D2O:7.4
+bmse000997:590-30-7:700:betaine:D2O:7.4
+bmse000997:590-46-5:700:betaine:D2O:7.4
+bmse000998:617-12-9:700:Chorismate:D2O:7.4
+bmse000999:57-00-1:700:Creatine:D2O:7.4
+bmse001000:2490-97-3:700:n-acetyl-L- glutamine:D2O:7.4
+bmse001000:30703-24-3:700:n-acetyl-L- glutamine:D2O:7.4
+bmse001000:7577-60-8:700:n-acetyl-L- glutamine:D2O:7.4
+bmse001001:15231-31-9:700:Creatinine:D2O:7.4
+bmse001001:45514-66-7:700:Creatinine:D2O:7.4
+bmse001001:60-27-5:700:Creatinine:D2O:7.4
+bmse001001:82016-55-5:700:Creatinine:D2O:7.4
+bmse001002:305-84-0:700:Carnosine:D2O:7.4
+bmse001002:7683-28-5:700:Carnosine:D2O:7.4
+bmse001003:67-48-1:700:Choline:D2O:7.4
+bmse001003:62-49-7:700:Choline:D2O:7.4
+bmse001003:139741-81-4:700:Choline:D2O:7.4
+bmse001004:584-85-0:700:L-Anserine:D2O:7.4
+bmse001005:53188-23-1:600:D-fructose:D2O:7.4
+bmse001006:59-23-4:600:D-galactose:D2O:7.4
+bmse001007:15060-73-8:600:D-Sorbitol:D2O:7.4
+bmse001007:36134-87-9:600:D-Sorbitol:D2O:7.4
+bmse001007:3959-53-3:600:D-Sorbitol:D2O:7.4
+bmse001007:50-70-4:600:D-Sorbitol:D2O:7.4
+bmse001007:63800-20-4:600:D-Sorbitol:D2O:7.4
+bmse001007:75398-79-7:600:D-Sorbitol:D2O:7.4
+bmse001007:8013-15-8:600:D-Sorbitol:D2O:7.4
+bmse001007:8014-89-9:600:D-Sorbitol:D2O:7.4
+bmse001007:8036-93-9:600:D-Sorbitol:D2O:7.4
+bmse001007:8042-39-5:600:D-Sorbitol:D2O:7.4
+bmse001007:8045-74-7:600:D-Sorbitol:D2O:7.4
+bmse001007:8046-05-7:600:D-Sorbitol:D2O:7.4
+bmse001007:98201-93-5:600:D-Sorbitol:D2O:7.4
+bmse001008:2595-97-3:600:D-allose:D2O:7.4
+bmse001009:127-31-1:600:Fludrocortisone:DMSO:n/a
+bmse001010:525-57-5:600:Harmalol:DMSO:n/a
+bmse001011:67-42-5:500:EGTA:D2O:7.4
+bmse001012:53188-23-1:700:D-fructose:D2O:7.4
+bmse001013:10549-13-0:700:L-glutamic acid:D2O:7.4
+bmse001013:138-15-8:700:L-glutamic acid:D2O:7.4
+bmse001013:138-16-9:700:L-glutamic acid:D2O:7.4
+bmse001013:16690-92-9:700:L-glutamic acid:D2O:7.4
+bmse001013:19238-49-4:700:L-glutamic acid:D2O:7.4
+bmse001013:19473-49-5:700:L-glutamic acid:D2O:7.4
+bmse001013:24595-14-0:700:L-glutamic acid:D2O:7.4
+bmse001013:55695-80-2:700:L-glutamic acid:D2O:7.4
+bmse001013:56-86-0:700:L-glutamic acid:D2O:7.4
+bmse001013:6899-05-4:700:L-glutamic acid:D2O:7.4
+bmse001013:7558-63-6:700:L-glutamic acid:D2O:7.4
+bmse001014:32640-56-5:700:Glutamine:D2O:7.4
+bmse001014:56-85-9:700:Glutamine:D2O:7.4
+bmse001015:150-35-6:700:L-Histidine:D2O:7.4
+bmse001015:155304-24-8:700:L-Histidine:D2O:7.4
+bmse001015:35479-49-3:700:L-Histidine:D2O:7.4
+bmse001015:35558-59-9:700:L-Histidine:D2O:7.4
+bmse001015:45955-20-2:700:L-Histidine:D2O:7.4
+bmse001015:54166-13-1:700:L-Histidine:D2O:7.4
+bmse001015:7006-35-1:700:L-Histidine:D2O:7.4
+bmse001015:71-00-1:700:L-Histidine:D2O:7.4
+bmse001016:10549-09-4:700:L-Phenylalanine:D2O:7.4
+bmse001016:3617-44-5:700:L-Phenylalanine:D2O:7.4
+bmse001016:5297-02-9:700:L-Phenylalanine:D2O:7.4
+bmse001016:63-91-2:700:L-Phenylalanine:D2O:7.4
+bmse001016:673-06-3:700:L-Phenylalanine:D2O:7.4
+bmse001016:67675-33-6:700:L-Phenylalanine:D2O:7.4
+bmse001017:6912-86-3:700:L-Tryptophan:D2O:7.4
+bmse001017:73-22-3:700:L-Tryptophan:D2O:7.4
+bmse001017:80206-30-0:700:L-Tryptophan:D2O:7.4
+bmse001018:118-00-3:700:Guanosine:D2O:11.36
+bmse001018:484-80-0:700:Guanosine:D2O:11.36
+bmse001018:85-30-3:700:Guanosine:D2O:11.36
+bmse001019:107-95-9:700:beta-alanine:D2O:7.4
+bmse001019:16690-93-0:700:beta-alanine:D2O:7.4
+bmse001019:36321-40-1:700:beta-alanine:D2O:7.4
+bmse001019:39748-53-3:700:beta-alanine:D2O:7.4
+bmse001019:87867-95-6:700:beta-alanine:D2O:7.4
+bmse001020:4395-95-3:700:Cytidine:D2O:7.4
+bmse001020:65-46-3:700:Cytidine:D2O:7.4
+bmse001021:739-27-5:500:11-Ketoetiocholanolone:DMSO:n/a
+bmse001022:23205-42-7:500:3-Deazauridine:DMSO:n/a
+bmse001025:3237-44-3:700:2-Isopropylmalic acid:D2O:7.4
+bmse001029:104-88-1:400:4-chlorobenzaldehyde:benzene:n/a
+bmse001030:108-90-7:400:chlorobenzene:benzene:n/a
+bmse001032:739-27-5:600:11-Ketoetiocholanolone:DMSO:n/a
+bmse500001:63-05-8:500:Androstenedione:D2O:7.00

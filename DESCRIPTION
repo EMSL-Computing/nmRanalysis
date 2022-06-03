@@ -1,0 +1,63 @@
+Package: nmRanalysisApp
+Type: Package
+Title: User-Friendly GUI for Targeted NMR Profiling
+Version: 0.1.0
+Authors@R: 
+    c(person("Javier E.", "Flores", , "javier.flores@pnnl.gov", role = c("aut", "cre"),
+            comment = c(ORCID = "YOUR-ORCID-ID")),
+      person("Allison", "Thompson", email = "allison.thompson@pnnl.gov", role = c("aut", "cre"),
+            comment = c(ORCID = "YOUR-ORCID-ID")),
+      person("Anastasiya V.", "Prymolenna", , "anastasiya.prymolenna@pnnl.gov", role = c("aut"),
+            comment = c(ORCID = "YOUR-ORCID-ID")),
+      person("Natalie M.", "Winans", , "natalie.winans@pnnl.gov", role = c("aut"),
+            comment = c(ORCID = "0000-0002-5755-7200")))
+Description: This package allows for the completion of targeted metabolite nuclear magnetic resonance (NMR) profiling in a semi-automated manner. 
+  Users may upload experimental NMR spectral data and specify the experimental conditions under which these data were generated/collected. User may additionally
+  specify a list of metabolites that they suspect are measured within the collected spectra. These metabolites are queried against an internal
+  database containing relevant profiling information for several metabolites under a variety of experimental conditions. Database entries
+  that match the requested metabolites and were collected under similar experimental conditions are returned to the user. The user may then
+  edit these data as necessary prior to profiling. Once satisfied with any edit(s) made to the profiling data (i.e. fitting parameters), the 
+  user may initiate profiling and view the resulting metabolite quantifications and fits. 
+License: MIT
+Depends: 
+  R (>= 4.0.0),
+LazyData: TRUE
+URL: https://stash.pnnl.gov/projects/NMR/repos/nmranalysis/browse
+BugReports: https://code.emsl.pnl.gov/emslc60117/nmranalysis/-/issues
+Encoding: UTF-8
+VignetteBuilder: knitr
+Imports:
+    shiny,
+    shinyWidgets,
+    shinyFeedback,
+    shinycssloaders,
+    rDolphin,
+    dplyr,
+    magrittr,
+    ggplot2,
+    tidyr,
+    stringr,
+    tools,
+    readxl,
+    DT,
+    plotly,
+    trelliscopejs,
+    baseline,
+    grDevices,
+    utils,
+    lubridate,
+    stats,
+    rlang,
+    plyr,
+    purrr,
+    tidyselect,
+    rjson,
+    dbscan,
+    data.table,
+    tibble
+Suggests:
+    knitr,
+    rmarkdown,
+    testthat (>= 3.0.0)
+RoxygenNote: 7.1.2
+Config/testthat/edition: 3
