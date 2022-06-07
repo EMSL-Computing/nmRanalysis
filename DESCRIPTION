@@ -5,7 +5,7 @@ Version: 0.1.0
 Authors@R: 
     c(person("Javier E.", "Flores", , "javier.flores@pnnl.gov", role = c("aut", "cre"),
             comment = c(ORCID = "YOUR-ORCID-ID")),
-      person("Allison", "Thompson", email = "allison.thompson@pnnl.gov", role = c("aut", "cre"),
+      person("Allison", "Thompson", email = "allison.thompson@pnnl.gov", role = c("aut"),
             comment = c(ORCID = "YOUR-ORCID-ID")),
       person("Anastasiya V.", "Prymolenna", , "anastasiya.prymolenna@pnnl.gov", role = c("aut"),
             comment = c(ORCID = "YOUR-ORCID-ID")),
