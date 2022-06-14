@@ -1,0 +1,209 @@
+---
+title: "nmRanalysis_rDolphin"
+author: "Allison Thompson, Anastasiya Prymolenna"
+date: "`r Sys.Date()`"
+output: 
+  rmarkdown::html_vignette:
+    toc: true
+    toc_depth: 1
+vignette: >
+  %\VignetteIndexEntry{nmRanalysis_rDolphin}
+  %\VignetteEngine{knitr::knitr}
+  \usepackage[utf8]{inputenc}
+---
+
+```{r, include = FALSE}
+knitr::opts_chunk$set(
+  collapse = TRUE,
+  comment = "#>"
+)
+```
+
+```{r}
+library(nmRanalysis)
+library(rDolphin)
+library(trelliscopejs)
+library(dplyr)
+library(tidyr)
+library(tidyselect)
+library(plotly)
+library(purrr)
+```
+
+This vignette describes the nmRanalysis package functionality for automatic profiling of 1D NMR spectra using rDolphin. It is based on example data in the nmRanalysis package.
+
+## Data
+
+Below we load in 2 data.frames from the nmRanalysis package:
+
+-   `e_data`: A $p * (n + 1)$ data.frame of spectra data, where $p$ is the number of PPM's observed and $n$ is the number of samples (an additional PPM identifier/name column should also be present anywhere in the data.frame). Each row corresponds to data for each PPM.
+
+-   `f_data`: A data.frame with $n$ rows. Each row corresponds to a sample with one column giving the unique sample identifiers found in e_data column names and other columns providing qualitative and/or quantitative traits of each sample.
+
+```{r}
+load("../data/e_data.rda")
+load("../data/f_data.rda")
+```
+
+Here, $p$ is `r nrow(e_data)` and $n$ is `r nrow(f_data)`. The `f_data` data.frame contains the sample identifier and the experiment number for each sample.
+
+Next we create ppmData object, which contains the 2 components loaded above. During object creation, we specify the names of the identifier columns in the `e_data` and `f_data` components of the data (`edata_cname = "PPM", fdata_cname = "Sample"`, respectively), as well as the strength of the instrument used to generate this data (`instrument_strength = 800`), the pH the samples were run at (`ph = 7.33`), and the solvent used for the data (`solvent = "h2o"`).
+
+```{r}
+mydata <- as.ppmData(e_data = e_data,
+                     f_data = f_data,
+                     align = TRUE,
+                     edata_cname = "PPM", fdata_cname = "Sample",
+                     instrument_strength = 600, ph = 7.33, solvent = "h2o")
+```
+
+If you want to filter out any ppm range(s), use the following filter function. List a minimum and a maximum (inclusive) value and the range between them will be removed from the dataset. It's possible to run this function multiple times to remove multiple ranges of values.
+
+```{r}
+mydata <- filter_ppm(ppmData = mydata, range = list(min = 4.5, max = 5))
+```
+
+We next have a function to input a list of metabolites which should be present in the data and return associated BMRB numbers, ROI profiles, chemical shifts and tolerance, half bandwidth, multiplicity, J coupling, and Roof effect. The user may set a specified half bandwidth (`half_bandwidth = 1.4`) and a tolerance around the center of the peak (`roi_tol = 0.02`) to define the region of interest.
+
+```{r}
+mymetabs <- roi_ref_export(cas_list = list("56-41-7","74-79-3","70-47-3", # alanine, arginine, asparagine
+                                             "56-84-8","64-18-6",  # aspartate, cystine, formate ## 56-89-3 (cystine) is not a recognized CAS number
+                                             "56-86-0","56-85-9","56-40-6",  # glutamate, glutamine, glycine
+                                             "71-00-1","73-32-5","61-90-5",  # histidine, isoleucine, leucine
+                                             "56-87-1","63-68-3","63-91-2",  # lysine, methionine, phenylalanine
+                                             "147-85-3","56-45-1", # proline, pyroglutamate, serine ## 98-79-3 (pyroglutamate) is not a recognized CAS number
+                                             "72-19-5","73-22-3","60-18-4",  # threonine, tryptophan, tyrosine
+                                             "72-18-4"                       # valine
+                                          ), 
+                           instrument_strength = attr(mydata, "exp_info")$instrument_strength, 
+                           solvent_type = attr(mydata, "exp_info")$solvent, 
+                           half_bandwidth = 1.4,
+                           roi_tol = 0.02,
+                           ph =7.4)
+```
+
+```{r}
+allmetabs <- roi_ref_export(cas_list = list("56-41-7","74-79-3","70-47-3", # alanine, arginine, asparagine
+                                             "56-84-8","64-18-6",  # aspartate, cystine, formate ## 56-89-3 (cystine) is not a recognized CAS number
+                                             "56-86-0","56-85-9","56-40-6",  # glutamate, glutamine, glycine
+                                             "71-00-1","73-32-5","61-90-5",  # histidine, isoleucine, leucine
+                                             "56-87-1","63-68-3","63-91-2",  # lysine, methionine, phenylalanine
+                                             "147-85-3","56-45-1", # proline, pyroglutamate, serine ## 98-79-3 (pyroglutamate) is not a recognized CAS number
+                                             "72-19-5","73-22-3","60-18-4",  # threonine, tryptophan, tyrosine
+                                             "72-18-4"                       # valine
+                                          ),
+                           return_metabs = "all",
+                           # instrument_strength = attr(mydata, "exp_info")$instrument_strength, 
+                           # solvent_type = attr(mydata, "exp_info")$solvent, 
+                           half_bandwidth = 1.4,
+                           roi_tol = 0.02
+                           # ph =7.4
+                           )
+```
+
+We can take the ppmData object and the metabolites object we previously created and use them to create the input necessary for rDolphin. The following function formats the data objects, creates a temporary folder to store the files, and uses those files as input for rDolphin.
+
+```{r}
+imported_data <- ppmData_to_rDolphin(ppmData = mydata,
+                                 metabs = mymetabs)
+```
+
+## Optional Visualization
+
+Once the data is formatted for rDolphin, we can generate some initial plots and then tinker around with the input if we need to optimize parameters. These plots include \* exemplars_plot - figure of a subset of representative spectra of the dataset. This plot helps to determine the best parameters for quantification (for example, the number of signals to fit and chemical shift tolerance). \* median_plot - figure with the median spectrum for each group of spectra \* profile_model_spectrum - figure with performed fitting for every ROI and p-value for every bin
+
+```{r}
+mydolphin <- opt_rDolphin(imported_data = imported_data)
+mydolphin$total_signals_parameters
+```
+
+## Editing ROI reference data
+
+If you'd like to change the ROI information based on these plots, you can do so by modifying the ROI_data.
+
+```{r}
+
+roi_df <- imported_data$ROI_data
+```
+
+To edit the data you must know which parameters you wish to change based on the ppm it is found at.
+
+If you do not know the parameters available to edit, but you know the relative ppm of a reference peak you wish to edit, use the search function to return the row of editable parameters.
+
+```{r}
+search_edit_params(roi_df, ppm=3.75)
+```
+
+You may also narrow your search by providing a metabolite name to search by
+
+```{r}
+search_edit_params(roi_df, metabolite_name = "L-Alanine", ppm=3.75)
+```
+
+Knowing the parameters you wish to edit, re-define the ROI data frame with the same name as the input data frame to save the changes.
+
+```{r}
+roi_df <- edit_reference_data(roi_df, 
+                    metabolite_name = "L-Alanine", 
+                    ppm = 3.75, 
+                    parameter_name = "Quantification.Mode", 
+                    parameter_value = "Baseline Sum")
+```
+
+If you wish to edit multiple values at the same time, specify each change in order corresponding to each name and ppm. The length of all input vectors must be the same so the index of each individual change corresponds to the intended edit.
+
+```{r, warning=TRUE}
+roi_df <- edit_reference_data(roi_df, 
+                             metabolite_name = c("L-Arginine","L-Alanine"), 
+                             ppm = c(3.75, 3.75), 
+                             parameter_name = c("Quantification.Mode", "Roof.effect"), 
+                             parameter_value = c("Baseline Sum", "0.35"))
+```
+
+To insert these changes back into the rDolphin object, use
+
+```{r}
+imported_data$ROI_data <- roi_df
+```
+
+If after running rDolphin, the fits still do not look right, you may wish to come back and edit the feature that did not match quite correctly and run again with the modified ROI reference data.
+
+## Profiling
+
+Once you're satisfied with the ROI_data, we can actually run rDolphin. This function runs automatic_profiling from rDolphin, which performs automatic quantification of signals for all experiments using the information located in the ROI patterns file.
+
+```{r}
+profiling_data <- run_rDolphin(imported_data = imported_data)
+profiling_data$final_output$quantification
+```
+
+Now, we need to format the output before we can create a plot.
+
+```{r}
+plot.data <- format_plotting(profiling_data = profiling_data)
+```
+
+We also have a function to create a Trelliscope display. This function will create a single plot for every metabolite and sample combination.
+
+```{r}
+trel_plot(plot.data) %>% trelliscope(name = "Results")
+```
+
+Finally, we can look at the final calculated concentration for each metabolite.
+
+```{r}
+results <- as.data.frame(profiling_data$final_output$quantification) %>% 
+  dplyr::mutate(Sample = rownames(.)) %>%
+  tidyr::pivot_longer(names_to = "Metabolite", values_to = "Quantity", -Sample) %>%
+  tidyr::separate(col="Metabolite", into=c("Metabolite","Quantification Signal"), sep="_") %>%
+  dplyr::mutate(`Quantification Signal` = as.numeric(as.character(`Quantification Signal`))) %>%
+  dplyr::left_join(as.data.frame(mymetabs) %>%
+                     dplyr::mutate(Metabolite=gsub("-",".",Metabolite)) %>%
+                     dplyr::mutate(Multiplicity = as.numeric(as.character(Multiplicity))),
+                   by = c("Metabolite", "Quantification Signal")) %>%
+  dplyr::mutate(WeightedQuant = Quantity / Multiplicity) %>%
+  dplyr::group_by(Sample, Metabolite) %>%
+  dplyr::summarise(Concentration = median(WeightedQuant, na.rm=TRUE)) %>%
+  tidyr::pivot_wider(names_from = "Sample", values_from = "Concentration")
+results
+```
