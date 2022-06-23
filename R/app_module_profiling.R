@@ -5,8 +5,7 @@
 #' @details This is one of the UI components for the module created to handle all functions related to profiling
 #' of experimental data, based on user edits to the fitting parameters of a pre-specified list of
 #' reference (target) metabolites. The value provided for 'id' should be identical across the following:
-#' profiling_controlsUI(), profiling_trelliscopeUI(), profiling_quantificationUI(), profiling_summaryUI(), and
-#' profilingServer().
+#' profiling_completeviewUI(), profiling_detailedviewUI(), and profilingServer().
 #'
 #' This module component provides the UI element that allow users to:
 #' 1) View (within a trelliscope display) the fitted spectra over the sample spectra for all samples and target metabolites
@@ -21,6 +20,21 @@ profiling_completeviewUI <- function(id){
   )
 }
 
+#' Module: UI element to display trelliscope plot of fitted spectra
+#'
+#' @param id A string denoting the namespace id.
+#'
+#' @details This is one of the UI components for the module created to handle all functions related to profiling
+#' of experimental data, based on user edits to the fitting parameters of a pre-specified list of
+#' reference (target) metabolites. The value provided for 'id' should be identical across the following:
+#' profiling_completeviewUI(), profiling_detailedviewUI(), and profilingServer().
+#'
+#' This module component provides the UI elements that allow users to:
+#' 1) Select from several options to control the shown display
+#' 2) View interactively the fitted spectra of a given metabolite over a given sample spectrum
+#'
+#' @import shiny
+#'
 profiling_detailedviewUI <- function(id){
   ns <- NS(id)
 
@@ -39,12 +53,11 @@ profiling_detailedviewUI <- function(id){
 #' @details This is the server component for the module created to handle all functions related to profiling
 #' of experimental data, based on user edits to the fitting parameters of a pre-specified list of
 #' reference (target) metabolites. The value provided for 'id' should be identical across the following:
-#' profiling_controlsUI(), profiling_trelliscopeUI(), profiling_quantificationUI(), profiling_summaryUI(), and
-#' profilingServer().
+#' profiling_completeviewUI(), profiling_detailedviewUI(), and profilingServer()
 #'
 #' This module component provides the back-end code that:
 #' 1) Performs the profiling for all target metabolites for all sample spectra
-#' 2) Generates the trelliscope plot and variety of tables used to visualize and summarize the profiling results
+#' 2) Generates plots and table(s) used to visualize and summarize the profiling results
 #'
 #' @return A reactive object containing a list of two elements. The first element of this list, final_output, is the
 #' output of rDolphin's profiling procedure. The second element of the list, reproducibility_data, is some other component
@@ -61,22 +74,164 @@ profilingServer <- function(id, xpmt_data, ref_data){
   stopifnot(is.reactive(ref_data))
   moduleServer(id, function(input, output, session){
 
+    rv <- reactiveValues(obs_show_subplot_suspend = TRUE,
+                         new_profiling = FALSE)
+
     output$trelliscope <- trelliscopejs::renderTrelliscope({
 
       req(user_profiling())
+      # Create a new directory in the temp directory for each new instance of this trelliscope.
+      treldir <- file.path(tempdir(), paste0("Result_", format(Sys.time(), format = "%H-%m-%s", tz = "UTC")))
+      dir.create(treldir)
 
       user_profiling <- user_profiling()
-      plot.data <- format_plotting(profiling_data = user_profiling)
+      profiling_data = user_profiling
+      signals_to_plot = NULL
+
+      ############################## # Within this chunk is code adapted from format_plotting()
+      # plot all metabolites where there's at least one non-missing value
+      if (is.null(signals_to_plot)){
+        signals_to_plot <- which(apply(profiling_data$final_output$quantification, 2, function(x){all(is.na(x))}) == F)
+      }
+
+      # list of number of samples
+      p <- vector(mode = "list", length = nrow(profiling_data$final_output$quantification))
+
+      plotdataall.out <- list()
+
+      # loops for plotting
+      # for each metabolite
+      for (ind2 in signals_to_plot) {
+
+        plotdataall.in <- list()
+
+        # for each sample
+        for (ind in 1:nrow(profiling_data$final_output$quantification)) {
+
+          # x-axis data
+          Xdata <- profiling_data$reproducibility_data[[ind]][[ind2]]$Xdata
+
+          # if no data, move on
+          if(is.null(Xdata)){
+            next
+          }
+
+          # y-axis data
+          Ydata <- profiling_data$reproducibility_data[[ind]][[ind2]]$Ydata
+
+          # plot data
+          plot_data <- profiling_data$reproducibility_data[[ind]][[ind2]]$plot_data
+
+          # ROI profile
+          ROI_profile <- profiling_data$reproducibility_data[[ind]][[ind2]]$ROI_profile
+
+          # combine
+          plotdata2 <- data.frame(Xdata        = Xdata,
+                                  Ydata        = Ydata,
+                                  fitted_sum   = plot_data[3, ] , # fitted_sum
+                                  baseline_sum = plot_data[2, ]) # baseline_sum
+
+          # make long
+          plotdata3 <- reshape2::melt(plotdata2, id = "Xdata")
+
+          # specify variables
+          plotdata3$variable <- c(
+            rep('Original Spectrum', length(Ydata)),
+            rep('Generated Spectrum', length(Ydata)),
+            rep('Generated Background', length(Ydata))
+          )
+
+          r <- which(make.names(paste(ROI_profile[,4],ROI_profile[,5],sep='_')) == colnames(profiling_data$final_output$quantification)[ind2])
+          if(length(r) == 0){
+            next
+          }
+          plotdata <- data.frame(Xdata, signals = plot_data[3 + r,] )
+
+          # format plotdata3
+          plotdata3$variable2 <- plotdata3$variable
+
+          # format plotdata
+          colnames(plotdata)[which(colnames(plotdata) == "signals")] <- "value"
+          plotdata$variable  <- "Quantified Signal"
+          plotdata$variable2 <- "Quantified Signal"
+
+          # combine
+          temp                  <- rbind(plotdata, plotdata3)
+          temp$Sample           <- rownames(profiling_data$final_output$quantification)[ind]
+          plotdataall.in[[ind]] <- temp
+
+        }
+
+        tempdat <- ref_data()$quantdata %>%
+          dplyr::mutate(SigName = make.names(paste0(.data$Metabolite, "_", .data$`Quantification Signal`)),
+                        Signal = paste0(.data$Metabolite, " [", .data$`Quantification Signal`, "]"))
+
+        temp2               <- do.call(rbind, plotdataall.in)
+        temp2$Signal        <- tempdat$Signal[which(tempdat$SigName == colnames(profiling_data$final_output$quantification)[ind2])]
+        plotdataall.out[[ind2]] <- temp2
+      }
+
+      plotdataall <- do.call(rbind, plotdataall.out)
+
+      # Used to fix Signal names to be more consistent with UI display formatting
+      tempdat <- ref_data()$quantdata %>%
+        dplyr::mutate(SigName = make.names(paste0(.data$Metabolite, "_", .data$`Quantification Signal`)),
+                      Signal = paste0(.data$Metabolite, " [", .data$`Quantification Signal`, "]")) %>%
+        dplyr::ungroup() %>%
+        dplyr::select(SigName, Signal)
+
+      # Quantification data
+      temp_quantdat <- data.frame(Sample = rownames(profiling_data$final_output$quantification), profiling_data$final_output$quantification) %>%
+        tidyr::pivot_longer(-.data$Sample, names_to = "SigName", values_to = "Quantification") %>%
+        dplyr::left_join(tempdat, by = "SigName") %>% dplyr::select(-SigName)
+
+      # Signal to Area Ratio
+      temp_sardat <- data.frame(Sample = rownames(profiling_data$final_output$signal_area_ratio), profiling_data$final_output$signal_area_ratio) %>%
+        tidyr::pivot_longer(-.data$Sample, names_to = "SigName", values_to = "Signal to Area Ratio") %>%
+        dplyr::left_join(tempdat, by = "SigName") %>% dplyr::select(-SigName)
+
+      # Fitting Error
+      temp_fedat <- data.frame(Sample = rownames(profiling_data$final_output$fitting_error), profiling_data$final_output$fitting_error) %>%
+        tidyr::pivot_longer(-.data$Sample, names_to = "SigName", values_to = "Fitting Error") %>%
+        dplyr::left_join(tempdat, by = "SigName") %>% dplyr::select(-SigName)
+
+      # Chemical Shift
+      temp_csdat <- data.frame(Sample = rownames(profiling_data$final_output$chemical_shift), profiling_data$final_output$chemical_shift) %>%
+        tidyr::pivot_longer(-.data$Sample, names_to = "SigName", values_to = "Chemical Shift") %>%
+        dplyr::left_join(tempdat, by = "SigName") %>% dplyr::select(-SigName)
+
+      # Intensity
+      temp_intdat <- data.frame(Sample = rownames(profiling_data$final_output$intensity), profiling_data$final_output$intensity) %>%
+        tidyr::pivot_longer(-.data$Sample, names_to = "SigName", values_to = "Intensity") %>%
+        dplyr::left_join(tempdat, by = "SigName") %>% dplyr::select(-SigName)
+
+      # Half bandwidth
+      temp_hwdat <- data.frame(Sample = rownames(profiling_data$final_output$half_bandwidth), profiling_data$final_output$half_bandwidth) %>%
+        tidyr::pivot_longer(-.data$Sample, names_to = "SigName", values_to = "Half Bandwidth") %>%
+        dplyr::left_join(tempdat, by = "SigName") %>% dplyr::select(-SigName)
+
+
+      # Add Quantification, Signal to Area Ratio, Fitting Error, Chemical Shift, Intensity, Half Bandwidth
+      plotdataall2 <- plotdataall %>% dplyr::full_join(temp_quantdat, by = c("Sample", "Signal")) %>%
+        dplyr::full_join(temp_sardat, by = c("Sample", "Signal")) %>%
+        dplyr::full_join(temp_fedat, by = c("Sample", "Signal")) %>%
+        dplyr::full_join(temp_csdat, by = c("Sample", "Signal")) %>%
+        dplyr::full_join(temp_intdat, by = c("Sample", "Signal")) %>%
+        dplyr::full_join(temp_hwdat, by = c("Sample", "Signal"))
+      ##############################
+
+      # plot.data <- format_plotting(profiling_data = user_profiling)
+      plot.data <- plotdataall2
       plot.data %>%
-        tidyr::nest(data = !one_of(c("Sample", "Metabolite"))) %>%
+        tidyr::nest(data = !tidyselect::one_of(c("Sample", "Signal"))) %>%
         dplyr::mutate(
-          Quantification = purrr::map_dbl(data, ~ unique(.$Quantification)),
-          Signal_Area_Ratio = purrr::map_dbl(data, ~ unique(.$Signal_Area_Ratio)),
-          Fitting_Error = purrr::map_dbl(data, ~ unique(.$Fitting_Error)),
-          Chemical_Shift = purrr::map_dbl(data, ~ unique(.$Chemical_Shift)),
-          Intensity = purrr::map_dbl(data, ~ unique(.$Intensity)),
-          Half_Bandwidth = purrr::map_dbl(data, ~ unique(.$Half_Bandwidth)),
-          panel = trelliscopejs::map_plot(data, function(x){
+          Quantification = purrr::map_dbl(.data$data, ~ unique(.$Quantification)),
+          Signal_Area_Ratio = purrr::map_dbl(.data$data, ~ unique(.$`Signal to Area Ratio`)),
+          Fitting_Error = purrr::map_dbl(.data$data, ~ unique(.$`Fitting Error`)),
+          Chemical_Shift = purrr::map_dbl(.data$data, ~ unique(.$`Chemical Shift`)),
+          Intensity = purrr::map_dbl(.data$data, ~ unique(.$Intensity)),
+          Half_Bandwidth = purrr::map_dbl(.data$data, ~ unique(.$`Half Bandwidth`)),
+          panel = trelliscopejs::map_plot(.data$data, function(x){
             ggplot2::ggplot(data = subset(x, variable != "Quantified Signal"), ggplot2::aes(x = Xdata, y = value, color = variable))+
               ggplot2::geom_line() +
               ggplot2::geom_line(data = subset(x, variable == "Quantified Signal"), ggplot2::aes(x = Xdata, y = value, color=variable), alpha = 0.5)+
@@ -84,9 +239,9 @@ profilingServer <- function(id, xpmt_data, ref_data){
           })
         ) %>%
         trelliscopejs::trelliscope(name           = "Results",
-                                   path           = "www/",
+                                   path           = treldir,
                                    self_contained = TRUE,
-                                   state = list(labels = c("Sample", "Metabolite")))
+                                   state = list(labels = c("Sample", "Signal")))
 
     })
 
@@ -151,7 +306,7 @@ profilingServer <- function(id, xpmt_data, ref_data){
                                 .data$`Signal to Area Ratio`) %>%
         DT::datatable(rownames   = FALSE,
                       filter = "top",
-                      extensions = c("Responsive", "Buttons"),
+                      extensions = c("Responsive", "Buttons", "Scroller"),
                       options = exprToFunction(
                         list(dom = 'Bf',
                              buttons = list(
@@ -230,8 +385,11 @@ profilingServer <- function(id, xpmt_data, ref_data){
       req(xpmt_data())
       req(ref_data())
 
-
       input$view_detailed
+
+      if(rv$new_profiling){
+        input$refmet_to_plot
+      }
 
       isolate({
         profiling_data <- user_profiling()
@@ -241,6 +399,10 @@ profilingServer <- function(id, xpmt_data, ref_data){
         # Extract indices of reproducibility data that correspond to selected sample and metabolite
         selsamp_ind <- which(rownames(profiling_data$final_output$quantification) == input$sample_to_plot)
         selmet_inds <- which(grepl(make.names(input$refmet_to_plot), colnames(profiling_data$final_output$quantification)))
+
+        req(length(selmet_inds) > 0)
+
+        rv$new_profiling <- FALSE
 
         ROI_plots <- vector("list", length = length(selmet_inds))
         for(i in 1:length(selmet_inds)){
@@ -261,7 +423,7 @@ profilingServer <- function(id, xpmt_data, ref_data){
 
           # Update intensities accordingly
           plotdata$Intensity[plotdata$Intensity_Type == "Signal"] <-
-            tempdat$plot_data[which(grepl(make.names(input$refmet_to_plot), rownames(tempdat$plot_data))),]
+            colSums(tempdat$plot_data[which(grepl(make.names(input$refmet_to_plot), rownames(tempdat$plot_data))),,drop = FALSE])
           plotdata$Intensity[plotdata$Intensity_Type == "Background"] <-
             tempdat$plot_data[rownames(tempdat$plot_data) == "baseline_sum", ]
           plotdata$Intensity[plotdata$Intensity_Type == "Generated"] <-
@@ -274,7 +436,9 @@ profilingServer <- function(id, xpmt_data, ref_data){
         }
 
         ROI_plots <- Reduce("rbind", ROI_plots)
-        ROI_data <- ref_data()$user_edited_refdata %>% dplyr::filter(.data$Quantify == 1)
+        ROI_data <- ref_data()$user_edited_refdata %>% dplyr::filter(.data$Metabolite == input$refmet_to_plot, .data$Quantify == 1)
+        ROI_collapsed_data <- ref_data()$quantdata[!duplicated(ref_data()$quantdat$`ROI left edge (ppm)`),] %>%
+          dplyr::filter(.data$Metabolite == input$refmet_to_plot, .data$Quantify == 1)
 
         # Line shape update
         # Create default line object to add as shape to plot
@@ -288,10 +452,10 @@ profilingServer <- function(id, xpmt_data, ref_data){
         # Create list containing all line objects. For each line object in this list, populate with the
         # ROI information corresponding to the given reference metabolite peak.
         ROI_lines <- list()
-        for(i in 1:nrow(ROI_data)){
+        for(i in 1:nrow(ROI_collapsed_data)){
 
-          ROI_line[["x0"]]        <- ROI_data[i,,drop = FALSE]$"ROI left edge (ppm)"
-          ROI_line[["x1"]]        <- ROI_data[i,,drop = FALSE]$"ROI right edge (ppm)"
+          ROI_line[["x0"]]        <- ROI_collapsed_data[i,,drop = FALSE]$"ROI left edge (ppm)"
+          ROI_line[["x1"]]        <- ROI_collapsed_data[i,,drop = FALSE]$"ROI right edge (ppm)"
           ROI_line[c("y0", "y1")] <- 0
           ROI_lines               <- c(ROI_lines, list(ROI_line))
         }
@@ -309,13 +473,15 @@ profilingServer <- function(id, xpmt_data, ref_data){
         ROI_annots <- list()
         for(i in 1:nrow(ROI_data)){
           ROI_annot[["x"]]         <- ROI_data[i,,drop = FALSE]$"Chemical shift(ppm)"
-          ROI_annot[["text"]]      <- paste0(sprintf("<b>%s</b>", "ROI: "),
+          ROI_annot[["text"]]      <- paste0(sprintf("<b>%s</b>", paste0(ROI_data[i,,drop = FALSE]$Metabolite,
+                                                                         " [", ROI_data[i,,drop = FALSE]$`Quantification Signal`,
+                                                                         "]: ")),
                                              ROI_data[i,,drop = FALSE]$"Chemical shift(ppm)", " (",
                                              ROI_data[i,,drop = FALSE]$"ROI left edge (ppm)", ", ",
                                              ROI_data[i,,drop = FALSE]$"ROI right edge (ppm)", ")", " <br> ",
-                                             sprintf("<b>%s</b>", "Quantification: "), round(profiling_data$final_output$quantification[selsamp_ind, i],3), " <br> ",
-                                             sprintf("<b>%s</b>", "Signal to Area Ratio: "), round(profiling_data$final_output$signal_area_ratio[selsamp_ind, i],3), " <br> ",
-                                             sprintf("<b>%s</b>", "Fitting Error: "), round(profiling_data$final_output$fitting_error[selsamp_ind, i],3))
+                                             sprintf("<b>%s</b>", "Quantification: "), round(profiling_data$final_output$quantification[selsamp_ind, selmet_inds[i]],3), " <br> ",
+                                             sprintf("<b>%s</b>", "Signal to Area Ratio: "), round(profiling_data$final_output$signal_area_ratio[selsamp_ind, selmet_inds[i]],3), " <br> ",
+                                             sprintf("<b>%s</b>", "Fitting Error: "), round(profiling_data$final_output$fitting_error[selsamp_ind, selmet_inds[i]],3))
           ROI_annot[["arrowsize"]] <- ROI_data[i,,drop = FALSE]$"Chemical shift tolerance (ppm)"
           ROI_annot[["showarrow"]] <- TRUE
           ROI_annots               <- c(ROI_annots, list(ROI_annot))
@@ -326,7 +492,16 @@ profilingServer <- function(id, xpmt_data, ref_data){
         df_long <- xpmt_data_sample %>%
           tidyr::pivot_longer(!.data$PPM, names_to = "Sample", values_to = "Intensity")
 
-        ROI_plots %>% dplyr::group_by(.data$ROI) %>% plotly::plot_ly(source = "id_prof_refmet_view_plot") %>%
+        # Code to resume the observer that was started in a suspended state. We also update the value of
+        # rv$obs_show_subplot_suspend so that $resume() is not called every time this plot is rendered,
+        # but only after the first rendering of the plot.
+        if(rv$obs_show_subplot_suspend){
+          obs_show_subplot$resume()
+          rv$obs_show_subplot_suspend <- FALSE
+        }
+
+        ROI_plots %>% dplyr::group_by(.data$ROI) %>%
+          plotly::plot_ly(source = "id_prof_refmet_view_plot", type = "scatter", mode = "lines") %>%
           plotly::config(displaylogo = FALSE,
                          modeBarButtons = list(list("select2d"), list("zoom2d"), list("zoomIn2d"),
                                                list("zoomOut2d"), list("pan2d"), list("autoScale2d"),
@@ -387,14 +562,6 @@ profilingServer <- function(id, xpmt_data, ref_data){
 
       isolate({
 
-
-        df_long <- xpmt_data()$e_data %>%
-          tidyr::pivot_longer(!.data$PPM, names_to = "Sample", values_to = "Intensity")
-
-        df_long <- df_long %>% dplyr::filter(.data$PPM >= min(brushedData$x), .data$PPM <= max(brushedData$x))
-        df_long_selsamp <- df_long %>% dplyr::filter(.data$Sample == input$sample_to_plot)
-        df_long_nonselsamp <- df_long %>% dplyr::filter(.data$Sample != input$sample_to_plot)
-
         profiling_data <- user_profiling()
 
         # Extract indices of reproducibility data that correspond to selected sample and metabolite
@@ -420,7 +587,7 @@ profilingServer <- function(id, xpmt_data, ref_data){
 
           # Update intensities accordingly
           plotdata$Intensity[plotdata$Intensity_Type == "Signal"] <-
-            tempdat$plot_data[which(grepl(make.names(input$refmet_to_plot), rownames(tempdat$plot_data))),]
+            colSums(tempdat$plot_data[which(grepl(make.names(input$refmet_to_plot), rownames(tempdat$plot_data))),,drop = FALSE])
           plotdata$Intensity[plotdata$Intensity_Type == "Background"] <-
             tempdat$plot_data[rownames(tempdat$plot_data) == "baseline_sum", ]
           plotdata$Intensity[plotdata$Intensity_Type == "Generated"] <-
@@ -433,7 +600,15 @@ profilingServer <- function(id, xpmt_data, ref_data){
         }
 
         ROI_plots <- Reduce("rbind", ROI_plots)
-        ROI_data <- ref_data()$user_edited_refdata %>% dplyr::filter(.data$Quantify == 1)
+        ROI_data <- ref_data()$user_edited_refdata %>% dplyr::filter(.data$Metabolite == input$refmet_to_plot,
+                                                                     .data$Quantify == 1,
+                                                                     .data$`Chemical shift(ppm)` >= min(brushedData$x),
+                                                                     .data$`Chemical shift(ppm)` <= max(brushedData$x))
+        ROI_collapsed_data <- ref_data()$quantdata %>%
+          dplyr::filter(.data$Metabolite == input$refmet_to_plot, .data$Quantify == 1,
+                        .data$`Chemical shift(ppm)` >= min(brushedData$x),
+                        .data$`Chemical shift(ppm)` <= max(brushedData$x)) %>%
+          dplyr::filter(!duplicated(.data$`ROI left edge (ppm)`))
 
         # Line shape update
         # Create default line object to add as shape to plot
@@ -447,10 +622,10 @@ profilingServer <- function(id, xpmt_data, ref_data){
         # Create list containing all line objects. For each line object in this list, populate with the
         # ROI information corresponding to the given reference metabolite peak.
         ROI_lines <- list()
-        for(i in 1:nrow(ROI_data)){
+        for(i in 1:nrow(ROI_collapsed_data)){
 
-          ROI_line[["x0"]]        <- ROI_data[i,,drop = FALSE]$"ROI left edge (ppm)"
-          ROI_line[["x1"]]        <- ROI_data[i,,drop = FALSE]$"ROI right edge (ppm)"
+          ROI_line[["x0"]]        <- ROI_collapsed_data[i,,drop = FALSE]$"ROI left edge (ppm)"
+          ROI_line[["x1"]]        <- ROI_collapsed_data[i,,drop = FALSE]$"ROI right edge (ppm)"
           ROI_line[c("y0", "y1")] <- 0
           ROI_lines               <- c(ROI_lines, list(ROI_line))
         }
@@ -468,66 +643,85 @@ profilingServer <- function(id, xpmt_data, ref_data){
         ROI_annots <- list()
         for(i in 1:nrow(ROI_data)){
           ROI_annot[["x"]]         <- ROI_data[i,,drop = FALSE]$"Chemical shift(ppm)"
-          ROI_annot[["text"]]      <- paste0(sprintf("<b>%s</b>", "ROI: "),
+          ROI_annot[["text"]]      <- paste0(sprintf("<b>%s</b>", paste0(ROI_data[i,,drop = FALSE]$Metabolite,
+                                                                         " [", ROI_data[i,,drop = FALSE]$`Quantification Signal`,
+                                                                         "]: ")),
                                              ROI_data[i,,drop = FALSE]$"Chemical shift(ppm)", " (",
                                              ROI_data[i,,drop = FALSE]$"ROI left edge (ppm)", ", ",
                                              ROI_data[i,,drop = FALSE]$"ROI right edge (ppm)", ")", " <br> ",
-                                             sprintf("<b>%s</b>", "Quantification: "), round(profiling_data$final_output$quantification[selsamp_ind, i],3), " <br> ",
-                                             sprintf("<b>%s</b>", "Signal to Area Ratio: "), round(profiling_data$final_output$signal_area_ratio[selsamp_ind, i],3), " <br> ",
-                                             sprintf("<b>%s</b>", "Fitting Error: "), round(profiling_data$final_output$fitting_error[selsamp_ind, i],3))
+                                             sprintf("<b>%s</b>", "Quantification: "), round(profiling_data$final_output$quantification[selsamp_ind, selmet_inds[i]],3), " <br> ",
+                                             sprintf("<b>%s</b>", "Signal to Area Ratio: "), round(profiling_data$final_output$signal_area_ratio[selsamp_ind, selmet_inds[i]],3), " <br> ",
+                                             sprintf("<b>%s</b>", "Fitting Error: "), round(profiling_data$final_output$fitting_error[selsamp_ind, selmet_inds[i]],3))
           ROI_annot[["arrowsize"]] <- ROI_data[i,,drop = FALSE]$"Chemical shift tolerance (ppm)"
           ROI_annot[["showarrow"]] <- TRUE
           ROI_annots               <- c(ROI_annots, list(ROI_annot))
         }
 
-        # Include only the annotations within the selected range.
-        tempidx <- lapply(ROI_lines, function(x){ifelse((x$x0 >= min(brushedData$x) & x$x0 <= max(brushedData$x)) |
-                                                          (x$x1 >= min(brushedData$x) & x$x0 <= max(brushedData$x) |
-                                                             ((x$x0+x$x1)/2 >= min(brushedData$x) & (x$x0+x$x1)/2 <= max(brushedData$x))),
-                                                        TRUE, FALSE)})
-        tempidx <- Reduce("c", tempidx)
+
+        # xpmt_data_sample <- xpmt_data()$e_data %>% dplyr::select(.data$PPM, .data[[input$sample_to_plot]])
+        df_long <- xpmt_data()$e_data %>%
+          tidyr::pivot_longer(!.data$PPM, names_to = "Sample", values_to = "Intensity")
+        df_long <- df_long %>% dplyr::filter(.data$PPM >= min(brushedData$x), .data$PPM <= max(brushedData$x))
+        df_long_selsamp <- df_long %>% dplyr::filter(.data$Sample == input$sample_to_plot)
+        df_long_nonselsamp <- df_long %>% dplyr::filter(.data$Sample != input$sample_to_plot)
+
+        # Include only the signals within the selected range.
+        tempdat <- ref_data()$user_edited_refdata %>%
+          dplyr::mutate(SigName = make.names(paste0(.data$Metabolite, "_", .data$`Quantification Signal`)),
+                        Signal = paste0(.data$Metabolite, " [", .data$`Quantification Signal`, "]")) %>%
+          dplyr::filter(.data$`Chemical shift(ppm)` >= min(brushedData$x) & .data$`Chemical shift(ppm)` <= max(brushedData$x)) %>%
+          dplyr::filter(grepl(make.names(input$refmet_to_plot), .data$Metabolite))
+        selmet_inds2 <- which(which(colnames(profiling_data$final_output$quantification) %in% tempdat$SigName) %in% selmet_inds)
+
+        ROI_plots2 <- ROI_plots %>% dplyr::filter(ROI %in% selmet_inds2)
 
 
-        ROI_lines <- ROI_lines[tempidx]
-        ROI_annots <- ROI_annots[tempidx]
-        ROI_plots <- ROI_plots %>% dplyr::filter(.data$ROI %in% which(tempidx))
-
-        ROI_plots %>% dplyr::group_by(.data$ROI) %>% plotly::plot_ly(source = "id_prof_refmet_view_subplot") %>%
+        ROI_plots2 %>% dplyr::group_by(.data$ROI) %>%
+          plotly::plot_ly(source = "id_prof_refmet_view_subplot", type = "scatter", mode = "lines") %>%
           plotly::config(displaylogo = FALSE,
-                         modeBarButtons = list(list("zoom2d"), list("zoomIn2d"),
+                         modeBarButtons = list(list("select2d"), list("zoom2d"), list("zoomIn2d"),
                                                list("zoomOut2d"), list("pan2d"), list("autoScale2d"),
                                                list("resetScale2d"), list("toImage"))) %>%
-          plotly::layout(xaxis = list(title     = "PPM",
+          plotly::layout(title = paste("Experimental Data:", input$sample_to_plot, "<br>", "<sup>",
+                                       input$refmet_to_plot, "Region(s) of Interest (ROI) displayed", "</sup>"),
+                         xaxis = list(title     = "PPM",
                                       autorange = "reversed"),
                          yaxis = list(title     = "Intensity"),
                          showlegend = TRUE,
                          dragmode = "zoom2d",
                          annotations = ROI_annots,
                          shapes = ROI_lines) %>%
-          plotly::add_trace(data = df_long_selsamp,
-                            x=~.data$PPM, y=~.data$Intensity, type = "scatter", mode = "lines", name = input$sample_to_plot,
-                            line = list(width = 1.3), hoverinfo = "text",
+          plotly::config(edits = list(annotationTail     = TRUE,
+                                      annotationText     = FALSE,
+                                      annotationPosition = FALSE,
+                                      shapePosition      = FALSE)) %>%
+          plotly::add_trace(x    = df_long_selsamp$PPM,
+                            y    = df_long_selsamp$Intensity,
+                            name = input$sample_to_plot,
+                            type = 'scatter',
+                            mode = 'lines',
+                            line = list(width = 1.3),
+                            hoverinfo = "text",
                             hovertext = paste0("Sample: ", input$sample_to_plot,
                                                "\nPPM: ", round(df_long_selsamp$PPM, 4),
                                                "\nIntensity: ", round(df_long_selsamp$Intensity, 4))) %>%
-          plotly::add_trace(data = df_long_nonselsamp,
-                            x=~.data$PPM, y=~.data$Intensity, type = "scatter", name = ~.data$Sample,
+          plotly::add_trace(x    = df_long_nonselsamp$PPM,
+                            y    = df_long_nonselsamp$Intensity,
+                            name = ~df_long_nonselsamp$Sample,
+                            type = 'scatter',
                             opacity = 0.3, mode = "lines", line = list(color = "#000000", width = 0.75),
                             hoverinfo = "text", hovertext = paste0("Sample: ", df_long_nonselsamp$Sample,
                                                                    "\nPPM: ", round(df_long_nonselsamp$PPM, 4),
                                                                    "\nIntensity: ", round(df_long_nonselsamp$Intensity, 4)),
                             showlegend = FALSE) %>%
-          plotly::add_trace(x = ROI_plots$PPM,
-                            y = ROI_plots$Intensity,
-                            name = ~ROI_plots$Intensity_Type,
+          plotly::add_trace(x = ROI_plots2$PPM,
+                            y = ROI_plots2$Intensity,
+                            name = ~ROI_plots2$Intensity_Type,
                             type = "scatter",
                             mode = "lines",
-                            line = list(color = ~ROI_plots$Intensity_Type,
-                                        width = 1)) %>%
-          plotly::config(edits = list(annotationTail     = TRUE,
-                                      annotationText     = FALSE,
-                                      annotationPosition = FALSE,
-                                      shapePosition      = FALSE))
+                            line = list(color = ~ROI_plots2$Intensity_Type,
+                                        width = 1))
+
 
       })
 
@@ -539,7 +733,7 @@ profilingServer <- function(id, xpmt_data, ref_data){
     # On initial plot, the loading spinner shows, but on subsequent plots, it does not.
     # Not sure how to fix this yet, but I suspect the issue lies in the execution order.
     # This observer triggers before "e_data_subplot" invalidates.
-    observeEvent(plotly::event_data("plotly_brushed", source = "id_prof_refmet_view_plot"),{
+    obs_show_subplot <- observeEvent(plotly::event_data("plotly_brushed", source = "id_prof_refmet_view_plot"), suspended = TRUE, {
       req(input$show_subplot)
 
       brushedData <- plotly::event_data("plotly_brushed", source = "id_prof_refmet_view_plot")
@@ -575,16 +769,11 @@ profilingServer <- function(id, xpmt_data, ref_data){
 
       #formats the data object
       imported_data <- ppmData_to_rDolphin(ppmData = xpmt_data(),
-                                                        metabs  = ref_data()$user_edited_refdata %>% dplyr::filter(.data$Quantify == 1))
+                                           metabs  = ref_data()$quantdata %>% dplyr::filter(.data$Quantify == 1))
       # In the above (metabs), we exclude the peaks designated by the user to remove from quantification (Quantify == 0).
+      # Replace "program_parameters" with those specified by the user.
+      imported_data$program_parameters <- ref_data()$global_parameters
 
-      # Don't think we need since we apply filtering earlier to vreate xpmt_data()
-      # if(xpmt_data_mods()$filter_status){
-      #   #Filter selected region
-      #   imported_data <- filter_ppm(imported_data = imported_data,
-      #                                            range         = list(min = min(as.numeric(xpmt_data_mods()$filter_range)),
-      #                                                                 max = max(as.numeric(xpmt_data_mods()$filter_range))))
-      # }
 
       ROI_data           = imported_data$ROI_data
       optimization       = TRUE
@@ -629,12 +818,12 @@ profilingServer <- function(id, xpmt_data, ref_data){
         dummy <- dim(ROI_data)[1]+1
       }
       lal <- which(duplicated(ROI_data[-dummy,1:2]) == F)
-      ROI_separator <-cbind(lal, c(lal[-1] - 1, dim(ROI_data[-dummy,])[1]))
+      ROI_separator <- cbind(lal, c(lal[-1] - 1, dim(ROI_data[-dummy,])[1]))
 
       baselinedataset <- baseline::baseline.rollingBall(imported_data$dataset,5,5)$baseline
 
       #For every ROI
-      totit <- max(seq_along(ROI_separator[, 1]))*nrow(imported_data$dataset)
+      totit <- max(seq_along(ROI_separator[, 1])) * nrow(imported_data$dataset)
       sumit <- 0
       for (ROI_index in seq_along(ROI_separator[, 1])) {
 
@@ -688,10 +877,7 @@ profilingServer <- function(id, xpmt_data, ref_data){
                              nrow(imported_data$dataset)),
             value   = trunc(sumit/totit*100)
           )
-          # THIS IS A TEMPORARY SOLUTION. THE PERMANENT SOLUTION IS TO FORK
-          # RDOLPHIN, ADAPT CODE AS NECESSARY, AND PROPERLY CITE THE ORIGINAL AUTHOR
-          # OF RDOLPHIN
-          profiling_func <- utils::getFromNamespace("profiling_func", "rDolphin")
+
           output=profiling_func(spectrum_index, signals_codes,
                                 imported_data,
                                 ROI_buckets, fitting_type,
@@ -701,8 +887,6 @@ profilingServer <- function(id, xpmt_data, ref_data){
                                 ROI_profile, baselinedataset,
                                 signals_to_quantify,
                                 pb = NULL)
-          # profiling_func() is an internal rDolphin function that is not
-          # meant to be accessed by the user.
           # Note that Ydata is internally defined by profiling function despite
           # what is supplied to the argument above. See automatic_profiling.R and
           # profiling_func().
@@ -742,6 +926,8 @@ profilingServer <- function(id, xpmt_data, ref_data){
                              reproducibility_data = reproducibility_data)
 
       all_profiling_results <- profiling_data
+
+      rv$new_profiling <- TRUE
 
       return(all_profiling_results)
     })

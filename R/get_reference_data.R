@@ -1,7 +1,7 @@
 #' Verifying an entry exists for a given CAS number and solvent type
 #'
 #'@param casno_list list of CAS registry numbers written as characters
-#'@param return_metabs
+#'@param return_metabs string, must be one of "exact_match", "nearest_match", or "all". Defaults to "exact_match". If "exact_match", returns metabolites that exactly match specified experimental conditions (solvent type, pH, and instrument strength). If "nearest_match", returns nearest match metabolites, sorted by Euclidean distance. If "all", returns all entries corresponding to supplied CAS numbers, experimental conditions ignored.
 #'@param solvent_type choose from available solvents 'D2O', 'H2O', ...
 #'@param ph numeric value specifying pH of experimental conditions
 #'@param instrument_strength numeric value specifying experimental instrument strength
@@ -77,7 +77,7 @@ as.bmseList <- function(casno_list, return_metabs = "exact_match", solvent_type 
 
 #' Verifying an entry exists for a given metabolite name
 #'@param name_list list of metabolite names
-#'@param return_metabs
+#'@param return_metabs string, must be one of "exact_match", "nearest_match", or "all". Defaults to "exact_match". If "exact_match", returns metabolites that exactly match specified experimental conditions (solvent type, pH, and instrument strength). If "nearest_match", returns nearest match metabolites, sorted by Euclidean distance. If "all", returns all entries corresponding to supplied CAS numbers, experimental conditions ignored.
 #'@param solvent_type choose from available solvents 'D2O', 'H2O', ...
 #'@param ph numerical value specifying pH of the experimental conditions
 #'@param instrument_strength numeric value specifying experimental instrument strength
@@ -166,7 +166,7 @@ show_file <- function(ID){
 
   # create ultimate path to the select BMSE json file
   file_location <- system.file("json_star", paste0(ID,".json"),
-                               package = "nmRanalysis")
+                               package = "nmRanalysisApp")
 
   #import the BMSE entry as a JSON
   spectra_file <- rjson::fromJSON(file = file_location)
@@ -423,7 +423,7 @@ get_spectra_data <- function(ID_list){
 
 #' Format spectra data into a proper rDolphin ROI reference file
 #' @param spectra_df `data.frame` containing spectral data
-#' @param return_metabs
+#' @param return_metabs string, must be one of "exact_match", "nearest_match", or "all". Defaults to "exact_match". If "exact_match", returns metabolites that exactly match specified experimental conditions (solvent type, pH, and instrument strength). If "nearest_match", returns nearest match metabolites, sorted by Euclidean distance. If "all", returns all entries corresponding to supplied CAS numbers, experimental conditions ignored.
 #' @param half_bandwidth This will be set to 1.4 unless otherwise specified
 #' @param roi_tol The ROI tolerance, length from the center of the peak to each edge. Default is 0.02.
 #' @param spectra_df data frame of the spectra from get_spectra_data() function
@@ -554,12 +554,14 @@ roi_ref_export <- function(name_list           = NULL,
                             roi_tol             = roi_tol,
                             instrument_strength = instrument_strength)
 
-  if (return_metabs == "exact_match") {
-    roi_df$pH                    <- ph
-    roi_df$`Instrument strength` <- instrument_strength
-    roi_df$Solvent               <- solvent_type
-  } else {
+  if(nrow(roi_df) != 0){
+    if (return_metabs == "exact_match") {
+      roi_df$pH                    <- ph
+      roi_df$`Instrument strength` <- instrument_strength
+      roi_df$Solvent               <- solvent_type
+    } else {
 
+    }
   }
 
 

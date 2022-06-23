@@ -62,8 +62,9 @@ nmRapp_server <- function(input, output, session) {
                              value = "RefMetTab",
                              sidebarLayout(
                                sidebarPanel(
-                                 ref_data_uploadUI(id = "ref_data_init", ref_db = refmets),
-                                 ref_data_profileUI(id = "ref_data_edits")
+                                 ref_data_uploadUI(id = "ref_data_init", ref_db = bmse_associations),
+                                 h1(""),
+                                 ref_data_global_fittingparamsUI(id = "ref_data_edits"),
                                ),
                                mainPanel(
                                  tabsetPanel(
@@ -123,7 +124,7 @@ nmRapp_server <- function(input, output, session) {
   # The code for the ref_data_uploadServer() module is found in ./R/ref_data_upload.R
   ref_data <- ref_data_uploadServer(id        = "ref_data_init",
                                     xpmt_data = mod_xpmt_data,
-                                    ref_db    = refmets)
+                                    ref_db    = bmse_associations)
 
   # Output a warning if any of uploaded reference metabolites not contained within database
   observe({
@@ -166,7 +167,7 @@ nmRapp_server <- function(input, output, session) {
   mod_ref_data <- ref_data_editingServer(id        = "ref_data_edits",
                                          xpmt_data = mod_xpmt_data,
                                          ref_data  = ref_data,
-                                         ref_db    = refmets)
+                                         ref_db    = bmse_associations)
 
 
   ### Tab: Profiling Data ----------------------------------------------------------
@@ -188,60 +189,17 @@ nmRapp_server <- function(input, output, session) {
                              value = "ProfilingTab",
                              tabsetPanel(
                                tabPanel(
-                                 title = "Detailed View",
+                                 title = "Signal View",
                                  profiling_completeviewUI(id = "profiling")
                                ),
                                tabPanel(
-                                 title = "Full View",
+                                 title = "Metabolite View",
                                  profiling_detailedviewUI(id = "profiling")
                                )
                              )
                            )
-                        )
+                 )
                  updateTabsetPanel(session, "AllTabs",
                                    selected = "ProfilingTab")
                })
-
-  # observeEvent(profiling_results(),
-  #              {
-  #                req(mod_xpmt_data())
-  #                req(mod_ref_data()$profile_confirm == TRUE)
-  #
-  #                removeTab(inputId = "AllTabs",
-  #                          target  = "ProfilingTab")
-  #                appendTab(inputId = "AllTabs",
-  #                          tabPanel(
-  #                            title = "Profile Data",
-  #                            value = "ProfilingTab",
-  #                            sidebarLayout(
-  #                              sidebarPanel(
-  #                                profiling_controlsUI(id = "profiling",
-  #                                                     xpmt_data = mod_xpmt_data,
-  #                                                     ref_data = mod_ref_data)
-  #                              ),
-  #
-  #                              mainPanel(
-  #                                tabsetPanel(
-  #                                  tabPanel(
-  #                                    title = "Plot View",
-  #                                    profiling_trelliscopeUI("profiling")
-  #                                  ),
-  #                                  tabPanel(
-  #                                    title = "Quantification",
-  #                                    profiling_quantificationUI("profiling")
-  #                                  ),
-  #                                  tabPanel(
-  #                                    title = "Profile Summary",
-  #                                    profiling_summaryUI("profiling")
-  #                                  )
-  #                                )
-  #                              )
-  #                            )
-  #                          )
-  #
-  #                )
-  #                updateTabsetPanel(session, "AllTabs",
-  #                                  selected = "ProfilingTab")
-  #              })
-
 }
