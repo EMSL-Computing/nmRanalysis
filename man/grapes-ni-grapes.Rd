@@ -2,7 +2,7 @@
 % Please edit documentation in R/utils.R
 \name{\%ni\%}
 \alias{\%ni\%}
-\title{Negation of %in% operator}
+\title{Negation of \%in\% operator}
 \usage{
 a \%ni\% b
 }
@@ -15,7 +15,7 @@ a \%ni\% b
 a logical-valued vector with length identical to vector "a".
 }
 \description{
-Negation of %in% operator
+Negation of \%in\% operator
 }
 \details{
 This function determines which of the elements of "a" are not contained within "b"

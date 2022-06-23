@@ -14,7 +14,7 @@ Module: UI element to display trelliscope plot of fitted spectra
 }
 \details{
 This is one of the UI components for the module created to handle all functions related to profiling
-of experimental data, based on user edits to the fitting parameters of a pre-specified list of 
+of experimental data, based on user edits to the fitting parameters of a pre-specified list of
 reference (target) metabolites. The value provided for 'id' should be identical across the following:
 profiling_controlsUI(), profiling_trelliscopeUI(), profiling_quantificationUI(), profiling_summaryUI(), and
 profilingServer().

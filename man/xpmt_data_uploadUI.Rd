@@ -19,10 +19,10 @@ This is the UI component for the module created to handle the uploading of exper
 The value provided for 'id' should be identical across xpmt_data_uploadUI() and xpmt_data_uploadServer().
 
 This module component provides the UI elements that allow users to:
-1) Upload the .csv file containing the experimental PPM and Intensity data for all samples. The first column of 
+1) Upload the .csv file containing the experimental PPM and Intensity data for all samples. The first column of
 this datafile should provide the PPM values and subsequent columns the corresponding intensity values for each
 sample.
 2) Upload the .csv file containing experimental metadata. Currently, the only metadata processed are sample labels.
-3) Specify experimental pH, instrument strength, and the solvent used. The available choices for each of these 
+3) Specify experimental pH, instrument strength, and the solvent used. The available choices for each of these
 "experimental conditions" is constrained by the conditions available in our internal database.
 }

@@ -14,7 +14,7 @@ Module: UI elements specific to experimental data visualization
 }
 \details{
 This is the UI component for the module created to handle the visualization of experimental data.
-The value provided for 'id' should be identical across xpmt_data_vizUI(), xpmt_data_vizoptionsUI(), 
+The value provided for 'id' should be identical across xpmt_data_vizUI(), xpmt_data_vizoptionsUI(),
 xpmt_metadata_vizUI, and xpmt_data_vizServer().
 
 This module component provides the UI elements that allow users to:

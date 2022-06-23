@@ -14,15 +14,15 @@ Module: UI elements specific to reference data ROI editing
 }
 \details{
 This is one of the UI components for the module created to handle all editing of reference (target) metabolite data.
-The value provided for 'id' should be identical across the following: ref_data_ROIeditingUI(), ref_data_add_delUI(), 
+The value provided for 'id' should be identical across the following: ref_data_ROIeditingUI(), ref_data_add_delUI(),
 ref_data_quantTab(), ref_data_profileUI(), and ref_data_editingServer().
 
 This module component provides the UI elements that allow users to:
-1) Select from a dropdown of several options that relate to the main plot. These options include the choice of 
+1) Select from a dropdown of several options that relate to the main plot. These options include the choice of
    sample spectrum to plot, the choice of target metabolites that they wish to edit and display over the sample spectrum,
-   and whether subplots should be displayed on region select. The dropdown also indicates 
-   what filters (if any) have been applied to the experimental spectral data. 
-2) Save changes, revert the last saved changes, and revert all saved changes made to a given target 
+   and whether subplots should be displayed on region select. The dropdown also indicates
+   what filters (if any) have been applied to the experimental spectral data.
+2) Save changes, revert the last saved changes, and revert all saved changes made to a given target
    metabolite's data (i.e. fitting parameters)
 
 This module component also displays target metabolite data within an interactive plot and table.

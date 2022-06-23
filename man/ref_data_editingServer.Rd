@@ -16,7 +16,7 @@ ref_data_editingServer(id, xpmt_data, ref_data, ref_db)
 \item{ref_db}{Dataframe of internal database of reference metabolite data.}
 }
 \value{
-A reactive object containing the edited target (reference) metabolite data, with attributes describing the history of 
+A reactive object containing the edited target (reference) metabolite data, with attributes describing the history of
 changes made to the initial data; and a logical value (TRUE/FALSE) indicating whether the user confirmed proceeding with profiling.
 }
 \description{
@@ -24,12 +24,12 @@ Module: Server functions specific to target metabolite data modification
 }
 \details{
 This is the server component for the module created to handle all editing of reference (target) metabolite data.
-The value provided for 'id' should be identical across the following: ref_data_ROIeditingUI(), ref_data_add_delUI(), 
+The value provided for 'id' should be identical across the following: ref_data_ROIeditingUI(), ref_data_add_delUI(),
 ref_data_quantTab(), ref_data_profileUI(), and ref_data_editingServer().
 
 This module component provides the back-end code that:
 1) Populates the list of editable target metabolites that users may select from
-2) Adds and/or removes target metabolites 
+2) Adds and/or removes target metabolites
 3) Creates/formats reference (target) metabolite data for display and editing
 4) Creates the dropdown containing several plot options.
 5) Saves/reverts changes made to target metabolite data

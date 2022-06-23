@@ -9,7 +9,7 @@ xpmt_data_vizServer(id, xpmt_data)
 \arguments{
 \item{id}{A string denoting the namespace id.}
 
-\item{xpmt_data}{The reactive object returned by the xpmt_data_uploadServer() server module containing 
+\item{xpmt_data}{The reactive object returned by the xpmt_data_uploadServer() server module containing
 the experimental data as a nmRanalysis ppmData object.}
 }
 \value{
@@ -22,7 +22,7 @@ Module: Server functions specific to experimental data and metadata visualizatio
 }
 \details{
 This is the UI component for the module created to handle the visualization of experimental data and metadata.
-The value provided for 'id' should be identical across xpmt_data_vizUI(), xpmt_data_vizoptionsUI(), 
+The value provided for 'id' should be identical across xpmt_data_vizUI(), xpmt_data_vizoptionsUI(),
 xpmt_metadata_vizUI, and xpmt_data_vizServer().
 
 This module component provides the back-end code that:

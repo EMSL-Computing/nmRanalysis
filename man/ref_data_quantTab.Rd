@@ -14,7 +14,7 @@ Module: UI element displaying target metabolite(s) to be quantified
 }
 \details{
 This is one of the UI components for the module created to handle all editing of reference (target) metabolite data.
-The value provided for 'id' should be identical across the following: ref_data_ROIeditingUI(), ref_data_add_delUI(), 
+The value provided for 'id' should be identical across the following: ref_data_ROIeditingUI(), ref_data_add_delUI(),
 ref_data_quantTab(), ref_data_profileUI(), and ref_data_editingServer().
 
 This module component displays the set of target metabolite data that will be used for profiling. These data reflect any

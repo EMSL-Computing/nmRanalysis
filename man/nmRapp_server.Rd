@@ -7,10 +7,10 @@
 nmRapp_server(input, output, session)
 }
 \arguments{
-\item{input}{A list-like object containing all input data sent from the browser. Elements of this list are 
+\item{input}{A list-like object containing all input data sent from the browser. Elements of this list are
 named according to their input ID.}
 
-\item{output}{A list-like object containing all output data, Elements of this list are named according to 
+\item{output}{A list-like object containing all output data, Elements of this list are named according to
 their output ID.}
 
 \item{session}{A new instance of the shiny app.}

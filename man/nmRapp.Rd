@@ -13,6 +13,6 @@ nmRapp(...)
 Semi-Automated Targeted Metabolite NMR Profiling
 }
 \details{
-Calls to this function create a new instance of a shiny app developed for semi-automated 
+Calls to this function create a new instance of a shiny app developed for semi-automated
 targeted metabolite NMR profiling.
 }
