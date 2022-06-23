@@ -166,7 +166,7 @@ show_file <- function(ID){
 
   # create ultimate path to the select BMSE json file
   file_location <- system.file("json_star", paste0(ID,".json"),
-                               package = "nmRanalysis")
+                               package = "nmRanalysisApp")
 
   #import the BMSE entry as a JSON
   spectra_file <- rjson::fromJSON(file = file_location)
