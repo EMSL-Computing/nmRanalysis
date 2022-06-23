@@ -38,7 +38,7 @@ nmRapp_ui <- function(request){
       sidebarLayout(
         # Specify the elements contained in the sidebarPanel
         sidebarPanel(
-          xpmt_data_uploadUI(id = "xpmt", ref_db = refmets)
+          xpmt_data_uploadUI(id = "xpmt", ref_db = bmse_associations)
         ),
 
         # Specify elements to include in main panel

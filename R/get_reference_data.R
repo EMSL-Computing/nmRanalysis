@@ -554,12 +554,14 @@ roi_ref_export <- function(name_list           = NULL,
                             roi_tol             = roi_tol,
                             instrument_strength = instrument_strength)
 
-  if (return_metabs == "exact_match") {
-    roi_df$pH                    <- ph
-    roi_df$`Instrument strength` <- instrument_strength
-    roi_df$Solvent               <- solvent_type
-  } else {
+  if(nrow(roi_df) != 0){
+    if (return_metabs == "exact_match") {
+      roi_df$pH                    <- ph
+      roi_df$`Instrument strength` <- instrument_strength
+      roi_df$Solvent               <- solvent_type
+    } else {
 
+    }
   }
 
 
