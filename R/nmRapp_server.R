@@ -31,7 +31,7 @@ nmRapp_server <- function(input, output, session) {
   # The code for the xpmt_data_* modules are found in ./R/xpmt_data_*.R
 
   # Stores the returned reactive value from the uploadServer module. The returned reactive
-  # value is the output of nmRanalysis::as.ppmData() given the user specified experimental
+  # value is the output of as.ppmData() given the user specified experimental
   # conditions
   xpmt_data       <- xpmt_data_uploadServer(id = "xpmt")
 

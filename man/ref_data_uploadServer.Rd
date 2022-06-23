@@ -14,8 +14,8 @@ ref_data_uploadServer(id, xpmt_data, ref_db)
 \item{ref_db}{Dataframe of internal database of reference metabolite data.}
 }
 \value{
-A reactive object with two elements. The first, $ref_data, is a dataframe containing the uploaded or manually specified 
-reference data, formatted as per nmRanalysis::roi_ref_export(). The second, $casno_not_in_db, is a list containing any CAS number(s)
+A reactive object with two elements. The first, $ref_data, is a dataframe containing the uploaded or manually specified
+reference data, formatted as per roi_ref_export(). The second, $casno_not_in_db, is a list containing any CAS number(s)
 and corresponding uploaded data entries that were not matched to entries within our internal database. This element will be null
 if reference metabolites were manually specified or all uploaded reference metabolites were matched to internal database entries.
 }
