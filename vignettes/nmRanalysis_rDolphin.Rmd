@@ -20,7 +20,6 @@ knitr::opts_chunk$set(
 ```
 
 ```{r}
-library(nmRanalysis)
 library(rDolphin)
 library(trelliscopejs)
 library(dplyr)
