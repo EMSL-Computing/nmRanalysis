@@ -837,10 +837,14 @@ ref_data_editingServer <- function(id, xpmt_data, ref_data, ref_db){
       if(nrow(tempdf) > 1){
         for(i in 1:(nrow(tempdf) - 1)){
           if(tempdf$`ROI left edge (ppm)`[i] - tempdf$`ROI right edge (ppm)`[i+1] > -buffer){
-            # If there is an overlap or near overlap, update the right end (lower value) of the subsequent, overlapped ROI to that of the current.
-            # Also update the left end (higher value) of any other ROIs with the same right end value to
-            # that of the (i+1)st.
-            tempdf$`ROI right edge (ppm)`[i+1] <- tempdf$`ROI right edge (ppm)`[i]
+            # If there is an overlap or near overlap, update the right end (lower value) of the subsequent, overlapped ROI to that of
+            # the minimum between the two.
+            tempdf$`ROI right edge (ppm)`[i+1] <- min(tempdf$`ROI right edge (ppm)`[i], tempdf$`ROI right edge (ppm)`[i+1])
+            # Also update the ith right end and all others that share the same right end value to the same minimum.
+            tempdf$`ROI right edge (ppm)`[which(tempdf$`ROI right edge (ppm)` == tempdf$`ROI right edge (ppm)`[i])] <-
+              tempdf$`ROI right edge (ppm)`[i+1]
+            # Last, update the left end (higher value) of any other ROIs with the maximum right end value among all that share the
+            # updated ROI right edge
             tempdf$`ROI left edge (ppm)`[which(tempdf$`ROI right edge (ppm)` == tempdf$`ROI right edge (ppm)`[i])] <-
               max(tempdf$`ROI left edge (ppm)`[which(tempdf$`ROI right edge (ppm)` == tempdf$`ROI right edge (ppm)`[i])])
           }
