@@ -27,7 +27,7 @@ refmet_data_change_fromtab <- function(dspedt_refmet_data, changed_row, change, 
     dspedt_refmet_data$"Chemical shift(ppm)"[changed_row]  <- new_chemshift
     dspedt_refmet_data$"ROI left edge (ppm)"[changed_row]  <- new_chemshift + dist
     dspedt_refmet_data$"ROI right edge (ppm)"[changed_row] <- new_chemshift - dist
-    dspedt_refmet_data$"Chemical shift tolerance (ppm)"[changed_row] <- round(dist, round_num)
+    dspedt_refmet_data$"Chemical shift tolerance (ppm)"[changed_row] <- round(min(dist/2, 0.005), round_num)
 
   } else if(edtd_colname == "Chemical shift tolerance (ppm)") {
 
@@ -37,6 +37,34 @@ refmet_data_change_fromtab <- function(dspedt_refmet_data, changed_row, change, 
     dspedt_refmet_data$"ROI left edge (ppm)"[changed_row]  <- chemshift + round(new_tol, round_num)
     dspedt_refmet_data$"ROI right edge (ppm)"[changed_row] <- chemshift - round(new_tol, round_num)
     dspedt_refmet_data$"Chemical shift tolerance (ppm)"[changed_row] <- round(new_tol, round_num)
+
+  } else if(edtd_colname == "Signal left edge (ppm)"){
+
+    new_ROIs <- c(change,
+                  dspedt_refmet_data$"ROI right edge (ppm)"[changed_row])
+    chemshift <- dspedt_refmet_data$"Chemical shift(ppm)"[changed_row]
+
+    dist <- ifelse(new_ROIs[1] < dspedt_refmet_data$"ROI left edge (ppm)"[changed_row],
+                   min(abs(chemshift - new_ROIs[1]), abs(chemshift - new_ROIs[2])),
+                   max(abs(chemshift - new_ROIs[1]), abs(chemshift - new_ROIs[2])))
+
+    dspedt_refmet_data$"ROI left edge (ppm)"[changed_row]  <- chemshift + round(dist, round_num)
+    dspedt_refmet_data$"ROI right edge (ppm)"[changed_row] <- chemshift - round(dist, round_num)
+    dspedt_refmet_data$"Chemical shift tolerance (ppm)"[changed_row] <- round(min(dist/2, 0.005), round_num)
+
+  } else if(edtd_colname == "Signal right edge (ppm)"){
+
+    new_ROIs <- c(dspedt_refmet_data$"ROI left edge (ppm)"[changed_row],
+                  change)
+    chemshift <- dspedt_refmet_data$"Chemical shift(ppm)"[changed_row]
+
+    dist <- ifelse(new_ROIs[2] < dspedt_refmet_data$"ROI right edge (ppm)"[changed_row],
+                   max(abs(chemshift - new_ROIs[1]), abs(chemshift - new_ROIs[2])),
+                   min(abs(chemshift - new_ROIs[1]), abs(chemshift - new_ROIs[2])))
+
+    dspedt_refmet_data$"ROI left edge (ppm)"[changed_row]  <- chemshift + round(dist, round_num)
+    dspedt_refmet_data$"ROI right edge (ppm)"[changed_row] <- chemshift - round(dist, round_num)
+    dspedt_refmet_data$"Chemical shift tolerance (ppm)"[changed_row] <- round(min(dist/2, 0.005), round_num)
 
   }
 

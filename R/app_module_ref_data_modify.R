@@ -325,14 +325,15 @@ ref_data_editingServer <- function(id, xpmt_data, ref_data, ref_db){
         # separate subtab (Reference Data for Quantification) where reference data are grouped by ROIs
         rv$user_reference_data %>% dplyr::ungroup() %>%
           dplyr::filter(.data$Metabolite %in% input$which_refmet_dspedt) %>%
-          dplyr::mutate(Signal = paste0(.data$Metabolite, " [", .data$`Quantification Signal`, "]")) %>%
-          dplyr::select(.data$Signal, .data$Quantify, .data$`Chemical shift(ppm)`, .data$`Chemical shift tolerance (ppm)`,
-                        .data$`Half bandwidth (Hz)`, .data$Multiplicity, .data$`J coupling (Hz)`, .data$`J coupling 2 (Hz)`,
-                        .data$`Roof effect`, .data$`Roof effect 2`) %>%
+          dplyr::mutate(Signal = paste0(.data$Metabolite, " [", .data$`Quantification Signal`, "]"),
+                        `Signal left edge (ppm)` = .data$`ROI left edge (ppm)`,
+                        `Signal right edge (ppm)` = .data$`ROI right edge (ppm)`) %>%
+          dplyr::select(.data$Signal, .data$Quantify, .data$`Chemical shift(ppm)`, .data$`Signal left edge (ppm)`,
+                        .data$`Signal right edge (ppm)`, .data$`Half bandwidth (Hz)`, .data$Multiplicity, .data$`J coupling (Hz)`,
+                        .data$`J coupling 2 (Hz)`, .data$`Roof effect`, .data$`Roof effect 2`) %>%
           DT::datatable(rownames   = FALSE,
                         editable   = TRUE,
-                        selection = "none",
-                        extensions = "Responsive")
+                        selection = "none")
 
       })
     })
@@ -703,15 +704,17 @@ ref_data_editingServer <- function(id, xpmt_data, ref_data, ref_db){
                    # Modify rv$dspedt_user_reference_data so that it is formatted the same way as the displayed table
                    # This is only done to extract the correct column name
                    temp <- rv$dspedt_user_reference_data %>% dplyr::ungroup() %>% dplyr::select(-.data$rowid) %>%
-                     dplyr::mutate(Signal = paste0(.data$Metabolite, " [", .data$`Quantification Signal`, "]")) %>%
-                     dplyr::select(.data$Signal, .data$Quantify, .data$`Chemical shift(ppm)`, .data$`Chemical shift tolerance (ppm)`,
-                                   .data$`Half bandwidth (Hz)`, .data$Multiplicity, .data$`J coupling (Hz)`, .data$`J coupling 2 (Hz)`,
-                                   .data$`Roof effect`, .data$`Roof effect 2`)
+                     dplyr::mutate(Signal = paste0(.data$Metabolite, " [", .data$`Quantification Signal`, "]"),
+                                   `Signal left edge (ppm)` = .data$`ROI left edge (ppm)`,
+                                   `Signal right edge (ppm)` = .data$`ROI right edge (ppm)`) %>%
+                     dplyr::select(.data$Signal, .data$Quantify, .data$`Chemical shift(ppm)`, .data$`Signal left edge (ppm)`,
+                                   .data$`Signal right edge (ppm)`, .data$`Half bandwidth (Hz)`, .data$Multiplicity, .data$`J coupling (Hz)`,
+                                   .data$`J coupling 2 (Hz)`, .data$`Roof effect`, .data$`Roof effect 2`)
 
 
                    edtd_colname <- names(temp)[changed_col]
 
-                   if(edtd_colname %in% c("Chemical shift(ppm)", "Chemical shift tolerance (ppm)")) {
+                   if(edtd_colname %in% c("Chemical shift(ppm)", "Signal left edge (ppm)", "Signal right edge (ppm)")) {
 
                      rv$dspedt_user_reference_data <-
                        refmet_data_change_fromtab(dspedt_refmet_data = rv$dspedt_user_reference_data,
@@ -826,18 +829,12 @@ ref_data_editingServer <- function(id, xpmt_data, ref_data, ref_db){
       # Retain only those signals that will be quantified.
       tempdf <- rv$user_reference_data %>% dplyr::filter(.data$Quantify == 1)
 
-      # Merge metabolite peaks whose bounds are close enough to one another (within 0.01) into single ROIs
-      buffer <- 0.005
+      # Merge metabolite signals whose bounds overlap into single ROIs
       tempdf <- tempdf %>% dplyr::arrange(.data$`Chemical shift(ppm)`)
-      # Note that we add a buffer around peak bounds so that peak center bounds do not define the edges of the ROI.
-      # If this buffer isn't added, then signal fits may be unintentionally truncated. Choice of buffer size is
-      # arbitrary
-      tempdf$`ROI left edge (ppm)` <- tempdf$`ROI left edge (ppm)` + buffer
-      tempdf$`ROI right edge (ppm)` <- tempdf$`ROI right edge (ppm)` - buffer
       if(nrow(tempdf) > 1){
         for(i in 1:(nrow(tempdf) - 1)){
-          if(tempdf$`ROI left edge (ppm)`[i] - tempdf$`ROI right edge (ppm)`[i+1] > -buffer){
-            # If there is an overlap or near overlap, update the right end (lower value) of the subsequent, overlapped ROI to that of
+          if(tempdf$`ROI left edge (ppm)`[i] - tempdf$`ROI right edge (ppm)`[i+1] >= 0){
+            # If there is an overlap, update the right end (lower value) of the subsequent, overlapped ROI to that of
             # the minimum between the two.
             tempdf$`ROI right edge (ppm)`[i+1] <- min(tempdf$`ROI right edge (ppm)`[i], tempdf$`ROI right edge (ppm)`[i+1])
             # Also update the ith right end and all others that share the same right end value to the same minimum.

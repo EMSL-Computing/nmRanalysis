@@ -158,7 +158,8 @@ ref_data_uploadServer <- function(id, xpmt_data, ref_db){
                                                            rowid    = paste0(.data$Metabolite, dplyr::row_number()),
                                                            Multiplicity = as.character(.data$`Multiplicity`),
                                                            `J coupling 2 (Hz)` = 0,
-                                                           `Roof effect 2` = 0) %>%
+                                                           `Roof effect 2` = 0,
+                                                           `Chemical shift tolerance (ppm)` = 0.005) %>% # Note that I am manually setting the tolerance here. This should instead be changed in the appropriate nmRanalysis function for retrieving the ref data
                                              dplyr::select(.data$`ROI left edge (ppm)`, .data$`ROI right edge (ppm)`,
                                                            .data$`Quantification Mode`, .data$`Metabolite`, .data$`Quantification Signal`,
                                                            .data$`Chemical shift(ppm)`, .data$`Chemical shift tolerance (ppm)`,
@@ -201,7 +202,8 @@ ref_data_uploadServer <- function(id, xpmt_data, ref_db){
                                                            rowid    = paste0(.data$Metabolite, dplyr::row_number()),
                                                            Multiplicity = as.character(.data$`Multiplicity`),
                                                            `J coupling 2 (Hz)` = 0,
-                                                           `Roof effect 2` = 0) %>%
+                                                           `Roof effect 2` = 0,
+                                                           `Chemical shift tolerance (ppm)` = 0.005) %>% # Note that I am manually setting the tolerance here. This should instead be changed in the appropriate nmRanalysis function for retrieving the ref data
                                              dplyr::select(.data$`ROI left edge (ppm)`, .data$`ROI right edge (ppm)`,
                                                            .data$`Quantification Mode`, .data$`Metabolite`, .data$`Quantification Signal`,
                                                            .data$`Chemical shift(ppm)`, .data$`Chemical shift tolerance (ppm)`,
