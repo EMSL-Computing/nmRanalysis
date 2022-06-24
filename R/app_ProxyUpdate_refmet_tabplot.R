@@ -32,10 +32,12 @@ ProxyUpdate_refmet_tabplot <- function(tabproxy, pltproxy, newdat){
                                  shapes = ROI_lines))
   # Update table
   newdat <- newdat %>% dplyr::ungroup() %>% dplyr::select(-.data$rowid) %>%
-    dplyr::mutate(Signal = paste0(.data$Metabolite, " [", .data$`Quantification Signal`, "]")) %>%
-    dplyr::select(.data$Signal, .data$Quantify, .data$`Chemical shift(ppm)`, .data$`Chemical shift tolerance (ppm)`,
-                  .data$`Half bandwidth (Hz)`, .data$Multiplicity, .data$`J coupling (Hz)`, .data$`J coupling 2 (Hz)`,
-                  .data$`Roof effect`, .data$`Roof effect 2`)
+    dplyr::mutate(Signal = paste0(.data$Metabolite, " [", .data$`Quantification Signal`, "]"),
+                  `Signal left edge (ppm)` = .data$`ROI left edge (ppm)`,
+                  `Signal right edge (ppm)` = .data$`ROI right edge (ppm)`) %>%
+    dplyr::select(.data$Signal, .data$Quantify, .data$`Chemical shift(ppm)`, .data$`Signal left edge (ppm)`,
+                  .data$`Signal right edge (ppm)`, .data$`Half bandwidth (Hz)`, .data$Multiplicity, .data$`J coupling (Hz)`,
+                  .data$`J coupling 2 (Hz)`, .data$`Roof effect`, .data$`Roof effect 2`)
 
   DT::replaceData(tabproxy, newdat,
                   resetPaging = FALSE,

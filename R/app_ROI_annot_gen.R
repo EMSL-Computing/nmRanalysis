@@ -31,7 +31,7 @@ ROI_annot_gen <- function(data){
                                          data[i,,drop = FALSE]$"Chemical shift(ppm)", " (",
                                          data[i,,drop = FALSE]$"ROI left edge (ppm)", ", ",
                                          data[i,,drop = FALSE]$"ROI right edge (ppm)", ")")
-      ROI_annot[["arrowsize"]] <- data[i,,drop = FALSE]$"Chemical shift tolerance (ppm)"
+      ROI_annot[["arrowsize"]] <- 1
       ROI_annot[["showarrow"]] <- TRUE
     } else {
       ROI_annot[["x"]]         <- data[i,,drop = FALSE]$"Chemical shift(ppm)"
