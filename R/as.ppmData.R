@@ -160,11 +160,12 @@ as.ppmData <- function(e_data, f_data, edata_cname, fdata_cname, align = FALSE, 
 
 #' Spectrum Alignment Pre-processing
 #' @param e_data a data.frame of expression data, first component of a ppmData object
+#' @param max_shift integer value, optional. Defaults to NULL. If NULL, automatically detects optimal maxShift value.
 #' @description This function takes the data.frame `e_data` and runs the CluPA spectrum alignment algorithm from the `speaq` R package
 #' @return a data.frame containing aligned spectra with same format as `e_data`
 #' @author Natalie Winans
 #' @export
-peak_alignment <- function(e_data) {
+peak_alignment <- function(e_data, max_shift = NULL) {
   data <- as.matrix(t(e_data[,-1]))
   label <- colnames(e_data)[-1]
 
@@ -180,7 +181,7 @@ peak_alignment <- function(e_data) {
   Y <- speaq::dohCluster(X = X$data,
                          peakList = peak_list,
                          refInd = ref_index,
-                         maxShift = NULL, # automatically detect optimal maxShift value
+                         maxShift = max_shift,
                          verbose = FALSE)
 
   # Format output
