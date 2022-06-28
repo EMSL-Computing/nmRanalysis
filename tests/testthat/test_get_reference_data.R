@@ -1,4 +1,4 @@
-library(nmRanalysis)
+library(nmRanalysisApp)
 
 data("bmse_associations")
 

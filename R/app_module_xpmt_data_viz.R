@@ -89,6 +89,7 @@ xpmt_metadata_vizUI <- function(id){
 #'
 #' @import shiny
 #' @importFrom magrittr %>%
+#' @importFrom rlang .data
 #'
 xpmt_data_vizServer <- function(id, xpmt_data){
   stopifnot(is.reactive(xpmt_data))
@@ -97,7 +98,7 @@ xpmt_data_vizServer <- function(id, xpmt_data){
     # Initialize reactiveValues object that will be used to store version of uploaded experimental data (xpmt_data())
     # that may be modified/updated at various points. Cannot call xpmt_data() directly in the initialization because
     # reactiveValues() is not a reactive environment. Therefore, we use the observer seen immediately below.
-    rv <- reactiveValues()
+    rv <- reactiveValues(obs_show_subplot_suspend = TRUE)
 
     observe({
       req(xpmt_data())
@@ -193,6 +194,14 @@ xpmt_data_vizServer <- function(id, xpmt_data){
       req(xpmt_data())
       req(input$sample_to_plot)
 
+      # Code to resume the observer that was started in a suspended state. We also update the value of
+      # rv$obs_show_subplot_suspend so that $resume() is not called every time this plot is rendered,
+      # but only after the first rendering of the plot.
+      if(rv$obs_show_subplot_suspend){
+        obs_show_subplot$resume()
+        rv$obs_show_subplot_suspend <- FALSE
+      }
+
       plot_xpmt_data(xpmt_data      = isolate(rv$modified_xpmt_data$e_data),
                      sourceid       = "e_data_plot",
                      sample_to_plot = input$sample_to_plot)
@@ -226,7 +235,11 @@ xpmt_data_vizServer <- function(id, xpmt_data){
     # On initial plot, the loading spinner shows, but on subsequent plots, it does not.
     # Not sure how to fix this yet, but I suspect the issue lies in the execution order.
     # This observer triggers before "e_data_subplot" invalidates.
-    observeEvent(plotly::event_data("plotly_brushed", source = "e_data_plot"),{
+    # Note that we specify suspended = TRUE. This forces the observer to begin in a suspended state on app initialization.
+    # We do this here because on app start e_data_plot is not defined and so a warning error is output. Given that the
+    # observer is in a suspended state, we need to resume it after e_data_plot is defined so that the observer can
+    # operate as intended. See the code snippet under output$e_data_plot for how this is done.
+    obs_show_subplot <- observeEvent(plotly::event_data("plotly_brushed", source = "e_data_plot"), suspended = TRUE, {
       req(input$show_subplot)
       req(xpmt_data())
 
@@ -240,7 +253,7 @@ xpmt_data_vizServer <- function(id, xpmt_data){
           size = "xl",
           easyClose = TRUE,
           fade = FALSE
-      ))
+        ))
     })
 
 
@@ -261,7 +274,7 @@ xpmt_data_vizServer <- function(id, xpmt_data){
                    req(input$apply_filter > 0)
 
                    rv$modified_xpmt_data <- filter_ppm(rv$modified_xpmt_data,
-                                                                    range = list(min = min(as.numeric(input$range)),
+                                                       range = list(min = min(as.numeric(input$range)),
                                                                     max = max(as.numeric(input$range))))
 
                    plotly::plotlyProxyInvoke(e_data_plot_proxy, "deleteTraces", as.list(as.integer(0)))
@@ -284,7 +297,7 @@ xpmt_data_vizServer <- function(id, xpmt_data){
                    idx_of_filt2rm <- which(lapply(allfilts, function(x){all(input$range %in% c(x$min, x$max))}) == TRUE)
 
                    rv$modified_xpmt_data <- remove_filter_ppm(rv$modified_xpmt_data,
-                                                                           filters = as.numeric(idx_of_filt2rm))
+                                                              filters = as.numeric(idx_of_filt2rm))
                    rv$modified_xpmt_data$e_data <- rv$modified_xpmt_data$e_data %>% dplyr::arrange(.data[["PPM"]])
 
                    plotly::plotlyProxyInvoke(e_data_plot_proxy, "deleteTraces", as.list(as.integer(0)))
@@ -300,11 +313,9 @@ xpmt_data_vizServer <- function(id, xpmt_data){
 
     # This reactive generates the output of this module. The output is the uploaded experimental data with any modifications
     # applied.
-    eventReactive(c(input$apply_filter, input$remove_filter),
-                  {
-                    req(xpmt_data())
-                    rv$modified_xpmt_data
-                  })
-
+    reactive({
+      req(xpmt_data())
+      rv$modified_xpmt_data
+    })
   })
 }

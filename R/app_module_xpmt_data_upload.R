@@ -1,0 +1,134 @@
+#' Module: UI elements specific to experimental data uploading
+#'
+#' @param id A string denoting the namespace id.
+#' @param ref_db Dataframe of internal database of reference metabolite data.
+#'
+#' @details This is the UI component for the module created to handle the uploading of experimental data.
+#' The value provided for 'id' should be identical across xpmt_data_uploadUI() and xpmt_data_uploadServer().
+#'
+#' This module component provides the UI elements that allow users to:
+#' 1) Upload the .csv file containing the experimental PPM and Intensity data for all samples. The first column of
+#' this datafile should provide the PPM values and subsequent columns the corresponding intensity values for each
+#' sample.
+#' 2) Upload the .csv file containing experimental metadata. Currently, the only metadata processed are sample labels.
+#' 3) Specify experimental pH, instrument strength, and the solvent used. The available choices for each of these
+#' "experimental conditions" is constrained by the conditions available in our internal database.
+#'
+#' @import shiny
+#'
+xpmt_data_uploadUI <- function(id, ref_db){
+  ns <- NS(id)
+  tagList(
+    h4("Experimental Data"),
+
+    # buttons to allow upload functionality
+    # first argument is the assigned name of the user input
+    # second argument is the displayed label on the button
+    fileInput(ns("uploaded_nmR_edata"),
+              label = "NMR PPM Data:"),
+
+    fileInput(ns("uploaded_nmR_fdata"),
+              label = "NMR Metadata:"),
+
+    # Note that tooltips are not working for some unknown reason.
+    shinyBS::bsCollapse(id = ns("experimental_params"), open = "Experimental Conditions",
+                        shinyBS::bsCollapsePanel(title = "Experimental Conditions",
+
+                                                 fluidRow(
+                                                   column(width = 6,
+                                                          shinyBS::tipify(numericInput(inputId  = ns("pH"),
+                                                                                       label    = "pH:",
+                                                                                       value    = 7.4),
+                                                                          title     = "pH of analytical sample",
+                                                                          placement = "bottom",
+                                                                          trigger   = "hover")),
+
+                                                   column(width = 6,
+                                                          shinyBS::tipify(numericInput(inputId  = ns("instrument_strength"),
+                                                                                       label    = "Spectrometer Frequency (MHz)",
+                                                                                       value    = 600),
+                                                                          title     = "Frequency (i.e. field strength) of spectrometer",
+                                                                          placement = "bottom",
+                                                                          trigger   = "hover"))
+
+                                                 ),
+
+                                                 fluidRow(
+                                                   column(width = 6,
+                                                          shinyBS::tipify(selectInput(ns("solvent"), "Solvent:",
+                                                                                      c('H2O' = "h2o",
+                                                                                        "D2O" = "d2o")),
+                                                                          title     = "Solvent used",
+                                                                          placement = "bottom",
+                                                                          trigger   = "click"))#,
+
+                                                   # column(width = 6,
+                                                   #        numericInput(inputId  = ns("instrument_strength"),
+                                                   #                     label    = "Spectrometer Frequency (MHz)")),
+                                                   # shinyBS::bsTooltip(id        = ns("instrument_strength"),
+                                                   #                    title     = "Frequency (i.e. field strength) of spectrometer",
+                                                   #                    placement = "bottom",
+                                                   #                    trigger   = "hover")
+
+                                                 ),
+                                                 style = "primary"
+                        )),
+
+
+    # clickable button
+    actionButton(ns("process_exp_inputs"), label = "Process Data")
+  )
+}
+
+#' Module: Server functions specific to experimental data uploading
+#'
+#' @param id A string denoting the namespace id.
+#'
+#' @details This is the UI component for the module created to handle the uploading of experimental data.
+#' The value provided for 'id' should be identical across xpmt_data_uploadUI() and xpmt_data_uploadServer().
+#'
+#' This module component provides the back-end code that:
+#' 1) Processes uploaded data based on the provided experimental conditions. Data are saved as an nmRanalysis ppmData object.
+#'
+#' @return A reactive object containing the uploaded experimental data and parameters saved as an nmRanalysis ppmData object.
+#'
+#' @import shiny
+#'
+xpmt_data_uploadServer <- function(id){
+  moduleServer(id, function(input, output, session){
+
+    # Define reactive object containing all user supplied experimental data
+    # First argument of eventReactive() describes the dependencies of the reactive expression.
+    # If any one of the specified objects changes,
+    # the eventReactive() will be prompted to invalidate (i.e. re-execute).
+    uploaded_xpmt_data <- eventReactive(c(input$process_exp_inputs),
+                                        {
+
+                                          # Will not evaluate unless edata and fdata are supplied.
+                                          # as well as field strength, ph, and solvent
+                                          req(input$uploaded_nmR_edata)
+                                          req(input$uploaded_nmR_fdata)
+                                          req(input$instrument_strength)
+                                          req(input$pH)
+                                          req(input$solvent)
+
+                                          # Read in experimental data file
+                                          xpmt.e_data <- load_file(path    = input$uploaded_nmR_edata$datapath,
+                                                                   dataset = "experiment")
+
+                                          # Read in experimental metadata file
+                                          xpmt.f_data <- load_file(path    = input$uploaded_nmR_fdata$datapath,
+                                                                   dataset = "experiment_metadata")
+
+                                          # Feed above into nmRanalysis function to create ppmData object
+                                          user.data <- as.ppmData(e_data              = xpmt.e_data,
+                                                                  f_data              = xpmt.f_data,
+                                                                  edata_cname         = "PPM",
+                                                                  fdata_cname         = "Sample",
+                                                                  instrument_strength = as.numeric(input$instrument_strength),
+                                                                  ph                  = as.numeric(input$pH),
+                                                                  solvent             = input$solvent)
+                                          return(user.data)
+                                        })
+  })
+}

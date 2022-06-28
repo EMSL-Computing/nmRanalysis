@@ -39,7 +39,7 @@ ref_data_uploadUI <- function(id, ref_db){
                        options = list(create = TRUE))
       )
     ),
-    actionButton(ns("process_ref_inputs"), label = "Process User Inputs")
+    actionButton(ns("process_ref_inputs"), label = "Import Database Entries")
   )
 }
 
@@ -142,10 +142,10 @@ ref_data_uploadServer <- function(id, xpmt_data, ref_db){
                                                                       table = data.frame(metab_names_table[metab_names_table[[input$columns]] %ni% ref_db$CASno, ,drop = FALSE]))
 
                                            # Feeds in above to nmRanalysis function that generates formatted dataframe of reference metabolite info
-                                           user_reference_data <- roi_ref_export(cas_list           = user.refchoices,
-                                                                                solvent_type        = attr(xpmt_data(), "exp_info")$solvent,
-                                                                                ph                  = attr(xpmt_data(), "exp_info")$ph,
-                                                                                instrument_strength = attr(xpmt_data(), "exp_info")$instrument_strength)
+                                           user_reference_data <- roi_ref_export(cas_list            = user.refchoices,
+                                                                                 solvent_type        = attr(xpmt_data(), "exp_info")$solvent,
+                                                                                 ph                  = attr(xpmt_data(), "exp_info")$ph,
+                                                                                 instrument_strength = attr(xpmt_data(), "exp_info")$instrument_strength)
 
                                            shinyFeedback::feedbackDanger("uploaded_refmet_file",
                                                                          nrow(user_reference_data) == 0,
@@ -155,12 +155,17 @@ ref_data_uploadServer <- function(id, xpmt_data, ref_db){
 
                                            user_reference_data <- user_reference_data %>% dplyr::group_by(.data$Metabolite) %>%
                                              dplyr::mutate(Quantify = 1,
-                                                           rowid    = paste0(.data$Metabolite, dplyr::row_number())) %>%
+                                                           rowid    = paste0(.data$Metabolite, dplyr::row_number()),
+                                                           Multiplicity = as.character(.data$`Multiplicity`),
+                                                           `J coupling 2 (Hz)` = 0,
+                                                           `Roof effect 2` = 0,
+                                                           `Chemical shift tolerance (ppm)` = 0.005) %>% # Note that I am manually setting the tolerance here. This should instead be changed in the appropriate nmRanalysis function for retrieving the ref data
                                              dplyr::select(.data$`ROI left edge (ppm)`, .data$`ROI right edge (ppm)`,
                                                            .data$`Quantification Mode`, .data$`Metabolite`, .data$`Quantification Signal`,
                                                            .data$`Chemical shift(ppm)`, .data$`Chemical shift tolerance (ppm)`,
                                                            .data$`Half bandwidth (Hz)`, .data$`Multiplicity`, .data$`J coupling (Hz)`,
-                                                           .data$`Roof effect`, .data$`Quantify`, .data$`HMDB_code`, .data$`rowid`)
+                                                           .data$`Roof effect`, .data$`J coupling 2 (Hz)`, .data$`Roof effect 2 (Hz)`,
+                                                           .data$`Quantify`, .data$`HMDB_code`, .data$`rowid`)
                                            # Note that the ordering of variables above *DOES* matter for
                                            # run_rDolphin()
 
@@ -181,10 +186,10 @@ ref_data_uploadServer <- function(id, xpmt_data, ref_db){
                                            rv$casno_not_in_db <- NULL
 
                                            # create an ROI reference object using nmRanalysis to be rendered as a table in the UI
-                                           user_reference_data <- roi_ref_export(name_list          = user.refchoices,
-                                                                                solvent_type        = attr(xpmt_data(), "exp_info")$solvent,
-                                                                                ph                  = attr(xpmt_data(), "exp_info")$ph,
-                                                                                instrument_strength = attr(xpmt_data(), "exp_info")$instrument_strength)
+                                           user_reference_data <- roi_ref_export(name_list           = user.refchoices,
+                                                                                 solvent_type        = attr(xpmt_data(), "exp_info")$solvent,
+                                                                                 ph                  = attr(xpmt_data(), "exp_info")$ph,
+                                                                                 instrument_strength = attr(xpmt_data(), "exp_info")$instrument_strength)
 
                                            shinyFeedback::feedbackDanger("user_refmets",
                                                                          nrow(user_reference_data) == 0,
@@ -194,12 +199,17 @@ ref_data_uploadServer <- function(id, xpmt_data, ref_db){
 
                                            user_reference_data <- user_reference_data %>% dplyr::group_by(.data$Metabolite) %>%
                                              dplyr::mutate(Quantify = 1,
-                                                           rowid    = paste0(.data$Metabolite, dplyr::row_number())) %>%
+                                                           rowid    = paste0(.data$Metabolite, dplyr::row_number()),
+                                                           Multiplicity = as.character(.data$`Multiplicity`),
+                                                           `J coupling 2 (Hz)` = 0,
+                                                           `Roof effect 2` = 0,
+                                                           `Chemical shift tolerance (ppm)` = 0.005) %>% # Note that I am manually setting the tolerance here. This should instead be changed in the appropriate nmRanalysis function for retrieving the ref data
                                              dplyr::select(.data$`ROI left edge (ppm)`, .data$`ROI right edge (ppm)`,
                                                            .data$`Quantification Mode`, .data$`Metabolite`, .data$`Quantification Signal`,
                                                            .data$`Chemical shift(ppm)`, .data$`Chemical shift tolerance (ppm)`,
                                                            .data$`Half bandwidth (Hz)`, .data$`Multiplicity`, .data$`J coupling (Hz)`,
-                                                           .data$`Roof effect`, .data$`Quantify`, .data$`HMDB_code`, .data$`rowid`)
+                                                           .data$`Roof effect`, .data$`J coupling 2 (Hz)`, .data$`Roof effect 2`,
+                                                           .data$`Quantify`, .data$`HMDB_code`, .data$`rowid`)
                                            # Note that the ordering of variables above *DOES* matter for
                                            # run_rDolphin()
 
@@ -222,17 +232,6 @@ ref_data_uploadServer <- function(id, xpmt_data, ref_db){
                                    paste(rv$casno_not_in_db$CASno, collapse = "\n")),
                      type = "warning"
                    )
-                 })
-
-    # Update text on action button after first click
-    observeEvent(c(input$process_ref_inputs),
-                 {
-                   req(xpmt_data())
-                   req(isolate(uploaded_ref_data()))
-                   req(input$process_ref_inputs > 0)
-
-
-                   updateActionButton(session, "process_ref_inputs", label = "Process New Data")
                  })
 
     # Module output

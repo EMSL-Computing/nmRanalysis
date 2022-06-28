@@ -15,7 +15,7 @@ export_roi_file(
 \arguments{
 \item{spectra_df}{data frame of the spectra from get_spectra_data() function}
 
-\item{return_metabs}{}
+\item{return_metabs}{string, must be one of "exact_match", "nearest_match", or "all". Defaults to "exact_match". If "exact_match", returns metabolites that exactly match specified experimental conditions (solvent type, pH, and instrument strength). If "nearest_match", returns nearest match metabolites, sorted by Euclidean distance. If "all", returns all entries corresponding to supplied CAS numbers, experimental conditions ignored.}
 
 \item{half_bandwidth}{This will be set to 1.4 unless otherwise specified}
 

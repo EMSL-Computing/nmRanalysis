@@ -15,7 +15,7 @@ as.bmseList(
 \arguments{
 \item{casno_list}{list of CAS registry numbers written as characters}
 
-\item{return_metabs}{}
+\item{return_metabs}{string, must be one of "exact_match", "nearest_match", or "all". Defaults to "exact_match". If "exact_match", returns metabolites that exactly match specified experimental conditions (solvent type, pH, and instrument strength). If "nearest_match", returns nearest match metabolites, sorted by Euclidean distance. If "all", returns all entries corresponding to supplied CAS numbers, experimental conditions ignored.}
 
 \item{solvent_type}{choose from available solvents 'D2O', 'H2O', ...}
 

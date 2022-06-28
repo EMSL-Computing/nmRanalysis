@@ -7,10 +7,10 @@
 peak_alignment(e_data)
 }
 \arguments{
-\item{e_data}{}
+\item{e_data}{a data.frame of expression data, first component of a ppmData object}
 }
 \value{
-data.frame containing aligned spectra with same format as `e_data`
+a data.frame containing aligned spectra with same format as `e_data`
 }
 \description{
 This function takes the data.frame `e_data` and runs the CluPA spectrum alignment algorithm from the `speaq` R package
