@@ -1,7 +1,7 @@
 #' Verifying an entry exists for a given CAS number and solvent type
 #'
 #'@param casno_list list of CAS registry numbers written as characters
-#'@param return_metabs string, must be one of "exact_match", "nearest_match", or "all". Defaults to "exact_match". If "exact_match", returns metabolites that exactly match specified experimental conditions (solvent type, pH, and instrument strength). If "nearest_match", returns nearest match metabolites, sorted by Euclidean distance. If "all", returns all entries corresponding to supplied CAS numbers, experimental conditions ignored.
+#'@param return_metabs string, must be one of "exact_match" or "all". Defaults to "exact_match". If "exact_match", returns metabolites that exactly match specified experimental conditions (solvent type, pH, and instrument strength). If "all", returns all entries corresponding to supplied CAS numbers, experimental conditions ignored.
 #'@param solvent_type choose from available solvents 'D2O', 'H2O', ...
 #'@param ph numeric value specifying pH of experimental conditions
 #'@param instrument_strength numeric value specifying experimental instrument strength
@@ -22,15 +22,19 @@ as.bmseList <- function(casno_list, return_metabs = "exact_match", solvent_type 
     stop("List of CAS numbers must be of the class 'list'.")
   }
 
-  if(!(return_metabs %in% c("exact_match", "nearest_match", "all"))){
-    stop('return_metabs must be one of "exact_match", "nearest_match", or "all"')
+  if(!(return_metabs %in% c("exact_match", "all"))){
+    stop('return_metabs must be one of "exact_match" or "all"')
   }
 
   if(return_metabs == "exact_match" & (is.null(solvent_type) | is.null(ph))){
     stop('Solvent type and ph must be specified if return_metabs = "exact_match"')
   }
 
-  # fail check if one casno isn't in the db
+  # if(return_metabs == "nearest_match" & (is.null(solvent_type) | is.null(ph))){
+  #   stop('Solvent type and ph must be specified if return_metabs = "nearest_match"')
+  # }
+
+  # warn if one casno isn't in the db
   for (item in casno_list){
     if (!(item %in% bmse_associations$CASno)){
       warning(sprintf("%s is not a recognized CAS registry number", item))
@@ -40,12 +44,12 @@ as.bmseList <- function(casno_list, return_metabs = "exact_match", solvent_type 
   if (return_metabs == "all") {
     #create list without filtering by exp conditions
     bmse_list <- list()
-
     for (item in casno_list){
       subset    <- bmse_associations[bmse_associations$CASno == item, ]
       bmse_val  <- subset$Entry_ID
       bmse_list <- append(bmse_list, bmse_val)
     }
+
   } else if (return_metabs == "exact_match") {
     #check solvent types, convert to acceptable types
     if(solvent_type != "D2O"){
@@ -61,8 +65,6 @@ as.bmseList <- function(casno_list, return_metabs = "exact_match", solvent_type 
       bmse_val  <- subset3$Entry_ID
       bmse_list <- append(bmse_list, bmse_val)
     }
-  } else if (return_metabs == "nearest_match") {
-    #TODO
   }
 
   # Note: Ideally, this final check should be one where we assess whether each provided casno has at least one
@@ -77,7 +79,7 @@ as.bmseList <- function(casno_list, return_metabs = "exact_match", solvent_type 
 
 #' Verifying an entry exists for a given metabolite name
 #'@param name_list list of metabolite names
-#'@param return_metabs string, must be one of "exact_match", "nearest_match", or "all". Defaults to "exact_match". If "exact_match", returns metabolites that exactly match specified experimental conditions (solvent type, pH, and instrument strength). If "nearest_match", returns nearest match metabolites, sorted by Euclidean distance. If "all", returns all entries corresponding to supplied CAS numbers, experimental conditions ignored.
+#'@param return_metabs string, must be one of "exact_match" or "all". Defaults to "exact_match". If "exact_match", returns metabolites that exactly match specified experimental conditions (solvent type, pH, and instrument strength). If "all", returns all entries corresponding to supplied CAS numbers, experimental conditions ignored.
 #'@param solvent_type choose from available solvents 'D2O', 'H2O', ...
 #'@param ph numerical value specifying pH of the experimental conditions
 #'@param instrument_strength numeric value specifying experimental instrument strength
@@ -94,8 +96,8 @@ as.bmseListFromName <- function(name_list, return_metabs = "exact_match", solven
     stop("List of metabolite names must be of the class 'list'.")
   }
 
-  if(!(return_metabs %in% c("exact_match", "nearest_match", "all"))){
-    stop('return_metabs must be one of "exact_match", "nearest_match", or "all"')
+  if(!(return_metabs %in% c("exact_match", "all"))){
+    stop('return_metabs must be either "exact_match" or "all"')
   }
 
   if(return_metabs == "exact_match" & (is.null(solvent_type) | is.null(ph))){
@@ -133,10 +135,7 @@ as.bmseListFromName <- function(name_list, return_metabs = "exact_match", solven
       bmse_val  <- subset3$Entry_ID
       bmse_list <- append(bmse_list, bmse_val)
     }
-  } else if (return_metabs == "nearest_match") {
-    #TODO
   }
-
 
   bmse_list <- unique(bmse_list)
 
@@ -254,7 +253,7 @@ get_spectra_data <- function(ID_list){
 
     ############################################################################
 
-    #Field strength extraction
+    # Field strength extraction
     spectrometer_info_index <- grep("NMR_spectrometer", categoriesL)[1]
     instrument              <- y[[spectrometer_info_index]]$tags
     fs_index                <- which(sapply(instrument, function(d){"Field_strength" %in% d}))
@@ -262,6 +261,7 @@ get_spectra_data <- function(ID_list){
 
     spectra_data_subset$instrument_strength <- instrument_strength
     spectra_data_subset$Metabolite <- metabolite_name
+
     ########## coupling and multiplicity extraction from supplement table #######
     # extract the loops for 1H NMR spectra from all possible data types in STAR file
     peak_loops <- y[[match("spectral_peak_1H", namesL)]]$loops
@@ -511,7 +511,7 @@ export_roi_file <- function(spectra_df, return_metabs = "exact_match", half_band
 #' Wrap the generating and exporting functions into one
 #' @param name_list list of metabolite names if cas numbers are not provided
 #' @param cas_list list of CAS registry numbers written as characters if metabolite names are not provided
-#' @param return_metabs string, must be one of "exact_match", "nearest_match", or "all". Defaults to "exact_match". If "exact_match", returns metabolites that exactly match specified experimental conditions (solvent type, pH, and instrument strength). If "nearest_match", returns nearest match metabolites, sorted by Euclidean distance. If "all", returns all entries corresponding to supplied CAS numbers, experimental conditions ignored.
+#' @param return_metabs string, must be one of "exact_match" or "all". Defaults to "exact_match". If "exact_match", returns metabolites that exactly match specified experimental conditions (solvent type, pH, and instrument strength). If "all", returns all entries corresponding to supplied CAS numbers, experimental conditions ignored.
 #' @param ph the experimental pH
 #' @param solvent_type the experimental solvent, choose from available solvents 'D2O', 'H2O', ...
 #' @param half_bandwidth This will be set to 1.4 unless otherwise specified
@@ -563,12 +563,8 @@ roi_ref_export <- function(name_list           = NULL,
 
     }
   }
-
-
   return(roi_df)
 }
-
-
 
 #' Return nearest match metabolites, sorted by Euclidean distance
 #' @param roi_df data.frame, output of \code{roi_ref_export} with parameter \code{return_all = TRUE}
@@ -602,7 +598,8 @@ nearest_match_metabs <- function(roi_df, pH, instrument_strength) {
     dist[i] <- sqrt((pH - metab_ph[i])^2 + (instrument_strength - metab_FS[i])^2)
   }
 
-  metabs <- as.data.frame(cbind(metab_id, metab_ph, metab_FS, dist)) %>% dplyr::arrange(dist)
+  metabs <- as.data.frame(cbind(metab_id, metab_ph, metab_FS, as.numeric(dist))) %>%
+    dplyr::arrange(dist)
 
   return(metabs)
 }
