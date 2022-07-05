@@ -1,0 +1,8 @@
+version: "0.0.1" 
+services:
+    web: 
+        build: .
+        image: nmrshinyapp
+        container_name: nmrshinyapp
+        ports:
+            - "3838:3838"
