@@ -20,7 +20,7 @@ roi_ref_export(
 
 \item{cas_list}{list of CAS registry numbers written as characters if metabolite names are not provided}
 
-\item{return_metabs}{string, must be one of "exact_match", "nearest_match", or "all". Defaults to "exact_match". If "exact_match", returns metabolites that exactly match specified experimental conditions (solvent type, pH, and instrument strength). If "nearest_match", returns nearest match metabolites, sorted by Euclidean distance. If "all", returns all entries corresponding to supplied CAS numbers, experimental conditions ignored.}
+\item{return_metabs}{string, must be one of "exact_match" or "all". Defaults to "exact_match". If "exact_match", returns metabolites that exactly match specified experimental conditions (solvent type, pH, and instrument strength). If "all", returns all entries corresponding to supplied CAS numbers, experimental conditions ignored.}
 
 \item{solvent_type}{the experimental solvent, choose from available solvents 'D2O', 'H2O', ...}
 
@@ -36,5 +36,19 @@ roi_ref_export(
 a data frame formatted for rDolphin use to be exported as excel sheet
 }
 \description{
-Wrap the generating and exporting functions into one
+Copyright (C) 2022 Battelle Memorial Institute
+
+ This program is free software; you can redistribute it and/or modify
+ it under the terms of the GNU General Public License as published by
+ the Free Software Foundation; either version 2 of the License, or
+ (at your option) any later version.
+
+ This program is distributed in the hope that it will be useful,
+ but WITHOUT ANY WARRANTY; without even the implied warranty of
+ MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ GNU General Public License for more details.
+
+ You should have received a copy of the GNU General Public License along
+ with this program; if not, write to the Free Software Foundation, Inc.,
+ 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
 }

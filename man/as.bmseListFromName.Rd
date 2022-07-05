@@ -15,7 +15,7 @@ as.bmseListFromName(
 \arguments{
 \item{name_list}{list of metabolite names}
 
-\item{return_metabs}{string, must be one of "exact_match", "nearest_match", or "all". Defaults to "exact_match". If "exact_match", returns metabolites that exactly match specified experimental conditions (solvent type, pH, and instrument strength). If "nearest_match", returns nearest match metabolites, sorted by Euclidean distance. If "all", returns all entries corresponding to supplied CAS numbers, experimental conditions ignored.}
+\item{return_metabs}{string, must be one of "exact_match" or "all". Defaults to "exact_match". If "exact_match", returns metabolites that exactly match specified experimental conditions (solvent type, pH, and instrument strength). If "all", returns all entries corresponding to supplied CAS numbers, experimental conditions ignored.}
 
 \item{solvent_type}{choose from available solvents 'D2O', 'H2O', ...}
 
@@ -27,7 +27,21 @@ as.bmseListFromName(
 a list of BMSE database entry numbers
 }
 \description{
-Verifying an entry exists for a given metabolite name
+Copyright (C) 2022 Battelle Memorial Institute
+
+ This program is free software; you can redistribute it and/or modify
+ it under the terms of the GNU General Public License as published by
+ the Free Software Foundation; either version 2 of the License, or
+ (at your option) any later version.
+
+ This program is distributed in the hope that it will be useful,
+ but WITHOUT ANY WARRANTY; without even the implied warranty of
+ MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ GNU General Public License for more details.
+
+ You should have received a copy of the GNU General Public License along
+ with this program; if not, write to the Free Software Foundation, Inc.,
+ 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
 }
 \examples{
 # test <- as.bmseListFromName(list("ATP","Maltose" "Oxalate"), solvent_type = 'D2O', ph = 7.4)

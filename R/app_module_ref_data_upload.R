@@ -1,5 +1,21 @@
 #' Module: UI elements specific to reference metabolite data uploading
 #'
+#' @description Copyright (C) 2022 Battelle Memorial Institute
+#'
+#'  This program is free software; you can redistribute it and/or modify
+#'  it under the terms of the GNU General Public License as published by
+#'  the Free Software Foundation; either version 2 of the License, or
+#'  (at your option) any later version.
+#'
+#'  This program is distributed in the hope that it will be useful,
+#'  but WITHOUT ANY WARRANTY; without even the implied warranty of
+#'  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+#'  GNU General Public License for more details.
+#'
+#'  You should have received a copy of the GNU General Public License along
+#'  with this program; if not, write to the Free Software Foundation, Inc.,
+#'  51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
+#'
 #' @param id A string denoting the namespace id.
 #' @param ref_db Dataframe of internal database of reference metabolite data.
 #'
@@ -44,6 +60,22 @@ ref_data_uploadUI <- function(id, ref_db){
 }
 
 #' Module: Server functions specific to target metabolite data uploading
+#'
+#' @description Copyright (C) 2022 Battelle Memorial Institute
+#'
+#'  This program is free software; you can redistribute it and/or modify
+#'  it under the terms of the GNU General Public License as published by
+#'  the Free Software Foundation; either version 2 of the License, or
+#'  (at your option) any later version.
+#'
+#'  This program is distributed in the hope that it will be useful,
+#'  but WITHOUT ANY WARRANTY; without even the implied warranty of
+#'  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+#'  GNU General Public License for more details.
+#'
+#'  You should have received a copy of the GNU General Public License along
+#'  with this program; if not, write to the Free Software Foundation, Inc.,
+#'  51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
 #'
 #' @param id A string denoting the namespace id.
 #' @param xpmt_data A reactive object containing experimental NMR data and associated metadata.
