@@ -19,6 +19,22 @@ search_edit_params(roi_df, metabolite_name = NULL, ppm, tolerance = 0.05)
 Table of current parameter values with one row per metabolite that meets criteria
 }
 \description{
+Copyright (C) 2022 Battelle Memorial Institute
+
+ This program is free software; you can redistribute it and/or modify
+ it under the terms of the GNU General Public License as published by
+ the Free Software Foundation; either version 2 of the License, or
+ (at your option) any later version.
+
+ This program is distributed in the hope that it will be useful,
+ but WITHOUT ANY WARRANTY; without even the implied warranty of
+ MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ GNU General Public License for more details.
+
+ You should have received a copy of the GNU General Public License along
+ with this program; if not, write to the Free Software Foundation, Inc.,
+ 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
+
 This function acquires the parameters from the reference table to specify which field of which entry needs to be edited. Also negates the need to open external reference files outside of nmrAnalysis package.
 }
 \author{

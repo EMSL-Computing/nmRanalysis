@@ -1,5 +1,21 @@
 #' Module: UI elements specific to reference data ROI editing
 #'
+#' @description Copyright (C) 2022 Battelle Memorial Institute
+#'
+#'  This program is free software; you can redistribute it and/or modify
+#'  it under the terms of the GNU General Public License as published by
+#'  the Free Software Foundation; either version 2 of the License, or
+#'  (at your option) any later version.
+#'
+#'  This program is distributed in the hope that it will be useful,
+#'  but WITHOUT ANY WARRANTY; without even the implied warranty of
+#'  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+#'  GNU General Public License for more details.
+#'
+#'  You should have received a copy of the GNU General Public License along
+#'  with this program; if not, write to the Free Software Foundation, Inc.,
+#'  51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
+#'
 #' @param id A string denoting the namespace id.
 #'
 #' @details This is one of the UI components for the module created to handle all editing of reference (target) metabolite data.
@@ -46,6 +62,22 @@ ref_data_ROIeditingUI <- function(id){
 }
 
 #' Module: UI elements specific to adding/removing target metabolites
+#'
+#' @description Copyright (C) 2022 Battelle Memorial Institute
+#'
+#'  This program is free software; you can redistribute it and/or modify
+#'  it under the terms of the GNU General Public License as published by
+#'  the Free Software Foundation; either version 2 of the License, or
+#'  (at your option) any later version.
+#'
+#'  This program is distributed in the hope that it will be useful,
+#'  but WITHOUT ANY WARRANTY; without even the implied warranty of
+#'  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+#'  GNU General Public License for more details.
+#'
+#'  You should have received a copy of the GNU General Public License along
+#'  with this program; if not, write to the Free Software Foundation, Inc.,
+#'  51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
 #'
 #' @param id A string denoting the namespace id.
 #'
@@ -98,6 +130,22 @@ ref_data_add_delUI <- function(id){
 
 #' Module: UI element displaying target metabolite(s) to be quantified
 #'
+#' @description Copyright (C) 2022 Battelle Memorial Institute
+#'
+#'  This program is free software; you can redistribute it and/or modify
+#'  it under the terms of the GNU General Public License as published by
+#'  the Free Software Foundation; either version 2 of the License, or
+#'  (at your option) any later version.
+#'
+#'  This program is distributed in the hope that it will be useful,
+#'  but WITHOUT ANY WARRANTY; without even the implied warranty of
+#'  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+#'  GNU General Public License for more details.
+#'
+#'  You should have received a copy of the GNU General Public License along
+#'  with this program; if not, write to the Free Software Foundation, Inc.,
+#'  51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
+#'
 #' @param id A string denoting the namespace id.
 #'
 #' @details This is one of the UI components for the module created to handle all editing of reference (target) metabolite data.
@@ -122,6 +170,22 @@ ref_data_quantTab <- function(id){
 
 #' Module: UI element displaying global profiling options
 #'
+#' @description Copyright (C) 2022 Battelle Memorial Institute
+#'
+#'  This program is free software; you can redistribute it and/or modify
+#'  it under the terms of the GNU General Public License as published by
+#'  the Free Software Foundation; either version 2 of the License, or
+#'  (at your option) any later version.
+#'
+#'  This program is distributed in the hope that it will be useful,
+#'  but WITHOUT ANY WARRANTY; without even the implied warranty of
+#'  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+#'  GNU General Public License for more details.
+#'
+#'  You should have received a copy of the GNU General Public License along
+#'  with this program; if not, write to the Free Software Foundation, Inc.,
+#'  51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
+#'
 #' @param id A string denoting the namespace id.
 #'
 #' @details This is one of the UI components for the module created to handle all editing of reference (target) metabolite data.
@@ -140,6 +204,22 @@ ref_data_global_fittingparamsUI <- function(id){
 }
 
 #' Module: Server functions specific to target metabolite data modification
+#'
+#' @description Copyright (C) 2022 Battelle Memorial Institute
+#'
+#'  This program is free software; you can redistribute it and/or modify
+#'  it under the terms of the GNU General Public License as published by
+#'  the Free Software Foundation; either version 2 of the License, or
+#'  (at your option) any later version.
+#'
+#'  This program is distributed in the hope that it will be useful,
+#'  but WITHOUT ANY WARRANTY; without even the implied warranty of
+#'  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+#'  GNU General Public License for more details.
+#'
+#'  You should have received a copy of the GNU General Public License along
+#'  with this program; if not, write to the Free Software Foundation, Inc.,
+#'  51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
 #'
 #' @param id A string denoting the namespace id.
 #' @param xpmt_data A reactive object containing experimental NMR data and associated metadata.

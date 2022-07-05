@@ -4,15 +4,33 @@
 \alias{peak_alignment}
 \title{Spectrum Alignment Pre-processing}
 \usage{
-peak_alignment(e_data)
+peak_alignment(e_data, max_shift = NULL)
 }
 \arguments{
 \item{e_data}{a data.frame of expression data, first component of a ppmData object}
+
+\item{max_shift}{integer value, optional. Defaults to NULL. If NULL, automatically detects optimal maxShift value.}
 }
 \value{
 a data.frame containing aligned spectra with same format as `e_data`
 }
 \description{
+Copyright (C) 2022 Battelle Memorial Institute
+
+ This program is free software; you can redistribute it and/or modify
+ it under the terms of the GNU General Public License as published by
+ the Free Software Foundation; either version 2 of the License, or
+ (at your option) any later version.
+
+ This program is distributed in the hope that it will be useful,
+ but WITHOUT ANY WARRANTY; without even the implied warranty of
+ MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ GNU General Public License for more details.
+
+ You should have received a copy of the GNU General Public License along
+ with this program; if not, write to the Free Software Foundation, Inc.,
+ 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
+
 This function takes the data.frame `e_data` and runs the CluPA spectrum alignment algorithm from the `speaq` R package
 }
 \author{

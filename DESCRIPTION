@@ -18,7 +18,7 @@ Description: This package allows for the completion of targeted metabolite nucle
   that match the requested metabolites and were collected under similar experimental conditions are returned to the user. The user may then
   edit these data as necessary prior to profiling. Once satisfied with any edit(s) made to the profiling data (i.e. fitting parameters), the 
   user may initiate profiling and view the resulting metabolite quantifications and fits. 
-License: MIT
+License: GPL (>= 2)
 Depends: 
   R (>= 4.0.0),
 LazyData: TRUE

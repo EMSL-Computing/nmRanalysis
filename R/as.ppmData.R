@@ -1,6 +1,22 @@
 #' Convert Data to Appropriate NMR Class
 #'
-#' Converts a list object or several data.frames of ppm-level data to an object of the class 'ppmData'. Objects of the class 'ppmData' are lists with two obligatory components \code{e_data} and \code{f_data}.
+#' @description Converts a list object or several data.frames of ppm-level data to an object of the class 'ppmData'. Objects of the class 'ppmData' are lists with two obligatory components \code{e_data} and \code{f_data}.
+#'
+#'  Copyright (C) 2022 Battelle Memorial Institute
+#'
+#'  This program is free software; you can redistribute it and/or modify
+#'  it under the terms of the GNU General Public License as published by
+#'  the Free Software Foundation; either version 2 of the License, or
+#'  (at your option) any later version.
+#'
+#'  This program is distributed in the hope that it will be useful,
+#'  but WITHOUT ANY WARRANTY; without even the implied warranty of
+#'  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+#'  GNU General Public License for more details.
+#'
+#'  You should have received a copy of the GNU General Public License along
+#'  with this program; if not, write to the Free Software Foundation, Inc.,
+#'  51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
 #'
 #' @param e_data a \eqn{p \times n + 1} data.frame of expression data, where \eqn{p} is the number of ppm bins observed and \eqn{n} is the number of samples (an additional identifier/name column should also be present anywhere in the data.frame). Each row corresponds to data for each ppm. One column specifying a unique identifier for each row must be present.
 #' @param f_data a data.frame with \eqn{n} rows. Each row corresponds to a sample with one column giving the unique sample identifiers found in e_data column names and other columns providing qualitative and/or quantitative traits of each sample.
@@ -159,6 +175,23 @@ as.ppmData <- function(e_data, f_data, edata_cname, fdata_cname, align = FALSE, 
 }
 
 #' Spectrum Alignment Pre-processing
+#'
+#' @description Copyright (C) 2022 Battelle Memorial Institute
+#'
+#'  This program is free software; you can redistribute it and/or modify
+#'  it under the terms of the GNU General Public License as published by
+#'  the Free Software Foundation; either version 2 of the License, or
+#'  (at your option) any later version.
+#'
+#'  This program is distributed in the hope that it will be useful,
+#'  but WITHOUT ANY WARRANTY; without even the implied warranty of
+#'  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+#'  GNU General Public License for more details.
+#'
+#'  You should have received a copy of the GNU General Public License along
+#'  with this program; if not, write to the Free Software Foundation, Inc.,
+#'  51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
+#'
 #' @param e_data a data.frame of expression data, first component of a ppmData object
 #' @param max_shift integer value, optional. Defaults to NULL. If NULL, automatically detects optimal maxShift value.
 #' @description This function takes the data.frame `e_data` and runs the CluPA spectrum alignment algorithm from the `speaq` R package
