@@ -20,7 +20,21 @@ and corresponding uploaded data entries that were not matched to entries within 
 if reference metabolites were manually specified or all uploaded reference metabolites were matched to internal database entries.
 }
 \description{
-Module: Server functions specific to target metabolite data uploading
+Copyright (C) 2022 Battelle Memorial Institute
+
+ This program is free software; you can redistribute it and/or modify
+ it under the terms of the GNU General Public License as published by
+ the Free Software Foundation; either version 2 of the License, or
+ (at your option) any later version.
+
+ This program is distributed in the hope that it will be useful,
+ but WITHOUT ANY WARRANTY; without even the implied warranty of
+ MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ GNU General Public License for more details.
+
+ You should have received a copy of the GNU General Public License along
+ with this program; if not, write to the Free Software Foundation, Inc.,
+ 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
 }
 \details{
 This is the server component for the module created to handle all uploading/specification of reference (target) metabolite data.

@@ -1,5 +1,22 @@
 #' Module: UI element to display trelliscope plot of fitted spectra
 #'
+#' @description Copyright (C) 2022 Battelle Memorial Institute
+#'
+#'  This program is free software; you can redistribute it and/or modify
+#'  it under the terms of the GNU General Public License as published by
+#'  the Free Software Foundation; either version 2 of the License, or
+#'  (at your option) any later version.
+#'
+#'  This program is distributed in the hope that it will be useful,
+#'  but WITHOUT ANY WARRANTY; without even the implied warranty of
+#'  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+#'  GNU General Public License for more details.
+#'
+#'  You should have received a copy of the GNU General Public License along
+#'  with this program; if not, write to the Free Software Foundation, Inc.,
+#'  51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
+#'
+#'
 #' @param id A string denoting the namespace id.
 #'
 #' @details This is one of the UI components for the module created to handle all functions related to profiling
@@ -9,6 +26,7 @@
 #'
 #' This module component provides the UI element that allow users to:
 #' 1) View (within a trelliscope display) the fitted spectra over the sample spectra for all samples and target metabolites
+#'
 #'
 #' @import shiny
 #'
@@ -22,6 +40,22 @@ profiling_completeviewUI <- function(id){
 
 #' Module: UI element to display trelliscope plot of fitted spectra
 #'
+#' @description Copyright (C) 2022 Battelle Memorial Institute
+#'
+#'  This program is free software; you can redistribute it and/or modify
+#'  it under the terms of the GNU General Public License as published by
+#'  the Free Software Foundation; either version 2 of the License, or
+#'  (at your option) any later version.
+#'
+#'  This program is distributed in the hope that it will be useful,
+#'  but WITHOUT ANY WARRANTY; without even the implied warranty of
+#'  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+#'  GNU General Public License for more details.
+#'
+#'  You should have received a copy of the GNU General Public License along
+#'  with this program; if not, write to the Free Software Foundation, Inc.,
+#'  51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
+#'
 #' @param id A string denoting the namespace id.
 #'
 #' @details This is one of the UI components for the module created to handle all functions related to profiling
@@ -32,6 +66,7 @@ profiling_completeviewUI <- function(id){
 #' This module component provides the UI elements that allow users to:
 #' 1) Select from several options to control the shown display
 #' 2) View interactively the fitted spectra of a given metabolite over a given sample spectrum
+#'
 #'
 #' @import shiny
 #'
@@ -46,6 +81,22 @@ profiling_detailedviewUI <- function(id){
 
 #' Module: Server functions specific to metabolite profiling and profiling result generation
 #'
+#' @description Copyright (C) 2022 Battelle Memorial Institute
+#'
+#'  This program is free software; you can redistribute it and/or modify
+#'  it under the terms of the GNU General Public License as published by
+#'  the Free Software Foundation; either version 2 of the License, or
+#'  (at your option) any later version.
+#'
+#'  This program is distributed in the hope that it will be useful,
+#'  but WITHOUT ANY WARRANTY; without even the implied warranty of
+#'  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+#'  GNU General Public License for more details.
+#'
+#'  You should have received a copy of the GNU General Public License along
+#'  with this program; if not, write to the Free Software Foundation, Inc.,
+#'  51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
+#'
 #' @param id A string denoting the namespace id.
 #' @param xpmt_data A reactive object containing experimental NMR data and associated metadata.
 #' @param ref_data A reactive object containing target metabolite data, after having been edited.
@@ -58,6 +109,7 @@ profiling_detailedviewUI <- function(id){
 #' This module component provides the back-end code that:
 #' 1) Performs the profiling for all target metabolites for all sample spectra
 #' 2) Generates plots and table(s) used to visualize and summarize the profiling results
+#'
 #'
 #' @return A reactive object containing a list of two elements. The first element of this list, final_output, is the
 #' output of rDolphin's profiling procedure. The second element of the list, reproducibility_data, is some other component
