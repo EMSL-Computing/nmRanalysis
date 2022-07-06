@@ -20,13 +20,14 @@ RUN apt-get update && apt-get install -y --no-install-recommends \
     libgsl0-dev \
     r-cran-xml \
     libxml2-dev \
+    xdg-utils \
     && rm -rf /var/lib/apt/lists/*
 
 
 #install renv on the docker image
 ENV RENV_VERSION 0.15.4
 
-#ENV RENV_PATHS_LIBRARY renv/library
+#ENV RENV_PATHS_CACHE /usr/local/lib/R/site-library
 RUN R -e "install.packages('remotes', repos = c(CRAN = 'https://cloud.r-project.org'), dependencies = TRUE)"
 RUN R -e "remotes::install_github('rstudio/renv@${RENV_VERSION}')"
 
@@ -55,7 +56,8 @@ RUN addgroup --system app \
 COPY * /srv/shiny/
 
 RUN chmod -R 755 /srv/shiny/
-RUN R -e 'remotes::install_local(upgrade="never", lib = "/usr/local/lib/R/site-library")'
+#RUN R -e 'remotes::install_local(upgrade="never", lib = "/usr/local/lib/R/site-library")'
+RUN R -e "remotes::install_github('EMSL-Computing/nmRanalysis')"
 #RUN R -e "library(devtools)"
 #RUN R -e "devtools::load_all('.')"
 # Make the ShinyApp available at port 3838
