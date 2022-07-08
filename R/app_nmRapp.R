@@ -32,5 +32,5 @@ nmRapp <- function(...){
 
   ui <- nmRapp_ui
   server <- nmRapp_server
-  shinyApp(ui = ui, server = server, options = list(launch.browser = TRUE), ...)
+  shinyApp(ui = ui, server = server, options = list(launch.browser = FALSE), ...)
 }
