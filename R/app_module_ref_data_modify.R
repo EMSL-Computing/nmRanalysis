@@ -1520,7 +1520,7 @@ ref_data_editingServer <- function(id, xpmt_data, ref_data, ref_db){
                                                      column(width = 6,
                                                             numericInput(inputId  = NS(id, "gpp_fitting_maxiter"),
                                                                          label    = "Max iterations of optimization subroutine:",
-                                                                         value    = NA)),
+                                                                         value    = 8)),
                                                      shinyBS::bsTooltip(id        = NS(id, "gpp_fitting_maxiter"),
                                                                         title     = "(Optional) The maximum number of iterations for a subroutine of an algorithm to optimize fitting parameters.",
                                                                         placement = "bottom",
