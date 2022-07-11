@@ -113,7 +113,7 @@ as.ppmData <- function(e_data, f_data, edata_cname, fdata_cname, align = FALSE, 
     stop("Solvent must be one of 'h2o' or 'd2o'")
   }
 
-  if(align == TRUE) {
+  if(align == TRUE){
     e_data <- peak_alignment(e_data = e_data)
   }
 
@@ -135,6 +135,11 @@ as.ppmData <- function(e_data, f_data, edata_cname, fdata_cname, align = FALSE, 
 
   # set data information attributes #
   attr(res, "data_info") <- list(num_edata = num_edata, num_miss_obs = num_miss_obs, prop_missing = prop_missing, num_samps = num_samps)
+
+  # set aligned attribute #
+  if (align == TRUE){
+    attr(res, "aligned") <- TRUE
+  }
 
   # set sample set information attributes #
   attr(res, "exp_info") <- list(instrument_strength = instrument_strength, ph = ph, solvent = solvent)
