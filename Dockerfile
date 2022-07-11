@@ -1,10 +1,10 @@
 ## Anastasiya Prymolenna, PNNL
-## Last Updated: 2022_06_28
+## Last Updated: 2022_07_06
 ## nmRanalysis BASE IMAGE Version: 0.0.1
 ## Tag: nmranalysisbase:0.0.1
 
 
-## BASE IMAGE 
+## BASE IMAGE
 
 # Install R Version 4.1.3
 FROM rocker/shiny:4.1.3
@@ -20,27 +20,22 @@ RUN apt-get update && apt-get install -y --no-install-recommends \
     libgsl0-dev \
     r-cran-xml \
     libxml2-dev \
+    xdg-utils \
     && rm -rf /var/lib/apt/lists/*
 
 
 #install renv on the docker image
-ENV RENV_VERSION 0.15.4
+ENV RENV_VERSION 0.15.5
 
-#ENV RENV_PATHS_LIBRARY renv/library
-RUN R -e "install.packages('remotes', repos = c(CRAN = 'https://cloud.r-project.org'), dependencies = TRUE)"
+#RUN R -e 'renv::install("remotes");remotes::install_local(upgrade="never")'
+RUN R -e "install.packages('remotes', repos = c(CRAN = 'http://cran.us.r-project.org'), dependencies = TRUE)"
 RUN R -e "remotes::install_github('rstudio/renv@${RENV_VERSION}')"
 
 
 # Install R packages from renv
-#COPY ../nmranalysis/* /srv/shiny/nmranalysis/
 WORKDIR /srv/shiny/
 COPY renv.lock renv.lock
 RUN R -e 'renv::restore()'
-#RUN R -e 'renv::deactivate()'
-#RUN R -e "remotes::install_local(path = '../nmranalysis', lib = '/usr/local/lib/R/site-library')"
-#RUN R -e "remotes::install_github('r-lib/devtools')"
-#RUN R -e "devtools::install_local('/srv/shiny/nmranalysis', force = TRUE)"
-
 
 # set Rprofile in dir
 RUN echo "local(options(shiny.port = 3838, shiny.host = '0.0.0.0'))" > /usr/lib/R/etc/Rprofile.site
@@ -49,19 +44,16 @@ RUN echo "local(options(shiny.port = 3838, shiny.host = '0.0.0.0'))" > /usr/lib/
 RUN addgroup --system app \
     && adduser --system --ingroup app app
 
-# nmrApp IMAGE  (move to separate script from here)
+# nmrApp IMAGE  --end of base--
 # copy the app directory into the image
 
 COPY * /srv/shiny/
 
 RUN chmod -R 755 /srv/shiny/
-RUN R -e 'remotes::install_local(upgrade="never", lib = "/usr/local/lib/R/site-library")'
-#RUN R -e "library(devtools)"
-#RUN R -e "devtools::load_all('.')"
+RUN R -e "remotes::install_github('EMSL-Computing/nmRanalysis')"
+
 # Make the ShinyApp available at port 3838
 EXPOSE 3838
 
 # run app
-CMD ["R", "-e", "options('shiny.port' = 3838,shiny.host='0.0.0.0');nmRanalysisApp::nmRapp()"]
-#CMD ["R", "-e", "nmRapp()"]
-#CMD Rscript R/app_nmRapp.R
+CMD ["R", "-e", "options('shiny.port' = 3838,shiny.host='0.0.0.0');nmRanalysis::nmRapp()"]
