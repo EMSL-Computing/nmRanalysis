@@ -1,5 +1,5 @@
 ---
-title: "nmRanalysis_rDolphin"
+title: "nmRanalysis"
 author: "Allison Thompson, Anastasiya Prymolenna"
 date: "`r Sys.Date()`"
 output: 

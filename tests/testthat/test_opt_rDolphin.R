@@ -1,4 +1,4 @@
-library(nmRanalysisApp)
+library(nmRanalysis)
 
 data("e_data")
 data("f_data")

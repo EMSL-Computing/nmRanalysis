@@ -25,12 +25,13 @@
 #'
 #' @import shiny
 #'
-nmRapp <- function(...){
+nmRapp <- function(launch.browser = FALSE, ...){
 
   # Option specifies the max datafile size that may be loaded into shiny
   options(shiny.maxRequestSize=30*1024^2)
 
   ui <- nmRapp_ui
   server <- nmRapp_server
-  shinyApp(ui = ui, server = server, options = list(launch.browser = FALSE), ...)
+  app <- shinyApp(ui = ui, server = server)
+  runApp(app, host = "0.0.0.0", port = 3838, launch.browser = launch.browser)
 }

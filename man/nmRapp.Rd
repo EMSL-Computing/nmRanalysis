@@ -4,7 +4,7 @@
 \alias{nmRapp}
 \title{Semi-Automated Targeted Metabolite NMR Profiling}
 \usage{
-nmRapp(...)
+nmRapp(launch.browser = FALSE, ...)
 }
 \arguments{
 \item{...}{additional arguments to be passed to shinyApp().}
