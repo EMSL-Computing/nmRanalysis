@@ -4,7 +4,7 @@
 ## Tag: nmranalysisbase:0.0.1
 
 
-## BASE IMAGE 
+## BASE IMAGE
 
 # Install R Version 4.1.3
 FROM rocker/shiny:4.1.3
@@ -28,7 +28,7 @@ RUN apt-get update && apt-get install -y --no-install-recommends \
 ENV RENV_VERSION 0.15.5
 
 #RUN R -e 'renv::install("remotes");remotes::install_local(upgrade="never")'
-RUN R -e "install.packages('remotes', repos = c(CRAN = 'http://cran.rstudio.com/'), dependencies = TRUE)"
+RUN R -e "install.packages('remotes', repos = c(CRAN = 'http://cran.us.r-project.org'), dependencies = TRUE)"
 RUN R -e "remotes::install_github('rstudio/renv@${RENV_VERSION}')"
 
 
@@ -56,4 +56,4 @@ RUN R -e "remotes::install_github('EMSL-Computing/nmRanalysis')"
 EXPOSE 3838
 
 # run app
-CMD ["R", "-e", "options('shiny.port' = 3838,shiny.host='0.0.0.0');nmRanalysisApp::nmRapp()"]
+CMD ["R", "-e", "options('shiny.port' = 3838,shiny.host='0.0.0.0');nmRanalysis::nmRapp()"]
