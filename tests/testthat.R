@@ -1,4 +1,4 @@
 library(testthat)
-library(nmRanalysisApp)
+library(nmRanalysis)
 
-test_check("nmRanalysisApp")
+test_check("nmRanalysis")
