@@ -55,7 +55,11 @@ ref_data_uploadUI <- function(id, ref_db){
                        options = list(create = TRUE))
       )
     ),
-    actionButton(ns("process_ref_inputs"), label = "Import Database Entries")
+    # clickable button
+    shinyWidgets::actionBttn(inputId = ns("process_ref_inputs"),
+                             label = "Query Reference Database",
+                             style = "unite",
+                             color = "primary")
   )
 }
 

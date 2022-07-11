@@ -35,16 +35,14 @@
 xpmt_data_uploadUI <- function(id, ref_db){
   ns <- NS(id)
   tagList(
-    h4("Experimental Data"),
-
-    # buttons to allow upload functionality
-    # first argument is the assigned name of the user input
-    # second argument is the displayed label on the button
-    fileInput(ns("uploaded_nmR_edata"),
-              label = "NMR PPM Data:"),
-
-    fileInput(ns("uploaded_nmR_fdata"),
-              label = "NMR Metadata:"),
+    shinyBS::bsCollapse(id = ns("experimental_data"), open = "Experimental Data",
+                        shinyBS::bsCollapsePanel(title = "Experimental Data",
+                                                 fileInput(ns("uploaded_nmR_edata"),
+                                                           label = "Experimental Data File:"),
+                                                 fileInput(ns("uploaded_nmR_fdata"),
+                                                           label = "(Optional) Experimental Metadata File:"),
+                                                 style = "primary")
+                        ),
 
     # Note that tooltips are not working for some unknown reason.
     shinyBS::bsCollapse(id = ns("experimental_params"), open = "Experimental Conditions",
@@ -92,7 +90,10 @@ xpmt_data_uploadUI <- function(id, ref_db){
 
 
     # clickable button
-    actionButton(ns("process_exp_inputs"), label = "Process Data")
+    shinyWidgets::actionBttn(inputId = ns("process_exp_inputs"),
+                             label = "Process Data",
+                             style = "unite",
+                             color = "primary")
   )
 }
 
@@ -139,7 +140,6 @@ xpmt_data_uploadServer <- function(id){
                                           # Will not evaluate unless edata and fdata are supplied.
                                           # as well as field strength, ph, and solvent
                                           req(input$uploaded_nmR_edata)
-                                          req(input$uploaded_nmR_fdata)
                                           req(input$instrument_strength)
                                           req(input$pH)
                                           req(input$solvent)
@@ -148,9 +148,24 @@ xpmt_data_uploadServer <- function(id){
                                           xpmt.e_data <- load_file(path    = input$uploaded_nmR_edata$datapath,
                                                                    dataset = "experiment")
 
-                                          # Read in experimental metadata file
-                                          xpmt.f_data <- load_file(path    = input$uploaded_nmR_fdata$datapath,
-                                                                   dataset = "experiment_metadata")
+                                          # Create or read in experimental metadata file
+                                          if(is.null(input$uploaded_nmR_fdata$datapath)){
+                                            xpmt.f_data <- data.frame(Sample = colnames(xpmt.e_data)[-1]) %>%
+                                              dplyr::mutate(Experiment = dplyr::row_number(),
+                                                            pH         = input$pH,
+                                                            Solvent    = input$solvent,
+                                                            Frequency  = input$instrument_strength)
+
+                                            shinyWidgets::show_alert(
+                                              title = "Experimental metadata not provided.",
+                                              text = "Default metadata were automatically generated.",
+                                              type = "warning"
+                                            )
+
+                                          } else{
+                                            xpmt.f_data <- load_file(path    = input$uploaded_nmR_fdata$datapath,
+                                                                     dataset = "experiment_metadata")
+                                          }
 
                                           # Feed above into nmRanalysis function to create ppmData object
                                           user.data <- as.ppmData(e_data              = xpmt.e_data,
