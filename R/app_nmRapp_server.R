@@ -117,7 +117,6 @@ nmRapp_server <- function(input, output, session) {
 
     updateTabsetPanel(inputId = "refdat_tab1", selected = "tab1_show")
     updateTabsetPanel(inputId = "refdat_tab2", selected = "tab2_show")
-    updateTabsetPanel(inputId = "refdat_tab3", selected = "tab3_show")
   })
 
   # Creates a datatable that displays entries not found in reference database
@@ -172,30 +171,11 @@ nmRapp_server <- function(input, output, session) {
                                        xpmt_data = mod_xpmt_data,
                                        ref_data = mod_ref_data)
 
-  observeEvent(profiling_results(),
-               {
-                 req(mod_xpmt_data())
-                 req(mod_ref_data()$profile_confirm == TRUE)
+  observeEvent(input$wizard_proftoref, {
+    req(input$wizard_proftoref > 0)
 
-                 removeTab(inputId = "AllTabs",
-                           target  = "ProfilingTab")
-                 appendTab(inputId = "AllTabs",
-                           tabPanel(
-                             title = "Profile Data",
-                             value = "ProfilingTab",
-                             tabsetPanel(
-                               tabPanel(
-                                 title = "Signal View",
-                                 profiling_completeviewUI(id = "profiling")
-                               ),
-                               tabPanel(
-                                 title = "Metabolite View",
-                                 profiling_detailedviewUI(id = "profiling")
-                               )
-                             )
-                           )
-                 )
-                 updateTabsetPanel(session, "AllTabs",
-                                   selected = "ProfilingTab")
-               })
+    updateTabsetPanel(session, "AllTabs",
+                      selected = "RefMetTab")
+  })
+
 }

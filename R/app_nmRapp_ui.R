@@ -38,7 +38,7 @@ nmRapp_ui <- function(request){
   # navBarPage specifies a template for the general page layout of the UI
   # This template consists of several panels accessible via tabs
   navbarPage(
-    "nmRanalysis GUI",
+    "nmRanalysis",
     id = "AllTabs", # unique identifier for navbarPage
 
     # The first panel/tab of the UI
@@ -132,21 +132,49 @@ nmRapp_ui <- function(request){
                   value = "tab2_hide"
                 )
               )
+            )
+          )
+        )
+      )
+    ),
+
+
+
+
+    # The final tab of the UI
+    tabPanel(
+      title = "Profiling",
+      value = "ProfilingTab",
+      sidebarLayout(
+        sidebarPanel(
+          profiling_quant_sidebarUI(id = "profiling"),
+          h4(""),
+          fluidRow(
+            column(6,
+                   shinyWidgets::actionBttn(
+                     inputId = "wizard_proftoref",
+                     label = "Reference Data Editing",
+                     style = "minimal",
+                     color = "primary",
+                     icon = icon("arrow-left"),
+                     size = "sm")
+            )
+          )
+        ),
+        mainPanel(
+          tabsetPanel(
+            id = "profout_tabs",
+            tabPanel(
+              title = "Quantification Data",
+              profiling_prequantUI(id = "profiling")
             ),
             tabPanel(
-              title = "Reference Data for Quantification",
-              tabsetPanel(
-                id = "refdat_tab3",
-                type = "hidden",
-                selected = "tab3_hide",
-                tabPanelBody(
-                  value = "tab3_show",
-                  ref_data_quantTab(id = "ref_data_edits")
-                ),
-                tabPanelBody(
-                  value = "tab3_hide"
-                )
-              )
+              title = "Signal View",
+              profiling_completeviewUI(id = "profiling")
+            ),
+            tabPanel(
+              title = "Metabolite View",
+              profiling_detailedviewUI(id = "profiling")
             )
           )
         )
