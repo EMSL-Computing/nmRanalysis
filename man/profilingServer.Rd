@@ -39,9 +39,11 @@ Copyright (C) 2022 Battelle Memorial Institute
 This is the server component for the module created to handle all functions related to profiling
 of experimental data, based on user edits to the fitting parameters of a pre-specified list of
 reference (target) metabolites. The value provided for 'id' should be identical across the following:
-profiling_completeviewUI(), profiling_detailedviewUI(), and profilingServer()
+profiling_quant_sidebarUI(), profiling_prequantUI(), profiling_completeviewUI(), profiling_detailedviewUI(),
+and profilingServer().
 
 This module component provides the back-end code that:
-1) Performs the profiling for all target metabolites for all sample spectra
-2) Generates plots and table(s) used to visualize and summarize the profiling results
+1) Allows for final editing of global profiling paramters, and displays metabolite data aggregated into ROIs
+2) Performs the profiling for all target metabolites for all sample spectra
+3) Generates plots and table(s) used to visualize and summarize the profiling results
 }

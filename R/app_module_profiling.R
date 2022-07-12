@@ -234,6 +234,7 @@ profilingServer <- function(id, xpmt_data, ref_data){
       req(input$ROI_to_plot_quantdat)
 
 
+
       temp <- ref_data()$quantdata %>%
         dplyr::mutate(ROI = paste0("(", .data$`ROI right edge (ppm)`, ", ", .data$`ROI left edge (ppm)`, ")")) %>%
         dplyr::filter(ROI %in% input$ROI_to_plot_quantdat)
@@ -276,16 +277,8 @@ profilingServer <- function(id, xpmt_data, ref_data){
     # Plot all collapsed ROIs over the spectrum
     output$quantdata_plot <- plotly::renderPlotly({
 
-      isolate({
-        req(ref_data())
-        req(xpmt_data())
-      })
-      # req(ref_data()$quantdata)
-      # req(input$ROI_to_plot_quantdat)
+      req(isolate({ref_data()}))
 
-      # # Generate line shapes based on collapsed ROIs
-      # ROI_lines <- ROI_line_gen(data = ref_data()$quantdata[!duplicated(ref_data()$quantdata$`ROI left edge (ppm)`),])
-      # ROI_annots <- ROI_annot_gen(data = ref_data()$user_edited_refdata)
 
       plotly::plot_ly(source = "id_quantdata_plot", type = "scatter", mode = "lines") %>%
         plotly::config(displaylogo = FALSE,
@@ -312,8 +305,10 @@ profilingServer <- function(id, xpmt_data, ref_data){
 
     # This observer is responsible for plotting the trace (i.e. line) corresponding to a selected
     # experimental spectrum. This is implemented through proxy updates for the sake of efficiency.
-    observeEvent(c(input$sample_to_plot_quantdat, xpmt_data()), priority = -1, {
+    observeEvent(c(input$sample_to_plot_quantdat, input$ROI_to_plot_quantdat, xpmt_data()), priority = -1, {
       req(input$sample_to_plot_quantdat)
+      req(input$ROI_to_plot_quantdat)
+      req(ref_data())
 
       xpmt_data_sample <- xpmt_data()$e_data %>% dplyr::select(.data$PPM, .data[[input$sample_to_plot_quantdat]])
       df_long <- xpmt_data_sample %>%
@@ -360,6 +355,8 @@ profilingServer <- function(id, xpmt_data, ref_data){
                  {
                    req(ref_data())
                    req(xpmt_data())
+
+
 
                    temp <- ref_data()$quantdata %>%
                      dplyr::mutate(ROI = paste0("(", .data$`ROI right edge (ppm)`, ", ", .data$`ROI left edge (ppm)`, ")")) %>%
@@ -426,6 +423,7 @@ profilingServer <- function(id, xpmt_data, ref_data){
 
     output$ui_global_profiling_parameters <- renderUI({
       req(ref_data())
+
 
       if(any(Reduce("c", lapply(ref_data()$global_parameters, is.null)))){
         shinyBS::bsCollapse(id = NS(id, "global_fitting_params"),
