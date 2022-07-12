@@ -56,7 +56,7 @@ ref_data_ROIeditingUI <- function(id){
     ),
     h5(tags$b("Select a Signal:")),
     uiOutput(ns("fitcheck")),
-
+    uiOutput(ns("ui_global_profiling_parameters")),
     DT::dataTableOutput(ns("refmet_dspedt_table"))
   )
 }
@@ -167,41 +167,6 @@ ref_data_quantTab <- function(id){
   )
 }
 
-
-#' Module: UI element displaying global profiling options
-#'
-#' @description Copyright (C) 2022 Battelle Memorial Institute
-#'
-#'  This program is free software; you can redistribute it and/or modify
-#'  it under the terms of the GNU General Public License as published by
-#'  the Free Software Foundation; either version 2 of the License, or
-#'  (at your option) any later version.
-#'
-#'  This program is distributed in the hope that it will be useful,
-#'  but WITHOUT ANY WARRANTY; without even the implied warranty of
-#'  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-#'  GNU General Public License for more details.
-#'
-#'  You should have received a copy of the GNU General Public License along
-#'  with this program; if not, write to the Free Software Foundation, Inc.,
-#'  51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
-#'
-#' @param id A string denoting the namespace id.
-#'
-#' @details This is one of the UI components for the module created to handle all editing of reference (target) metabolite data.
-#' The value provided for 'id' should be identical across the following: ref_data_ROIeditingUI(), ref_data_add_delUI(),
-#' ref_data_quantTab(), ref_data_profileUI(), ref_data_global_fittingparamsUI(), and ref_data_editingServer().
-#'
-#' This module component displays all global profiling options that are listed under rDolphin's "program_parameters."
-#'
-#' @import shiny
-#'
-ref_data_global_fittingparamsUI <- function(id){
-  ns <- NS(id)
-  tagList(
-    uiOutput(ns("ui_global_profiling_parameters"))
-  )
-}
 
 #' Module: Server functions specific to target metabolite data modification
 #'

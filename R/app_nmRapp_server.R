@@ -78,9 +78,7 @@ nmRapp_server <- function(input, output, session) {
                              value = "RefMetTab",
                              sidebarLayout(
                                sidebarPanel(
-                                 ref_data_uploadUI(id = "ref_data_init", ref_db = bmse_associations),
-                                 h1(""),
-                                 ref_data_global_fittingparamsUI(id = "ref_data_edits"),
+                                 ref_data_uploadUI(id = "ref_data_init", ref_db = bmse_associations)
                                ),
                                mainPanel(
                                  tabsetPanel(

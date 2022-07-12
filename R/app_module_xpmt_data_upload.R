@@ -140,17 +140,19 @@ xpmt_data_uploadServer <- function(id){
 
     output$wizard_exptoref_ui <- renderUI({
       req(uploaded_xpmt_data())
-      h4("")
-      fluidRow(
-        column(5, offset = 7,
-               shinyWidgets::actionBttn(
-                 inputId = NS(id, "wizard_exptoref"),
-                 label = "Reference Data Editing",
-                 style = "minimal",
-                 color = "primary",
-                 icon = icon("arrow-right"),
-                 size = "sm"
-               )
+      tagList(
+        h4(""),
+        fluidRow(
+          column(5, offset = 7,
+                 shinyWidgets::actionBttn(
+                   inputId = NS(id, "wizard_exptoref"),
+                   label = "Reference Data Editing",
+                   style = "minimal",
+                   color = "primary",
+                   icon = icon("arrow-right"),
+                   size = "sm"
+                 )
+          )
         )
       )
     })
