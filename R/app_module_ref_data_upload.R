@@ -59,7 +59,8 @@ ref_data_uploadUI <- function(id, ref_db){
     shinyWidgets::actionBttn(inputId = ns("process_ref_inputs"),
                              label = "Query Reference Database",
                              style = "unite",
-                             color = "primary")
+                             color = "primary",
+                             size = "sm")
   )
 }
 

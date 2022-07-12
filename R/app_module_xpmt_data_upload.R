@@ -41,7 +41,13 @@ xpmt_data_uploadUI <- function(id, ref_db){
                                                            label = "Experimental Data File:"),
                                                  fileInput(ns("uploaded_nmR_fdata"),
                                                            label = "(Optional) Experimental Metadata File:"),
-                                                 style = "primary")
+                                                 shinyWidgets::switchInput(
+                                                   inputId = ns("align_spectra"),
+                                                   label = "Align Spectra",
+                                                   size = "small"),
+                                                 htmlOutput(ns("align_note")),
+                                                 style = "primary"
+                                                 )
                         ),
 
     # Note that tooltips are not working for some unknown reason.
@@ -74,15 +80,7 @@ xpmt_data_uploadUI <- function(id, ref_db){
                                                                                         "D2O" = "d2o")),
                                                                           title     = "Solvent used",
                                                                           placement = "bottom",
-                                                                          trigger   = "click"))#,
-
-                                                   # column(width = 6,
-                                                   #        numericInput(inputId  = ns("instrument_strength"),
-                                                   #                     label    = "Spectrometer Frequency (MHz)")),
-                                                   # shinyBS::bsTooltip(id        = ns("instrument_strength"),
-                                                   #                    title     = "Frequency (i.e. field strength) of spectrometer",
-                                                   #                    placement = "bottom",
-                                                   #                    trigger   = "hover")
+                                                                          trigger   = "click"))
 
                                                  ),
                                                  style = "primary"
@@ -93,7 +91,9 @@ xpmt_data_uploadUI <- function(id, ref_db){
     shinyWidgets::actionBttn(inputId = ns("process_exp_inputs"),
                              label = "Process Data",
                              style = "unite",
-                             color = "primary")
+                             color = "primary",
+                             size = "sm"),
+    uiOutput(ns("wizard_exptoref_ui"))
   )
 }
 
@@ -130,6 +130,31 @@ xpmt_data_uploadUI <- function(id, ref_db){
 xpmt_data_uploadServer <- function(id){
   moduleServer(id, function(input, output, session){
 
+    # Output (in HTML format) to display a note about the effect of automatic alignment on processing time.
+    output$align_note <- renderUI({
+
+      req(input$align_spectra)
+
+      htmltools::HTML("<strong>Note:</strong> Alignment may substantially increase initial processing time.")
+    })
+
+    output$wizard_exptoref_ui <- renderUI({
+      req(uploaded_xpmt_data())
+      h4("")
+      fluidRow(
+        column(5, offset = 7,
+               shinyWidgets::actionBttn(
+                 inputId = NS(id, "wizard_exptoref"),
+                 label = "Reference Data Editing",
+                 style = "minimal",
+                 color = "primary",
+                 icon = icon("arrow-right"),
+                 size = "sm"
+               )
+        )
+      )
+    })
+
     # Define reactive object containing all user supplied experimental data
     # First argument of eventReactive() describes the dependencies of the reactive expression.
     # If any one of the specified objects changes,
@@ -158,7 +183,7 @@ xpmt_data_uploadServer <- function(id){
 
                                             shinyWidgets::show_alert(
                                               title = "Experimental metadata not provided.",
-                                              text = "Default metadata were automatically generated.",
+                                              text = "Default metadata will be automatically generated.",
                                               type = "warning"
                                             )
 
@@ -174,7 +199,8 @@ xpmt_data_uploadServer <- function(id){
                                                                   fdata_cname         = "Sample",
                                                                   instrument_strength = as.numeric(input$instrument_strength),
                                                                   ph                  = as.numeric(input$pH),
-                                                                  solvent             = input$solvent)
+                                                                  solvent             = input$solvent,
+                                                                  align               = input$align_spectra)
                                           return(user.data)
                                         })
   })
