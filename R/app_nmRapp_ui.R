@@ -60,25 +60,16 @@ nmRapp_ui <- function(request){
         # Specify elements to include in main panel
         mainPanel(
           tabsetPanel(
-            tabPanel(
-              title = "Experimental Data",
-              tabsetPanel(
-                id = "xpmtdat_tab1",
-                type = "hidden",
-                selected = "xpmt_tab1_hide",
-                tabPanelBody(
-                  value = "xpmt_tab1_show",
-                  xpmt_data_vizoptionsUI(id = "xpmt_viz"),
-                  xpmt_data_vizUI(id = "xpmt_viz")
-                ),
-                tabPanelBody(
-                  value = "xpmt_tab1_hide"
-                )
-              )
+            id = "xpmtdat_tab1",
+            type = "hidden",
+            selected = "xpmt_tab1_hide",
+            tabPanelBody(
+              value = "xpmt_tab1_show",
+              xpmt_data_vizoptionsUI(id = "xpmt_viz"),
+              xpmt_data_vizUI(id = "xpmt_viz")
             ),
-            tabPanel(
-              "Experimental Metadata",
-              xpmt_metadata_vizUI(id = "xpmt_viz")
+            tabPanelBody(
+              value = "xpmt_tab1_hide"
             )
           )
         )

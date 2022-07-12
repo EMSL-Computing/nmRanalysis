@@ -40,7 +40,7 @@ Copyright (C) 2022 Battelle Memorial Institute
 \details{
 This is the server component for the module created to handle all editing of reference (target) metabolite data.
 The value provided for 'id' should be identical across the following: ref_data_ROIeditingUI(), ref_data_add_delUI(),
-ref_data_quantTab(), ref_data_profileUI(), ref_data_global_fittingparamsUI(), and ref_data_editingServer().
+ref_data_quantTab(), ref_data_profileUI(), and ref_data_editingServer().
 
 This module component provides the back-end code that:
 1) Populates the list of editable target metabolites that users may select from

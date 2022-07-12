@@ -37,11 +37,11 @@ Copyright (C) 2022 Battelle Memorial Institute
 \details{
 This is the UI component for the module created to handle the visualization of experimental data and metadata.
 The value provided for 'id' should be identical across xpmt_data_vizUI(), xpmt_data_vizoptionsUI(),
-xpmt_metadata_vizUI, and xpmt_data_vizServer().
+and xpmt_data_vizServer().
 
 This module component provides the back-end code that:
 1) Generates the plotly figure of experimental data
-2) Generates the datatables of experimental data and metadata
+2) Generates the datatable of experimental metadata
 3) Creates and displays subplots corresponding to selected regions
 4) Applies or removes filters to the data
 }

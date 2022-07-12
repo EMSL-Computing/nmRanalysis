@@ -20,11 +20,11 @@
 #'
 #' @details This is the UI component for the module created to handle the visualization of experimental data.
 #' The value provided for 'id' should be identical across xpmt_data_vizUI(), xpmt_data_vizoptionsUI(),
-#' xpmt_metadata_vizUI, and xpmt_data_vizServer().
+#' and xpmt_data_vizServer().
 #'
 #' This module component provides the UI elements that allow users to:
 #' 1) Visualize uploaded experimental data through an interactive plotly figure
-#' 2) Visualize uploaded experimental data through a searchable datatable.
+#' 2) Visualize experimental metadata through a searchable datatable.
 #'
 #' @import shiny
 #' @importFrom magrittr %>%
@@ -33,7 +33,7 @@ xpmt_data_vizUI <- function(id){
   ns <- NS(id)
   tagList(
     shinycssloaders::withSpinner(plotly::plotlyOutput(ns('e_data_plot'))),
-    DT::dataTableOutput(ns("e_data_df"))
+    DT::dataTableOutput(ns("f_data_df"))
   )
 }
 
@@ -79,42 +79,6 @@ xpmt_data_vizoptionsUI <- function(id){
   )
 }
 
-#' Module: UI elements specific to experimental metadata visualization
-#'
-#' @description Copyright (C) 2022 Battelle Memorial Institute
-#'
-#'  This program is free software; you can redistribute it and/or modify
-#'  it under the terms of the GNU General Public License as published by
-#'  the Free Software Foundation; either version 2 of the License, or
-#'  (at your option) any later version.
-#'
-#'  This program is distributed in the hope that it will be useful,
-#'  but WITHOUT ANY WARRANTY; without even the implied warranty of
-#'  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-#'  GNU General Public License for more details.
-#'
-#'  You should have received a copy of the GNU General Public License along
-#'  with this program; if not, write to the Free Software Foundation, Inc.,
-#'  51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
-#'
-#' @param id A string denoting the namespace id.
-#'
-#' @details This is the UI component for the module created to handle the visualization of experimental metadata.
-#' The value provided for 'id' should be identical across xpmt_data_vizUI(), xpmt_data_vizoptionsUI(),
-#' xpmt_metadata_vizUI, and xpmt_data_vizServer().
-#'
-#' This module component provides the UI element that allows users to:
-#' 1) Visualize uploaded experimental metadata through a searchable datatable.
-#'
-#' @import shiny
-#'
-xpmt_metadata_vizUI <- function(id){
-  ns <- NS(id)
-  tagList(
-    DT::dataTableOutput(ns("f_data_df"))
-  )
-}
-
 #' Module: Server functions specific to experimental data and metadata visualization
 #'
 #' @description Copyright (C) 2022 Battelle Memorial Institute
@@ -139,11 +103,11 @@ xpmt_metadata_vizUI <- function(id){
 #'
 #' @details This is the UI component for the module created to handle the visualization of experimental data and metadata.
 #' The value provided for 'id' should be identical across xpmt_data_vizUI(), xpmt_data_vizoptionsUI(),
-#' xpmt_metadata_vizUI, and xpmt_data_vizServer().
+#' and xpmt_data_vizServer().
 #'
 #' This module component provides the back-end code that:
 #' 1) Generates the plotly figure of experimental data
-#' 2) Generates the datatables of experimental data and metadata
+#' 2) Generates the datatable of experimental metadata
 #' 3) Creates and displays subplots corresponding to selected regions
 #' 4) Applies or removes filters to the data
 #'
@@ -220,7 +184,7 @@ xpmt_data_vizServer <- function(id, xpmt_data){
         circle = TRUE, status = "info",
         icon = icon("cog"), width = "300px",
 
-        tooltip = shinyWidgets::tooltipOptions(title = "Plot Options")
+        tooltip = shinyWidgets::tooltipOptions(title = "Data Options")
       )
     })
 
@@ -240,17 +204,6 @@ xpmt_data_vizServer <- function(id, xpmt_data){
       }
     })
 
-    # Render interactive datatable object for output. For each renderDataTable call in the server.R file, there is a
-    # corresponding DT::dataTableOutput() in the ui.R file.
-    # This datatable corresponds to the ppm data
-    output$e_data_df <- DT::renderDataTable({
-      # Will not evaluate unless experimental data has been uploaded
-      req(xpmt_data())
-
-      xpmt_data()$e_data %>%
-        DT::datatable(rownames   = FALSE,
-                      extensions = "Responsive")
-    })
 
     # Initialize plot of single spectrum from uploaded experimental data
     output$e_data_plot <- plotly::renderPlotly({
