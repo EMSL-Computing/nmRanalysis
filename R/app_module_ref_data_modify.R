@@ -20,7 +20,7 @@
 #'
 #' @details This is one of the UI components for the module created to handle all editing of reference (target) metabolite data.
 #' The value provided for 'id' should be identical across the following: ref_data_ROIeditingUI(), ref_data_add_delUI(),
-#' ref_data_quantTab(), ref_data_profileUI(), ref_data_global_fittingparamsUI(), and ref_data_editingServer().
+#' ref_data_quantTab(), ref_data_profileUI(), and ref_data_editingServer().
 #'
 #' This module component provides the UI elements that allow users to:
 #' 1) Select from a dropdown of several options that relate to the main plot. These options include the choice of
@@ -29,6 +29,7 @@
 #'    what filters (if any) have been applied to the experimental spectral data.
 #' 2) Save changes, revert the last saved changes, and revert all saved changes made to a given target
 #'    metabolite's data (i.e. fitting parameters)
+#' 3) Check the fit of metabolites and make changes to global fitting parameters
 #'
 #' This module component also displays target metabolite data within an interactive plot and table.
 #'
@@ -83,7 +84,7 @@ ref_data_ROIeditingUI <- function(id){
 #'
 #' @details This is one of the UI components for the module created to handle all editing of reference (target) metabolite data.
 #' The value provided for 'id' should be identical across the following: ref_data_ROIeditingUI(), ref_data_add_delUI(),
-#' ref_data_quantTab(), ref_data_profileUI(), ref_data_global_fittingparamsUI(), and ref_data_editingServer().
+#' ref_data_quantTab(), ref_data_profileUI(), and ref_data_editingServer().
 #'
 #' This module component provides the UI elements that allow users to:
 #' 1) Specify metabolite(s) to add or remove
@@ -150,7 +151,7 @@ ref_data_add_delUI <- function(id){
 #'
 #' @details This is one of the UI components for the module created to handle all editing of reference (target) metabolite data.
 #' The value provided for 'id' should be identical across the following: ref_data_ROIeditingUI(), ref_data_add_delUI(),
-#' ref_data_quantTab(), ref_data_profileUI(), ref_data_global_fittingparamsUI(), and ref_data_editingServer().
+#' ref_data_quantTab(), ref_data_profileUI(), and ref_data_editingServer().
 #'
 #' This module component displays the set of target metabolite data that will be used for profiling. These data reflect any
 #' and all edits made to the target metabolite data and are displayed within a searchable, filterable table.
@@ -193,7 +194,7 @@ ref_data_quantTab <- function(id){
 #'
 #' @details This is the server component for the module created to handle all editing of reference (target) metabolite data.
 #' The value provided for 'id' should be identical across the following: ref_data_ROIeditingUI(), ref_data_add_delUI(),
-#' ref_data_quantTab(), ref_data_profileUI(), ref_data_global_fittingparamsUI(), and ref_data_editingServer().
+#' ref_data_quantTab(), ref_data_profileUI(), and ref_data_editingServer().
 #'
 #' This module component provides the back-end code that:
 #' 1) Populates the list of editable target metabolites that users may select from
