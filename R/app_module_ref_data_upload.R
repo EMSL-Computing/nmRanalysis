@@ -201,7 +201,7 @@ ref_data_uploadServer <- function(id, xpmt_data, ref_db){
                                                            .data$`Quantification Mode`, .data$`Metabolite`, .data$`Quantification Signal`,
                                                            .data$`Chemical shift(ppm)`, .data$`Chemical shift tolerance (ppm)`,
                                                            .data$`Half bandwidth (Hz)`, .data$`Multiplicity`, .data$`J coupling (Hz)`,
-                                                           .data$`Roof effect`, .data$`J coupling 2 (Hz)`, .data$`Roof effect 2 (Hz)`,
+                                                           .data$`Roof effect`, .data$`J coupling 2 (Hz)`, .data$`Roof effect 2`,
                                                            .data$`Quantify`, .data$`HMDB_code`, .data$`rowid`)
                                            # Note that the ordering of variables above *DOES* matter for
                                            # run_rDolphin()
