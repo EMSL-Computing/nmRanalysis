@@ -60,8 +60,7 @@ ref_data_uploadUI <- function(id, ref_db){
                              label = "Query Reference Database",
                              style = "unite",
                              color = "primary",
-                             size = "sm"),
-    uiOutput(ns("wizard_ref_ui"))
+                             size = "sm")
   )
 }
 
@@ -109,51 +108,6 @@ ref_data_uploadServer <- function(id, xpmt_data, ref_db){
   stopifnot(!is.reactive(ref_db))
   stopifnot(is.reactive(xpmt_data))
   moduleServer(id, function(input, output, session){
-
-    output$wizard_ref_ui <- renderUI({
-
-      if(is.null(uploaded_ref_data())){
-        tagList(
-          h4(""),
-          fluidRow(
-            column(6,
-                   shinyWidgets::actionBttn(
-                     inputId = NS(id, "wizard_reftoexp"),
-                     label = "Experimental Data Upload",
-                     style = "minimal",
-                     color = "primary",
-                     icon = icon("arrow-left"),
-                     size = "sm")
-            )
-          )
-        )
-      } else{
-        tagList(
-          h4(""),
-          fluidRow(
-            column(6,
-                   shinyWidgets::actionBttn(
-                     inputId = NS(id, "wizard_reftoexp"),
-                     label = "Experimental Data Upload",
-                     style = "minimal",
-                     color = "primary",
-                     icon = icon("arrow-left"),
-                     size = "sm")
-            ),
-            column(3, offset = 3,
-                   shinyWidgets::actionBttn(
-                     inputId = NS(id, "wizard_reftoprof"),
-                     label = "Profiling",
-                     style = "minimal",
-                     color = "primary",
-                     icon = icon("arrow-right"),
-                     size = "sm")
-            )
-          )
-        )
-      }
-
-    })
 
     # Initialize reactiveValues needed by this module
     rv <- reactiveValues(casno_not_in_db = NULL)

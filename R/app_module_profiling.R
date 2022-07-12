@@ -1,3 +1,78 @@
+#' Module: UI element displaying action button to trigger batch profiling, and a set of editable global profiling options
+#'
+#' @description Copyright (C) 2022 Battelle Memorial Institute
+#'
+#'  This program is free software; you can redistribute it and/or modify
+#'  it under the terms of the GNU General Public License as published by
+#'  the Free Software Foundation; either version 2 of the License, or
+#'  (at your option) any later version.
+#'
+#'  This program is distributed in the hope that it will be useful,
+#'  but WITHOUT ANY WARRANTY; without even the implied warranty of
+#'  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+#'  GNU General Public License for more details.
+#'
+#'  You should have received a copy of the GNU General Public License along
+#'  with this program; if not, write to the Free Software Foundation, Inc.,
+#'  51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
+#'
+#' @param id A string denoting the namespace id.
+#'
+#' @details This is one of the UI components for the module created to handle all profiling-related functions.
+#' The value provided for 'id' should be identical across the following: profiling_quant_sidebarUI(), profiling_prequantUI(),
+#' profiling_completeviewUI(), profiling_detailedviewUI(), and profilingServer().
+#'
+#' This module component displays an action button to trigger batch profiling, and a set of editable global profiling options
+#'
+#' @import shiny
+#'
+profiling_quant_sidebarUI <- function(id){
+  ns <- NS(id)
+  tagList(
+    uiOutput(ns("ui_global_profiling_parameters")),
+    uiOutput(ns("ui_auto_profile"))
+  )
+}
+
+#' Module: UI element displaying aggregated ROIs based on final edited metabolite fitting data
+#'
+#' @description Copyright (C) 2022 Battelle Memorial Institute
+#'
+#'  This program is free software; you can redistribute it and/or modify
+#'  it under the terms of the GNU General Public License as published by
+#'  the Free Software Foundation; either version 2 of the License, or
+#'  (at your option) any later version.
+#'
+#'  This program is distributed in the hope that it will be useful,
+#'  but WITHOUT ANY WARRANTY; without even the implied warranty of
+#'  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+#'  GNU General Public License for more details.
+#'
+#'  You should have received a copy of the GNU General Public License along
+#'  with this program; if not, write to the Free Software Foundation, Inc.,
+#'  51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
+#'
+#' @param id A string denoting the namespace id.
+#'
+#' @details This is one of the UI components for the module created to handle all profiling-related functions.
+#' The value provided for 'id' should be identical across the following: profiling_quant_sidebarUI(), profiling_prequantUI(),
+#' profiling_completeviewUI(), profiling_detailedviewUI(), and profilingServer().
+#'
+#' This module component displays the set of target metabolite data that will be used for profiling, aggregated into ROIs.
+#' These data reflect any and all edits made to the target metabolite data and are displayed within a searchable, filterable table.
+#'
+#' @import shiny
+#'
+profiling_prequantUI <- function(id){
+  ns <- NS(id)
+  tagList(
+    uiOutput(ns("vizoptions_quantdata_ui")),
+    shinycssloaders::withSpinner(plotly::plotlyOutput(ns('quantdata_plot'))),
+    DT::dataTableOutput(ns("refmet_quant_table")),
+    uiOutput(ns("tempsoln"))
+  )
+}
+
 #' Module: UI element to display trelliscope plot of fitted spectra
 #'
 #' @description Copyright (C) 2022 Battelle Memorial Institute
@@ -22,7 +97,8 @@
 #' @details This is one of the UI components for the module created to handle all functions related to profiling
 #' of experimental data, based on user edits to the fitting parameters of a pre-specified list of
 #' reference (target) metabolites. The value provided for 'id' should be identical across the following:
-#' profiling_completeviewUI(), profiling_detailedviewUI(), and profilingServer().
+#' profiling_quant_sidebarUI(), profiling_prequantUI(), profiling_completeviewUI(), profiling_detailedviewUI(),
+#' and profilingServer().
 #'
 #' This module component provides the UI element that allow users to:
 #' 1) View (within a trelliscope display) the fitted spectra over the sample spectra for all samples and target metabolites
@@ -61,7 +137,8 @@ profiling_completeviewUI <- function(id){
 #' @details This is one of the UI components for the module created to handle all functions related to profiling
 #' of experimental data, based on user edits to the fitting parameters of a pre-specified list of
 #' reference (target) metabolites. The value provided for 'id' should be identical across the following:
-#' profiling_completeviewUI(), profiling_detailedviewUI(), and profilingServer().
+#' profiling_quant_sidebarUI(), profiling_prequantUI(), profiling_completeviewUI(), profiling_detailedviewUI(),
+#' and profilingServer().
 #'
 #' This module component provides the UI elements that allow users to:
 #' 1) Select from several options to control the shown display
@@ -104,11 +181,13 @@ profiling_detailedviewUI <- function(id){
 #' @details This is the server component for the module created to handle all functions related to profiling
 #' of experimental data, based on user edits to the fitting parameters of a pre-specified list of
 #' reference (target) metabolites. The value provided for 'id' should be identical across the following:
-#' profiling_completeviewUI(), profiling_detailedviewUI(), and profilingServer()
+#' profiling_quant_sidebarUI(), profiling_prequantUI(), profiling_completeviewUI(), profiling_detailedviewUI(),
+#' and profilingServer().
 #'
 #' This module component provides the back-end code that:
-#' 1) Performs the profiling for all target metabolites for all sample spectra
-#' 2) Generates plots and table(s) used to visualize and summarize the profiling results
+#' 1) Allows for final editing of global profiling paramters, and displays metabolite data aggregated into ROIs
+#' 2) Performs the profiling for all target metabolites for all sample spectra
+#' 3) Generates plots and table(s) used to visualize and summarize the profiling results
 #'
 #'
 #' @return A reactive object containing a list of two elements. The first element of this list, final_output, is the
@@ -125,6 +204,559 @@ profilingServer <- function(id, xpmt_data, ref_data){
   stopifnot(is.reactive(xpmt_data))
   stopifnot(is.reactive(ref_data))
   moduleServer(id, function(input, output, session){
+
+    # Observer that prompts confirmation of profiling anytime the button is clicked.
+    observeEvent(c(input$auto_profile),
+                 {
+                   req(isolate(ref_data()))
+                   req(input$auto_profile > 0)
+
+                   shinyWidgets::ask_confirmation(
+                     inputId = NS(id, "profile_confirm"),
+                     title = "Are you sure you would like to begin profiling?",
+                     text = NULL,
+                     type = "question",
+                     btn_labels = c("Cancel", "Continue"),
+                     btn_colors = c("#D3D3D3", "#428BCA"),
+                     closeOnClickOutside = TRUE,
+                     showCloseButton = TRUE,
+                     allowEscapeKey = TRUE,
+                     cancelOnDismiss = TRUE,
+                     html = FALSE,
+                     session = shiny::getDefaultReactiveDomain()
+                   )
+                 })
+
+    # This datatable corresponds to the reference metabolite data to be used for quantification
+    output$refmet_quant_table <- DT::renderDT({
+
+      req(ref_data())
+      req(input$ROI_to_plot_quantdat)
+
+
+      temp <- ref_data()$quantdata %>%
+        dplyr::mutate(ROI = paste0("(", .data$`ROI right edge (ppm)`, ", ", .data$`ROI left edge (ppm)`, ")")) %>%
+        dplyr::filter(ROI %in% input$ROI_to_plot_quantdat)
+      temp2 <- ref_data()$user_edited_refdata %>% dplyr::ungroup() %>%
+        dplyr::filter(.data$`Chemical shift(ppm)` %in% temp$`Chemical shift(ppm)`) %>%
+        dplyr::mutate(Signal = paste0(.data$Metabolite, " [", .data$`Quantification Signal`, "]")) %>%
+        dplyr::filter(.data$Quantify == 1) %>%
+        dplyr::arrange(.data$`Chemical shift(ppm)`) %>%
+        dplyr::select(.data$Signal, .data$`Quantification Mode`, .data$`Chemical shift(ppm)`, .data$`Chemical shift tolerance (ppm)`,
+                      .data$`Half bandwidth (Hz)`, .data$Multiplicity, .data$`J coupling (Hz)`, .data$`J coupling 2 (Hz)`,
+                      .data$`Roof effect`, .data$`Roof effect 2`)
+
+      temp2 %>%
+        DT::datatable(rownames   = FALSE,
+                      editable   = FALSE,
+                      filter = "top",
+                      extensions = "Responsive")
+    })
+
+    # Output (in HTML format) to display the filters that are currently applied to the data.
+    output$applied_filters_text2 <- renderUI({
+
+      if(length(attr(xpmt_data(), "filters")) == 0){
+        htmltools::HTML("<strong>Currently applied filters:</strong><br/>None")
+
+      } else{
+        allfilts <- rlist::list.ungroup(rlist::list.select(attr(xpmt_data(), "filters"), range))
+        allfilts <- Reduce("c", lapply(allfilts, function(x){paste0("(", x$min, ", ", x$max, ")")}))
+        htmltools::HTML(paste0("<strong>Currently applied filters:</strong><br/>", paste(allfilts, collapse = "<br/>")))
+
+      }
+    })
+
+    # Janky solution to get the profiling progress bar to show on the page where the profile button is clicked.
+    output$tempsoln <- renderUI({
+      req(user_profiling())
+      htmltools::HTML("")
+    })
+
+    # Plot all collapsed ROIs over the spectrum
+    output$quantdata_plot <- plotly::renderPlotly({
+
+      isolate({
+        req(ref_data())
+        req(xpmt_data())
+      })
+      # req(ref_data()$quantdata)
+      # req(input$ROI_to_plot_quantdat)
+
+      # # Generate line shapes based on collapsed ROIs
+      # ROI_lines <- ROI_line_gen(data = ref_data()$quantdata[!duplicated(ref_data()$quantdata$`ROI left edge (ppm)`),])
+      # ROI_annots <- ROI_annot_gen(data = ref_data()$user_edited_refdata)
+
+      plotly::plot_ly(source = "id_quantdata_plot", type = "scatter", mode = "lines") %>%
+        plotly::config(displaylogo = FALSE,
+                       modeBarButtons = list(list("select2d"), list("zoom2d"), list("zoomIn2d"),
+                                             list("zoomOut2d"), list("pan2d"), list("autoScale2d"),
+                                             list("resetScale2d"), list("toImage"))) %>%
+        plotly::layout(title = paste("Experimental Data:", "<br>", "<sup>",
+                                     "Annotated Metabolite Peaks within Selected Region(s) of Interest (ROI)", "</sup>"),
+                       xaxis = list(title     = "PPM",
+                                    autorange = "reversed"),
+                       yaxis = list(title     = "Intensity"),
+                       dragmode = "zoom2d") %>% #,
+        # annotations = ROI_annots,
+        # shapes = ROI_lines) %>%
+        plotly::config(edits = list(annotationTail     = TRUE,
+                                    annotationText     = FALSE,
+                                    annotationPosition = FALSE,
+                                    shapePosition      = FALSE))
+
+    })
+
+    # Create proxy for the above plotly plot for improved efficiency
+    quantdata_plot_proxy <- plotly::plotlyProxy("quantdata_plot")
+
+    # This observer is responsible for plotting the trace (i.e. line) corresponding to a selected
+    # experimental spectrum. This is implemented through proxy updates for the sake of efficiency.
+    observeEvent(c(input$sample_to_plot_quantdat, xpmt_data()), priority = -1, {
+      req(input$sample_to_plot_quantdat)
+
+      xpmt_data_sample <- xpmt_data()$e_data %>% dplyr::select(.data$PPM, .data[[input$sample_to_plot_quantdat]])
+      df_long <- xpmt_data_sample %>%
+        tidyr::pivot_longer(!.data$PPM, names_to = "Sample", values_to = "Intensity")
+
+      # Clear shapes and annotations
+      plotly::plotlyProxyInvoke(quantdata_plot_proxy, "relayout",
+                                list(annotations = NULL,
+                                     shapes = NULL))
+
+      # Clear plots
+      plotly::plotlyProxyInvoke(quantdata_plot_proxy, "deleteTraces", as.list(as.integer(0)))
+
+      plotly::plotlyProxyInvoke(quantdata_plot_proxy, "addTraces",
+                                list(x    = df_long$PPM,
+                                     y    = df_long$Intensity,
+                                     type = 'scatter',
+                                     mode = 'lines',
+                                     line = list(width = 1),
+                                     hoverinfo = "text",
+                                     text = paste0("PPM: ", round(df_long$PPM, 4), "<br>",
+                                                   "Intensity: ", round(df_long$Intensity, 4))))
+      plotly::plotlyProxyInvoke(quantdata_plot_proxy, "relayout",
+                                list(title = paste("Experimental Data:", input$sample_to_plot_quantdat, "<br>", "<sup>",
+                                                   "Annotated Metabolite Peaks within Selected Region(s) of Interest (ROI)", "</sup>")))
+      # Update shapes/annotations
+      temp <- ref_data()$quantdata %>%
+        dplyr::mutate(ROI = paste0("(", .data$`ROI right edge (ppm)`, ", ", .data$`ROI left edge (ppm)`, ")")) %>%
+        dplyr::filter(ROI %in% input$ROI_to_plot_quantdat)
+      temp2 <- ref_data()$user_edited_refdata %>% dplyr::filter(.data$`Chemical shift(ppm)` %in% temp$`Chemical shift(ppm)`)
+
+      ROI_lines <- ROI_line_gen(data = temp[!duplicated(temp$`ROI left edge (ppm)`),,drop = FALSE])
+      ROI_annots <- ROI_annot_gen(data = temp2)
+
+      # Update plot
+      plotly::plotlyProxyInvoke(quantdata_plot_proxy, "relayout",
+                                list(annotations = ROI_annots,
+                                     shapes = ROI_lines))
+    })
+
+    # This observer is responsible for plotting the annotations and shapes for entries within the
+    # specified ROI. This is implemented through proxy updates for the sake of efficiency.
+    observeEvent(c(input$ROI_to_plot_quantdat), ignoreNULL = TRUE, ignoreInit = TRUE,
+                 {
+                   req(ref_data())
+                   req(xpmt_data())
+
+                   temp <- ref_data()$quantdata %>%
+                     dplyr::mutate(ROI = paste0("(", .data$`ROI right edge (ppm)`, ", ", .data$`ROI left edge (ppm)`, ")")) %>%
+                     dplyr::filter(ROI %in% input$ROI_to_plot_quantdat)
+                   temp2 <- ref_data()$user_edited_refdata %>% dplyr::filter(.data$`Chemical shift(ppm)` %in% temp$`Chemical shift(ppm)`)
+
+                   ROI_lines <- ROI_line_gen(data = temp[!duplicated(temp$`ROI left edge (ppm)`),,drop = FALSE])
+                   ROI_annots <- ROI_annot_gen(data = temp2)
+
+                   # Update plot
+                   plotly::plotlyProxyInvoke(quantdata_plot_proxy, "relayout",
+                                             list(annotations = ROI_annots,
+                                                  shapes = ROI_lines))
+                 })
+
+    # Visualization options for the plot of ROI-collapsed quantification data
+    output$vizoptions_quantdata_ui <- renderUI({
+
+      req(xpmt_data())
+      req(ref_data())
+
+      ROIvec <- unique(paste0("(", ref_data()$quantdata$`ROI right edge (ppm)`, ", ", ref_data()$quantdata$`ROI left edge (ppm)`, ")"))
+
+      shinyWidgets::dropdownButton(
+        # Allows users to select which sample spectrum to display.
+        selectInput(inputId = NS(id, "sample_to_plot_quantdat"),
+                    label   = "Choose a spectrum to plot",
+                    choices = colnames(xpmt_data()$e_data)[-1]),
+
+        selectInput(inputId = NS(id, "ROI_to_plot_quantdat"),
+                    label   = "Select a region of interest whose fitting data should be displayed.",
+                    choices = ROIvec),
+
+        # HTML output to display the filters currently applied
+        htmlOutput(NS(id,"applied_filters_text2")),
+
+        # Omit for now
+        # # Toggle for subplot display
+        # shinyWidgets::materialSwitch(inputId = NS(id, "show_subplot_quantdat"),
+        #                              label   = "Show subplot on box select",
+        #                              value   = FALSE,
+        #                              status  = "primary",
+        #                              right   = TRUE),
+
+        circle = TRUE, status = "info",
+        icon = icon("cog"), width = "300px",
+
+        tooltip = shinyWidgets::tooltipOptions(title = "Options")
+      )
+    })
+
+    # Dynamic action button to automatically profile reference metabolite data. Only appears after
+    # reference metabolite data are uploaded.
+    output$ui_auto_profile <- renderUI({
+      req(ref_data())
+
+      # clickable button
+      shinyWidgets::actionBttn(inputId = NS(id, "auto_profile"),
+                               label = "Profile",
+                               style = "unite",
+                               color = "primary",
+                               size = "sm")
+    })
+
+    output$ui_global_profiling_parameters <- renderUI({
+      req(ref_data())
+
+      if(any(Reduce("c", lapply(ref_data()$global_parameters, is.null)))){
+        shinyBS::bsCollapse(id = NS(id, "global_fitting_params"),
+                            shinyBS::bsCollapsePanel(title = "Global Profiling Parameters",
+                                                     # These are never used by rDolphin...not sure why they are defined
+                                                     # fluidRow(
+                                                     #   column(width = 6,
+                                                     #          numericInput(inputId  = NS(id, "gpp_left_spectral_edge"),
+                                                     #                       label    = "Left Spectral Edge:",
+                                                     #                       value    = 12)),
+                                                     #   column(width = 6,
+                                                     #          numericInput(inputId  = NS(id, "gpp_right_spectral_edge"),
+                                                     #                       label    = "Right Spectral Edge:",
+                                                     #                       value    = -0.5))
+                                                     # ),
+                                                     fluidRow(
+                                                       column(width = 6,
+                                                              numericInput(inputId  = NS(id, "gpp_widthtolerance"),
+                                                                           label    = "Bandwidth Tolerance (Hz):",
+                                                                           value    = 0.2)),
+
+
+                                                       column(width = 6,
+                                                              numericInput(inputId  = NS(id, "gpp_gaussian"),
+                                                                           label    = "Gaussian Ratio:",
+                                                                           value    = 0))
+                                                     ),
+                                                     fluidRow(
+                                                       column(width = 6,
+                                                              numericInput(inputId  = NS(id, "gpp_j_coupling_variation"),
+                                                                           label    = "J-coupling Tolerance (Hz):",
+                                                                           value    = 0.2)),
+
+
+                                                       column(width = 6,
+                                                              numericInput(inputId  = NS(id, "gpp_errorprov"),
+                                                                           label    = "Fitting error threshold:",
+                                                                           value    = 3))
+
+                                                     ),
+                                                     fluidRow(
+                                                       column(width = 6,
+                                                              numericInput(inputId  = NS(id, "gpp_fitting_maxiter"),
+                                                                           label    = "Max iterations of optimization subroutine:",
+                                                                           value    = 8)),
+
+
+                                                       column(width = 6,
+                                                              numericInput(inputId  = NS(id, "gpp_nls_lm_maxiter"),
+                                                                           label    = "Max iterations of Levenberg Marquardt (LM) algorithm:",
+                                                                           value    = 200))
+
+                                                     ),
+                                                     fluidRow(
+                                                       column(width = 6,
+                                                              numericInput(inputId  = NS(id, "gpp_ftol"),
+                                                                           label    = "LM algorithm sum of squares error threshold:",
+                                                                           value    = 1e-06)),
+
+
+                                                       column(width = 6,
+                                                              numericInput(inputId  = NS(id, "gpp_ptol"),
+                                                                           label    = "LM algorithm relative error threshold:",
+                                                                           value    = 1e-06))
+
+                                                     ),
+                                                     fluidRow(
+                                                       column(width = 6,
+                                                              numericInput(inputId  = NS(id, "gpp_factor"),
+                                                                           label    = "LM algorithm control factor:",
+                                                                           value    = 0.01)),
+
+
+                                                       column(width = 6,
+                                                              numericInput(inputId  = NS(id, "gpp_fitting_maxiterrep"),
+                                                                           label    = "fitting_maxiterrep:",
+                                                                           value    = 0))
+
+                                                     ),
+                                                     fluidRow(
+                                                       column(width = 6,
+                                                              numericInput(inputId  = NS(id, "gpp_peakdet_minimum"),
+                                                                           label    = "peakdet_minimum:",
+                                                                           value    = 0.01))
+
+                                                       # These only apply to the "fitting error / signal area ratio analyses"
+                                                       # performed in the rDolphin GUI. We do not implement them, so these
+                                                       # parameters are unnecessary.
+                                                       # column(width = 6,
+                                                       #        selectInput(inputId   = NS(id, "gpp_automatic_removal"),
+                                                       #                    label     = "automatic_removal:",
+                                                       #                    choices   = c("Yes" = "Y", "No" = "N"),
+                                                       #                    selected  = "Y"))
+                                                     ),
+                                                     # fluidRow(
+                                                     #   column(width = 6,
+                                                     #          numericInput(inputId  = NS(id, "gpp_fitting_error_analysis_limit"),
+                                                     #                       label    = "fitting_error_analysis_limit:",
+                                                     #                       value    = 0.15)),
+                                                     #   column(width = 6,
+                                                     #          numericInput(inputId  = NS(id, "gpp_signal_area_ratio_analysis_limit"),
+                                                     #                       label    = "signal_area_ratio_analysis_limit:",
+                                                     #                       value    = 10))
+                                                     # ),
+                                                     fluidRow(
+                                                       column(width = 6,
+                                                              numericInput(inputId  = NS(id, "gpp_BGdensity"),
+                                                                           label    = "Background Signal (BGS) Density:",
+                                                                           value    = 70)),
+
+
+                                                       column(width = 6,
+                                                              numericInput(inputId  = NS(id, "gpp_BG_gaussian_percentage"),
+                                                                           label    = "BGS Gaussian Ratio:",
+                                                                           value    = 0))
+
+                                                     ),
+                                                     fluidRow(
+                                                       column(width = 6,
+                                                              numericInput(inputId  = NS(id, "gpp_BG_width"),
+                                                                           label    = "BGS Bandwidth (Hz):",
+                                                                           value    = 8)),
+
+
+                                                       column(width = 6,
+                                                              numericInput(inputId  = NS(id, "gpp_BG_width_tolerance"),
+                                                                           label    = "BGS Bandwidth Tolerance (Hz):",
+                                                                           value    = 0.25))
+
+                                                     ),
+
+                                                     fluidRow(
+                                                       column(width = 6,
+                                                              numericInput(inputId  = NS(id, "gpp_additional_signal_ppm_distance"),
+                                                                           label    = "additional_signal_ppm_distance:",
+                                                                           value    = 0.002)),
+
+
+                                                       column(width = 6,
+                                                              numericInput(inputId  = NS(id, "gpp_signals_to_add"),
+                                                                           label    = "signals_to_add:",
+                                                                           value    = 2))
+
+                                                     ),
+
+                                                     fluidRow(
+                                                       column(width = 6,
+                                                              numericInput(inputId  = NS(id, "gpp_additional_signal_improvement"),
+                                                                           label    = "additional_signal_improvement:",
+                                                                           value    = 0.75)),
+
+                                                       column(width = 6,
+                                                              numericInput(inputId  = NS(id, "gpp_additional_signal_percentage_limit"),
+                                                                           label    = "additional_signal_percentage_limit:",
+                                                                           value    = 3))
+
+                                                     ),
+                                                     style = "primary"
+                            ))
+      } else{
+        shinyBS::bsCollapse(id = NS(id, "global_fitting_params"),
+                            shinyBS::bsCollapsePanel(title = "Global Profiling Parameters",
+                                                     # These are never used by rDolphin...not sure why they are defined
+                                                     # fluidRow(
+                                                     #   column(width = 6,
+                                                     #          numericInput(inputId  = NS(id, "gpp_left_spectral_edge"),
+                                                     #                       label    = "Left Spectral Edge:",
+                                                     #                       value    = 12)),
+                                                     #   column(width = 6,
+                                                     #          numericInput(inputId  = NS(id, "gpp_right_spectral_edge"),
+                                                     #                       label    = "Right Spectral Edge:",
+                                                     #                       value    = -0.5))
+                                                     # ),
+                                                     fluidRow(
+                                                       column(width = 6,
+                                                              numericInput(inputId  = NS(id, "gpp_widthtolerance"),
+                                                                           label    = "Bandwidth Tolerance (Hz):",
+                                                                           value    = ref_data()$global_parameters$widthtolerance)),
+
+
+                                                       column(width = 6,
+                                                              numericInput(inputId  = NS(id, "gpp_gaussian"),
+                                                                           label    = "Gaussian Ratio:",
+                                                                           value    = ref_data()$global_parameters$gaussian))
+
+                                                     ),
+                                                     fluidRow(
+                                                       column(width = 6,
+                                                              numericInput(inputId  = NS(id, "gpp_j_coupling_variation"),
+                                                                           label    = "J-coupling Tolerance (Hz):",
+                                                                           value    = ref_data()$global_parameters$j_coupling_variation)),
+
+
+                                                       column(width = 6,
+                                                              numericInput(inputId  = NS(id, "gpp_errorprov"),
+                                                                           label    = "Fitting error threshold:",
+                                                                           value    = ref_data()$global_parameters$errorprov))
+
+
+                                                     ),
+                                                     fluidRow(
+                                                       column(width = 6,
+                                                              numericInput(inputId  = NS(id, "gpp_fitting_maxiter"),
+                                                                           label    = "Max iterations of optimization subroutine:",
+                                                                           value    = ref_data()$global_parameters$fitting_maxiter)),
+
+
+                                                       column(width = 6,
+                                                              numericInput(inputId  = NS(id, "gpp_nls_lm_maxiter"),
+                                                                           label    = "Max iterations of Levenberg Marquardt (LM) algorithm:",
+                                                                           value    = ref_data()$global_parameters$nls_lm_maxiter))
+
+
+                                                     ),
+                                                     fluidRow(
+                                                       column(width = 6,
+                                                              numericInput(inputId  = NS(id, "gpp_ftol"),
+                                                                           label    = "LM algorithm sum of squares error threshold:",
+                                                                           value    = ref_data()$global_parameters$ftol)),
+
+
+                                                       column(width = 6,
+                                                              numericInput(inputId  = NS(id, "gpp_ptol"),
+                                                                           label    = "LM algorithm relative error threshold:",
+                                                                           value    = ref_data()$global_parameters$ptol))
+
+
+                                                     ),
+                                                     fluidRow(
+                                                       column(width = 6,
+                                                              numericInput(inputId  = NS(id, "gpp_factor"),
+                                                                           label    = "LM algorithm control factor:",
+                                                                           value    = ref_data()$global_parameters$factor)),
+
+
+                                                       column(width = 6,
+                                                              numericInput(inputId  = NS(id, "gpp_fitting_maxiterrep"),
+                                                                           label    = "fitting_maxiterrep:",
+                                                                           value    = ref_data()$global_parameters$fitting_maxiterrep))
+
+
+                                                     ),
+                                                     fluidRow(
+                                                       column(width = 6,
+                                                              numericInput(inputId  = NS(id, "gpp_peakdet_minimum"),
+                                                                           label    = "peakdet_minimum:",
+                                                                           value    = ref_data()$global_parameters$peakdet_minimum))
+
+
+                                                       # These only apply to the "fitting error / signal area ratio analyses"
+                                                       # performed in the rDolphin GUI. We do not implement them, so these
+                                                       # parameters are unnecessary.
+                                                       # column(width = 6,
+                                                       #        selectInput(inputId   = NS(id, "gpp_automatic_removal"),
+                                                       #                    label     = "automatic_removal:",
+                                                       #                    choices   = c("Yes" = "Y", "No" = "N"),
+                                                       #                    selected  = "Y"))
+                                                     ),
+                                                     # fluidRow(
+                                                     #   column(width = 6,
+                                                     #          numericInput(inputId  = NS(id, "gpp_fitting_error_analysis_limit"),
+                                                     #                       label    = "fitting_error_analysis_limit:",
+                                                     #                       value    = 0.15)),
+                                                     #   column(width = 6,
+                                                     #          numericInput(inputId  = NS(id, "gpp_signal_area_ratio_analysis_limit"),
+                                                     #                       label    = "signal_area_ratio_analysis_limit:",
+                                                     #                       value    = 10))
+                                                     # ),
+                                                     fluidRow(
+                                                       column(width = 6,
+                                                              numericInput(inputId  = NS(id, "gpp_BGdensity"),
+                                                                           label    = "Background Signal (BGS) Density:",
+                                                                           value    = ref_data()$global_parameters$BGdensity)),
+
+
+                                                       column(width = 6,
+                                                              numericInput(inputId  = NS(id, "gpp_BG_gaussian_percentage"),
+                                                                           label    = "BGS Gaussian Ratio:",
+                                                                           value    = ref_data()$global_parameters$BG_gaussian_percentage))
+
+
+                                                     ),
+                                                     fluidRow(
+                                                       column(width = 6,
+                                                              numericInput(inputId  = NS(id, "gpp_BG_width"),
+                                                                           label    = "BGS Bandwidth (Hz):",
+                                                                           value    = ref_data()$global_parameters$BG_width)),
+
+
+                                                       column(width = 6,
+                                                              numericInput(inputId  = NS(id, "gpp_BG_width_tolerance"),
+                                                                           label    = "BGS Bandwidth Tolerance (Hz):",
+                                                                           value    = ref_data()$global_parameters$BG_width_tolerance))
+
+
+                                                     ),
+
+                                                     fluidRow(
+                                                       column(width = 6,
+                                                              numericInput(inputId  = NS(id, "gpp_additional_signal_ppm_distance"),
+                                                                           label    = "additional_signal_ppm_distance:",
+                                                                           value    = ref_data()$global_parameters$additional_signal_ppm_distance)),
+
+
+                                                       column(width = 6,
+                                                              numericInput(inputId  = NS(id, "gpp_signals_to_add"),
+                                                                           label    = "signals_to_add:",
+                                                                           value    = ref_data()$global_parameters$signals_to_add))
+
+
+                                                     ),
+
+                                                     fluidRow(
+                                                       column(width = 6,
+                                                              numericInput(inputId  = NS(id, "gpp_additional_signal_improvement"),
+                                                                           label    = "additional_signal_improvement:",
+                                                                           value    = ref_data()$global_parameters$additional_signal_improvement)),
+
+
+                                                       column(width = 6,
+                                                              numericInput(inputId  = NS(id, "gpp_additional_signal_percentage_limit"),
+                                                                           label    = "additional_signal_percentage_limit:",
+                                                                           value    = ref_data()$global_parameters$additional_signal_percentage_limit))
+
+
+                                                     ),
+                                                     style = "primary"
+                            ))
+
+      }
+    })
 
     rv <- reactiveValues(obs_show_subplot_suspend = TRUE,
                          new_profiling = FALSE)
@@ -801,19 +1433,19 @@ profilingServer <- function(id, xpmt_data, ref_data){
         ))
     })
 
-    user_profiling <- eventReactive(ref_data()$profile_confirm,{
+    user_profiling <- eventReactive(input$profile_confirm,{
       req(xpmt_data())
-      req(ref_data()$profile_confirm == TRUE)
+      req(ref_data())
 
       shinyWidgets::progressSweetAlert(
-        session = session,
+        session = shiny::getDefaultReactiveDomain(),
         id = "profiling_progress",
         value = 0, title = "",
         display_pct = TRUE, striped = TRUE, status = "info"
       )
 
       shinyWidgets::updateProgressBar(
-        session = session,
+        session = shiny::getDefaultReactiveDomain(),
         id = "profiling_progress",
         title = "Importing and processing necessary data to begin the profiling...",
         value = 0
@@ -824,7 +1456,25 @@ profilingServer <- function(id, xpmt_data, ref_data){
                                            metabs  = ref_data()$quantdata %>% dplyr::filter(.data$Quantify == 1))
       # In the above (metabs), we exclude the peaks designated by the user to remove from quantification (Quantify == 0).
       # Replace "program_parameters" with those specified by the user.
-      imported_data$program_parameters <- ref_data()$global_parameters
+      imported_data$program_parameters <- list(BGdensity                          = input$gpp_BGdensity,
+                                               widthtolerance                     = input$gpp_widthtolerance,
+                                               gaussian                           = input$gpp_gaussian,
+                                               j_coupling_variation               = input$gpp_j_coupling_variation,
+                                               BG_gaussian_percentage             = input$gpp_BG_gaussian_percentage,
+                                               BG_width                           = input$gpp_BG_width,
+                                               BG_width_tolerance                 = input$gpp_BG_width_tolerance,
+                                               errorprov                          = input$gpp_errorprov,
+                                               fitting_maxiter                    = input$gpp_fitting_maxiter,
+                                               nls_lm_maxiter                     = input$gpp_nls_lm_maxiter,
+                                               ftol                               = input$gpp_ftol,
+                                               ptol                               = input$gpp_ptol,
+                                               factor                             = input$gpp_factor,
+                                               additional_signal_ppm_distance     = input$gpp_additional_signal_ppm_distance,
+                                               signals_to_add                     = input$gpp_signals_to_add,
+                                               fitting_maxiterrep                 = input$gpp_fitting_maxiterrep,
+                                               additional_signal_improvement      = input$gpp_additional_signal_improvement,
+                                               additional_signal_percentage_limit = input$gpp_additional_signal_percentage_limit,
+                                               peakdet_minimum                    = input$gpp_peakdet_minimum)
 
 
       ROI_data           = imported_data$ROI_data
@@ -886,7 +1536,7 @@ profilingServer <- function(id, xpmt_data, ref_data){
         if (length(ROI_buckets)<20) {
           sumit <- sumit + nrow(imported_data$dataset)
           shinyWidgets::updateProgressBar(
-            session = session,
+            session = shiny::getDefaultReactiveDomain(),
             id      = "profiling_progress",
             title   = paste0("Ignoring ROI as width is too small"),
             value   = trunc(sumit/totit*100)
@@ -922,7 +1572,7 @@ profilingServer <- function(id, xpmt_data, ref_data){
 
         for (spectrum_index in spectra_to_profile) {
           shinyWidgets::updateProgressBar(
-            session = session,
+            session = shiny::getDefaultReactiveDomain(),
             id      = "profiling_progress",
             title   = paste0('Profiling ROI ', ROI_index, ' of ', nrow(ROI_separator),
                              " for Spectrum ", spectrum_index, " of ",
@@ -947,7 +1597,7 @@ profilingServer <- function(id, xpmt_data, ref_data){
           sumit <- sumit + 1
         }
       }
-      shinyWidgets::closeSweetAlert(session = session)
+      shinyWidgets::closeSweetAlert(session = shiny::getDefaultReactiveDomain())
 
       tryCatch({
         if (optimization == TRUE & length(spectra_to_profile) > 20 & nrow(ROI_data) > 20) {

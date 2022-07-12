@@ -92,8 +92,7 @@ xpmt_data_uploadUI <- function(id, ref_db){
                              label = "Process Data",
                              style = "unite",
                              color = "primary",
-                             size = "sm"),
-    uiOutput(ns("wizard_exptoref_ui"))
+                             size = "sm")
   )
 }
 
@@ -136,25 +135,6 @@ xpmt_data_uploadServer <- function(id){
       req(input$align_spectra)
 
       htmltools::HTML("<strong>Note:</strong> Alignment may substantially increase initial processing time.")
-    })
-
-    output$wizard_exptoref_ui <- renderUI({
-      req(uploaded_xpmt_data())
-      tagList(
-        h4(""),
-        fluidRow(
-          column(5, offset = 7,
-                 shinyWidgets::actionBttn(
-                   inputId = NS(id, "wizard_exptoref"),
-                   label = "Reference Data Editing",
-                   style = "minimal",
-                   color = "primary",
-                   icon = icon("arrow-right"),
-                   size = "sm"
-                 )
-          )
-        )
-      )
     })
 
     # Define reactive object containing all user supplied experimental data

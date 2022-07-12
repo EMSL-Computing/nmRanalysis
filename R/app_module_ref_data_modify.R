@@ -129,45 +129,6 @@ ref_data_add_delUI <- function(id){
   )
 }
 
-#' Module: UI element displaying target metabolite(s) to be quantified
-#'
-#' @description Copyright (C) 2022 Battelle Memorial Institute
-#'
-#'  This program is free software; you can redistribute it and/or modify
-#'  it under the terms of the GNU General Public License as published by
-#'  the Free Software Foundation; either version 2 of the License, or
-#'  (at your option) any later version.
-#'
-#'  This program is distributed in the hope that it will be useful,
-#'  but WITHOUT ANY WARRANTY; without even the implied warranty of
-#'  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-#'  GNU General Public License for more details.
-#'
-#'  You should have received a copy of the GNU General Public License along
-#'  with this program; if not, write to the Free Software Foundation, Inc.,
-#'  51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
-#'
-#' @param id A string denoting the namespace id.
-#'
-#' @details This is one of the UI components for the module created to handle all editing of reference (target) metabolite data.
-#' The value provided for 'id' should be identical across the following: ref_data_ROIeditingUI(), ref_data_add_delUI(),
-#' ref_data_quantTab(), ref_data_profileUI(), and ref_data_editingServer().
-#'
-#' This module component displays the set of target metabolite data that will be used for profiling. These data reflect any
-#' and all edits made to the target metabolite data and are displayed within a searchable, filterable table.
-#'
-#' @import shiny
-#'
-ref_data_quantTab <- function(id){
-  ns <- NS(id)
-  tagList(
-    uiOutput(ns("ui_auto_profile")),
-    uiOutput(ns("vizoptions_quantdata_ui")),
-    shinycssloaders::withSpinner(plotly::plotlyOutput(ns('quantdata_plot'))),
-    DT::dataTableOutput(ns("refmet_quant_table"))
-  )
-}
-
 
 #' Module: Server functions specific to target metabolite data modification
 #'
@@ -898,209 +859,209 @@ ref_data_editingServer <- function(id, xpmt_data, ref_data, ref_db){
       rv$quantdat <- tempdf
     })
 
-    # This datatable corresponds to the reference metabolite data to be used for quantification
-    output$refmet_quant_table <- DT::renderDT({
+    # # This datatable corresponds to the reference metabolite data to be used for quantification
+    # output$refmet_quant_table <- DT::renderDT({
+    #
+    #   req(ref_data())
+    #   req(rv$user_reference_data)
+    #   req(rv$quantdat)
+    #   req(input$ROI_to_plot_quantdat)
+    #
+    #
+    #   temp <- rv$quantdat %>%
+    #     dplyr::mutate(ROI = paste0("(", .data$`ROI right edge (ppm)`, ", ", .data$`ROI left edge (ppm)`, ")")) %>%
+    #     dplyr::filter(ROI %in% input$ROI_to_plot_quantdat)
+    #   temp2 <- rv$user_reference_data %>% dplyr::ungroup() %>%
+    #     dplyr::filter(.data$`Chemical shift(ppm)` %in% temp$`Chemical shift(ppm)`) %>%
+    #     dplyr::mutate(Signal = paste0(.data$Metabolite, " [", .data$`Quantification Signal`, "]")) %>%
+    #     dplyr::filter(.data$Quantify == 1) %>%
+    #     dplyr::arrange(.data$`Chemical shift(ppm)`) %>%
+    #     dplyr::select(.data$Signal, .data$`Quantification Mode`, .data$`Chemical shift(ppm)`, .data$`Chemical shift tolerance (ppm)`,
+    #                   .data$`Half bandwidth (Hz)`, .data$Multiplicity, .data$`J coupling (Hz)`, .data$`J coupling 2 (Hz)`,
+    #                   .data$`Roof effect`, .data$`Roof effect 2`)
+    #
+    #   temp2 %>%
+    #     DT::datatable(rownames   = FALSE,
+    #                   editable   = FALSE,
+    #                   filter = "top",
+    #                   extensions = "Responsive")
+    # })
+    #
+    # # Output (in HTML format) to display the filters that are currently applied to the data.
+    # output$applied_filters_text2 <- renderUI({
+    #
+    #   if(length(attr(xpmt_data(), "filters")) == 0){
+    #     htmltools::HTML("<strong>Currently applied filters:</strong><br/>None")
+    #
+    #   } else{
+    #     allfilts <- rlist::list.ungroup(rlist::list.select(attr(xpmt_data(), "filters"), range))
+    #     allfilts <- Reduce("c", lapply(allfilts, function(x){paste0("(", x$min, ", ", x$max, ")")}))
+    #     htmltools::HTML(paste0("<strong>Currently applied filters:</strong><br/>", paste(allfilts, collapse = "<br/>")))
+    #
+    #   }
+    # })
 
-      req(ref_data())
-      req(rv$user_reference_data)
-      req(rv$quantdat)
-      req(input$ROI_to_plot_quantdat)
+    # # Visualization options for the plot of ROI-collapsed quantification data
+    # output$vizoptions_quantdata_ui <- renderUI({
+    #
+    #   req(xpmt_data())
+    #   req(ref_data())
+    #   req(rv$quantdat)
+    #
+    #   ROIvec <- unique(paste0("(", rv$quantdat$`ROI right edge (ppm)`, ", ", rv$quantdat$`ROI left edge (ppm)`, ")"))
+    #
+    #   shinyWidgets::dropdownButton(
+    #     # Allows users to select which sample spectrum to display.
+    #     selectInput(inputId = NS(id, "sample_to_plot_quantdat"),
+    #                 label   = "Choose a spectrum to plot",
+    #                 choices = colnames(xpmt_data()$e_data)[-1]),
+    #
+    #     selectInput(inputId = NS(id, "ROI_to_plot_quantdat"),
+    #                 label   = "Select a region of interest whose fitting data should be displayed.",
+    #                 choices = ROIvec),
+    #
+    #     # HTML output to display the filters currently applied
+    #     htmlOutput(NS(id,"applied_filters_text2")),
+    #
+    #     # Omit for now
+    #     # # Toggle for subplot display
+    #     # shinyWidgets::materialSwitch(inputId = NS(id, "show_subplot_quantdat"),
+    #     #                              label   = "Show subplot on box select",
+    #     #                              value   = FALSE,
+    #     #                              status  = "primary",
+    #     #                              right   = TRUE),
+    #
+    #     circle = TRUE, status = "info",
+    #     icon = icon("cog"), width = "300px",
+    #
+    #     tooltip = shinyWidgets::tooltipOptions(title = "Plot Options")
+    #   )
+    # })
 
+    # # Plot all collapsed ROIs over the spectrum
+    # output$quantdata_plot <- plotly::renderPlotly({
+    #
+    #   isolate({
+    #     req(ref_data())
+    #     req(xpmt_data())
+    #   })
+    #   # req(rv$quantdat)
+    #   # req(input$ROI_to_plot_quantdat)
+    #
+    #   # # Generate line shapes based on collapsed ROIs
+    #   # ROI_lines <- ROI_line_gen(data = rv$quantdat[!duplicated(rv$quantdat$`ROI left edge (ppm)`),])
+    #   # ROI_annots <- ROI_annot_gen(data = rv$user_reference_data)
+    #
+    #   plotly::plot_ly(source = "id_quantdata_plot", type = "scatter", mode = "lines") %>%
+    #     plotly::config(displaylogo = FALSE,
+    #                    modeBarButtons = list(list("select2d"), list("zoom2d"), list("zoomIn2d"),
+    #                                          list("zoomOut2d"), list("pan2d"), list("autoScale2d"),
+    #                                          list("resetScale2d"), list("toImage"))) %>%
+    #     plotly::layout(title = paste("Experimental Data:", "<br>", "<sup>",
+    #                                  "Metabolite Peaks within Selected Region(s) of Interest (ROI) Annotated", "</sup>"),
+    #                    xaxis = list(title     = "PPM",
+    #                                 autorange = "reversed"),
+    #                    yaxis = list(title     = "Intensity"),
+    #                    dragmode = "zoom2d") %>% #,
+    #     # annotations = ROI_annots,
+    #     # shapes = ROI_lines) %>%
+    #     plotly::config(edits = list(annotationTail     = TRUE,
+    #                                 annotationText     = FALSE,
+    #                                 annotationPosition = FALSE,
+    #                                 shapePosition      = FALSE))
+    #
+    # })
+    #
+    # # Create proxy for the above plotly plot for improved efficiency
+    # quantdata_plot_proxy <- plotly::plotlyProxy("quantdata_plot")
+    #
+    # # This observer is responsible for plotting the trace (i.e. line) corresponding to a selected
+    # # experimental spectrum. This is implemented through proxy updates for the sake of efficiency.
+    # observeEvent(c(input$sample_to_plot_quantdat, xpmt_data()), priority = -1, {
+    #   req(input$sample_to_plot_quantdat)
+    #
+    #   xpmt_data_sample <- xpmt_data()$e_data %>% dplyr::select(.data$PPM, .data[[input$sample_to_plot_quantdat]])
+    #   df_long <- xpmt_data_sample %>%
+    #     tidyr::pivot_longer(!.data$PPM, names_to = "Sample", values_to = "Intensity")
+    #
+    #   # Clear shapes and annotations
+    #   plotly::plotlyProxyInvoke(quantdata_plot_proxy, "relayout",
+    #                             list(annotations = NULL,
+    #                                  shapes = NULL))
+    #
+    #   # Clear plots
+    #   plotly::plotlyProxyInvoke(quantdata_plot_proxy, "deleteTraces", as.list(as.integer(0)))
+    #
+    #   plotly::plotlyProxyInvoke(quantdata_plot_proxy, "addTraces",
+    #                             list(x    = df_long$PPM,
+    #                                  y    = df_long$Intensity,
+    #                                  type = 'scatter',
+    #                                  mode = 'lines',
+    #                                  line = list(width = 1),
+    #                                  hoverinfo = "text",
+    #                                  text = paste0("PPM: ", round(df_long$PPM, 4), "<br>",
+    #                                                "Intensity: ", round(df_long$Intensity, 4))))
+    #   plotly::plotlyProxyInvoke(quantdata_plot_proxy, "relayout",
+    #                             list(title = paste("Experimental Data:", input$sample_to_plot_quantdat, "<br>", "<sup>",
+    #                                                "Metabolite Peaks within Selected Region(s) of Interest (ROI) Annotated", "</sup>")))
+    #   # Update shapes/annotations
+    #   temp <- rv$quantdat %>%
+    #     dplyr::mutate(ROI = paste0("(", .data$`ROI right edge (ppm)`, ", ", .data$`ROI left edge (ppm)`, ")")) %>%
+    #     dplyr::filter(ROI %in% input$ROI_to_plot_quantdat)
+    #   temp2 <- rv$user_reference_data %>% dplyr::filter(.data$`Chemical shift(ppm)` %in% temp$`Chemical shift(ppm)`)
+    #
+    #   ROI_lines <- ROI_line_gen(data = temp[!duplicated(temp$`ROI left edge (ppm)`),,drop = FALSE])
+    #   ROI_annots <- ROI_annot_gen(data = temp2)
+    #
+    #   # Update plot
+    #   plotly::plotlyProxyInvoke(quantdata_plot_proxy, "relayout",
+    #                             list(annotations = ROI_annots,
+    #                                  shapes = ROI_lines))
+    # })
+    #
+    # # This observer is responsible for plotting the annotations and shapes for entries within the
+    # # specified ROI. This is implemented through proxy updates for the sake of efficiency.
+    # observeEvent(c(input$ROI_to_plot_quantdat), ignoreNULL = TRUE, ignoreInit = TRUE,
+    #              {
+    #                req(ref_data())
+    #                req(xpmt_data())
+    #                req(rv$quantdat)
+    #
+    #                temp <- rv$quantdat %>%
+    #                  dplyr::mutate(ROI = paste0("(", .data$`ROI right edge (ppm)`, ", ", .data$`ROI left edge (ppm)`, ")")) %>%
+    #                  dplyr::filter(ROI %in% input$ROI_to_plot_quantdat)
+    #                temp2 <- rv$user_reference_data %>% dplyr::filter(.data$`Chemical shift(ppm)` %in% temp$`Chemical shift(ppm)`)
+    #
+    #                ROI_lines <- ROI_line_gen(data = temp[!duplicated(temp$`ROI left edge (ppm)`),,drop = FALSE])
+    #                ROI_annots <- ROI_annot_gen(data = temp2)
+    #
+    #                # Update plot
+    #                plotly::plotlyProxyInvoke(quantdata_plot_proxy, "relayout",
+    #                                          list(annotations = ROI_annots,
+    #                                               shapes = ROI_lines))
+    #              })
 
-      temp <- rv$quantdat %>%
-        dplyr::mutate(ROI = paste0("(", .data$`ROI right edge (ppm)`, ", ", .data$`ROI left edge (ppm)`, ")")) %>%
-        dplyr::filter(ROI %in% input$ROI_to_plot_quantdat)
-      temp2 <- rv$user_reference_data %>% dplyr::ungroup() %>%
-        dplyr::filter(.data$`Chemical shift(ppm)` %in% temp$`Chemical shift(ppm)`) %>%
-        dplyr::mutate(Signal = paste0(.data$Metabolite, " [", .data$`Quantification Signal`, "]")) %>%
-        dplyr::filter(.data$Quantify == 1) %>%
-        dplyr::arrange(.data$`Chemical shift(ppm)`) %>%
-        dplyr::select(.data$Signal, .data$`Quantification Mode`, .data$`Chemical shift(ppm)`, .data$`Chemical shift tolerance (ppm)`,
-                      .data$`Half bandwidth (Hz)`, .data$Multiplicity, .data$`J coupling (Hz)`, .data$`J coupling 2 (Hz)`,
-                      .data$`Roof effect`, .data$`Roof effect 2`)
-
-      temp2 %>%
-        DT::datatable(rownames   = FALSE,
-                      editable   = FALSE,
-                      filter = "top",
-                      extensions = "Responsive")
-    })
-
-    # Output (in HTML format) to display the filters that are currently applied to the data.
-    output$applied_filters_text2 <- renderUI({
-
-      if(length(attr(xpmt_data(), "filters")) == 0){
-        htmltools::HTML("<strong>Currently applied filters:</strong><br/>None")
-
-      } else{
-        allfilts <- rlist::list.ungroup(rlist::list.select(attr(xpmt_data(), "filters"), range))
-        allfilts <- Reduce("c", lapply(allfilts, function(x){paste0("(", x$min, ", ", x$max, ")")}))
-        htmltools::HTML(paste0("<strong>Currently applied filters:</strong><br/>", paste(allfilts, collapse = "<br/>")))
-
-      }
-    })
-
-    # Visualization options for the plot of ROI-collapsed quantification data
-    output$vizoptions_quantdata_ui <- renderUI({
-
-      req(xpmt_data())
-      req(ref_data())
-      req(rv$quantdat)
-
-      ROIvec <- unique(paste0("(", rv$quantdat$`ROI right edge (ppm)`, ", ", rv$quantdat$`ROI left edge (ppm)`, ")"))
-
-      shinyWidgets::dropdownButton(
-        # Allows users to select which sample spectrum to display.
-        selectInput(inputId = NS(id, "sample_to_plot_quantdat"),
-                    label   = "Choose a spectrum to plot",
-                    choices = colnames(xpmt_data()$e_data)[-1]),
-
-        selectInput(inputId = NS(id, "ROI_to_plot_quantdat"),
-                    label   = "Select a region of interest whose fitting data should be displayed.",
-                    choices = ROIvec),
-
-        # HTML output to display the filters currently applied
-        htmlOutput(NS(id,"applied_filters_text2")),
-
-        # Omit for now
-        # # Toggle for subplot display
-        # shinyWidgets::materialSwitch(inputId = NS(id, "show_subplot_quantdat"),
-        #                              label   = "Show subplot on box select",
-        #                              value   = FALSE,
-        #                              status  = "primary",
-        #                              right   = TRUE),
-
-        circle = TRUE, status = "info",
-        icon = icon("cog"), width = "300px",
-
-        tooltip = shinyWidgets::tooltipOptions(title = "Plot Options")
-      )
-    })
-
-    # Plot all collapsed ROIs over the spectrum
-    output$quantdata_plot <- plotly::renderPlotly({
-
-      isolate({
-        req(ref_data())
-        req(xpmt_data())
-      })
-      # req(rv$quantdat)
-      # req(input$ROI_to_plot_quantdat)
-
-      # # Generate line shapes based on collapsed ROIs
-      # ROI_lines <- ROI_line_gen(data = rv$quantdat[!duplicated(rv$quantdat$`ROI left edge (ppm)`),])
-      # ROI_annots <- ROI_annot_gen(data = rv$user_reference_data)
-
-      plotly::plot_ly(source = "id_quantdata_plot", type = "scatter", mode = "lines") %>%
-        plotly::config(displaylogo = FALSE,
-                       modeBarButtons = list(list("select2d"), list("zoom2d"), list("zoomIn2d"),
-                                             list("zoomOut2d"), list("pan2d"), list("autoScale2d"),
-                                             list("resetScale2d"), list("toImage"))) %>%
-        plotly::layout(title = paste("Experimental Data:", "<br>", "<sup>",
-                                     "Metabolite Peaks within Selected Region(s) of Interest (ROI) Annotated", "</sup>"),
-                       xaxis = list(title     = "PPM",
-                                    autorange = "reversed"),
-                       yaxis = list(title     = "Intensity"),
-                       dragmode = "zoom2d") %>% #,
-        # annotations = ROI_annots,
-        # shapes = ROI_lines) %>%
-        plotly::config(edits = list(annotationTail     = TRUE,
-                                    annotationText     = FALSE,
-                                    annotationPosition = FALSE,
-                                    shapePosition      = FALSE))
-
-    })
-
-    # Create proxy for the above plotly plot for improved efficiency
-    quantdata_plot_proxy <- plotly::plotlyProxy("quantdata_plot")
-
-    # This observer is responsible for plotting the trace (i.e. line) corresponding to a selected
-    # experimental spectrum. This is implemented through proxy updates for the sake of efficiency.
-    observeEvent(c(input$sample_to_plot_quantdat, xpmt_data()), priority = -1, {
-      req(input$sample_to_plot_quantdat)
-
-      xpmt_data_sample <- xpmt_data()$e_data %>% dplyr::select(.data$PPM, .data[[input$sample_to_plot_quantdat]])
-      df_long <- xpmt_data_sample %>%
-        tidyr::pivot_longer(!.data$PPM, names_to = "Sample", values_to = "Intensity")
-
-      # Clear shapes and annotations
-      plotly::plotlyProxyInvoke(quantdata_plot_proxy, "relayout",
-                                list(annotations = NULL,
-                                     shapes = NULL))
-
-      # Clear plots
-      plotly::plotlyProxyInvoke(quantdata_plot_proxy, "deleteTraces", as.list(as.integer(0)))
-
-      plotly::plotlyProxyInvoke(quantdata_plot_proxy, "addTraces",
-                                list(x    = df_long$PPM,
-                                     y    = df_long$Intensity,
-                                     type = 'scatter',
-                                     mode = 'lines',
-                                     line = list(width = 1),
-                                     hoverinfo = "text",
-                                     text = paste0("PPM: ", round(df_long$PPM, 4), "<br>",
-                                                   "Intensity: ", round(df_long$Intensity, 4))))
-      plotly::plotlyProxyInvoke(quantdata_plot_proxy, "relayout",
-                                list(title = paste("Experimental Data:", input$sample_to_plot_quantdat, "<br>", "<sup>",
-                                                   "Metabolite Peaks within Selected Region(s) of Interest (ROI) Annotated", "</sup>")))
-      # Update shapes/annotations
-      temp <- rv$quantdat %>%
-        dplyr::mutate(ROI = paste0("(", .data$`ROI right edge (ppm)`, ", ", .data$`ROI left edge (ppm)`, ")")) %>%
-        dplyr::filter(ROI %in% input$ROI_to_plot_quantdat)
-      temp2 <- rv$user_reference_data %>% dplyr::filter(.data$`Chemical shift(ppm)` %in% temp$`Chemical shift(ppm)`)
-
-      ROI_lines <- ROI_line_gen(data = temp[!duplicated(temp$`ROI left edge (ppm)`),,drop = FALSE])
-      ROI_annots <- ROI_annot_gen(data = temp2)
-
-      # Update plot
-      plotly::plotlyProxyInvoke(quantdata_plot_proxy, "relayout",
-                                list(annotations = ROI_annots,
-                                     shapes = ROI_lines))
-    })
-
-    # This observer is responsible for plotting the annotations and shapes for entries within the
-    # specified ROI. This is implemented through proxy updates for the sake of efficiency.
-    observeEvent(c(input$ROI_to_plot_quantdat), ignoreNULL = TRUE, ignoreInit = TRUE,
-                 {
-                   req(ref_data())
-                   req(xpmt_data())
-                   req(rv$quantdat)
-
-                   temp <- rv$quantdat %>%
-                     dplyr::mutate(ROI = paste0("(", .data$`ROI right edge (ppm)`, ", ", .data$`ROI left edge (ppm)`, ")")) %>%
-                     dplyr::filter(ROI %in% input$ROI_to_plot_quantdat)
-                   temp2 <- rv$user_reference_data %>% dplyr::filter(.data$`Chemical shift(ppm)` %in% temp$`Chemical shift(ppm)`)
-
-                   ROI_lines <- ROI_line_gen(data = temp[!duplicated(temp$`ROI left edge (ppm)`),,drop = FALSE])
-                   ROI_annots <- ROI_annot_gen(data = temp2)
-
-                   # Update plot
-                   plotly::plotlyProxyInvoke(quantdata_plot_proxy, "relayout",
-                                             list(annotations = ROI_annots,
-                                                  shapes = ROI_lines))
-                 })
-
-    # Observer that prompts confirmation of profiling anytime the button is clicked.
-    observeEvent(c(input$auto_profile),
-                 {
-                   req(isolate(ref_data()))
-                   req(input$auto_profile > 0)
-
-                   shinyWidgets::ask_confirmation(
-                     inputId = NS(id, "profile_confirm"),
-                     title = "Are you sure you would like to begin profiling?",
-                     text = NULL,
-                     type = "question",
-                     btn_labels = c("Cancel", "Continue"),
-                     btn_colors = c("#D3D3D3", "#428BCA"),
-                     closeOnClickOutside = TRUE,
-                     showCloseButton = TRUE,
-                     allowEscapeKey = TRUE,
-                     cancelOnDismiss = TRUE,
-                     html = FALSE,
-                     session = shiny::getDefaultReactiveDomain()
-                   )
-                 })
+    # # Observer that prompts confirmation of profiling anytime the button is clicked.
+    # observeEvent(c(input$auto_profile),
+    #              {
+    #                req(isolate(ref_data()))
+    #                req(input$auto_profile > 0)
+    #
+    #                shinyWidgets::ask_confirmation(
+    #                  inputId = NS(id, "profile_confirm"),
+    #                  title = "Are you sure you would like to begin profiling?",
+    #                  text = NULL,
+    #                  type = "question",
+    #                  btn_labels = c("Cancel", "Continue"),
+    #                  btn_colors = c("#D3D3D3", "#428BCA"),
+    #                  closeOnClickOutside = TRUE,
+    #                  showCloseButton = TRUE,
+    #                  allowEscapeKey = TRUE,
+    #                  cancelOnDismiss = TRUE,
+    #                  html = FALSE,
+    #                  session = shiny::getDefaultReactiveDomain()
+    #                )
+    #              })
 
     # Observer that performs quantification for individually selected metabolite and spectrum, and plots
     # resulting fit on the displayed plot (i.e. output$refmet_dspedt_selected_plot)
@@ -1418,13 +1379,13 @@ ref_data_editingServer <- function(id, xpmt_data, ref_data, ref_db){
         ))
     })
 
-    # Dynamic action button to automatically profile reference metabolite data. Only appears after
-    # reference metabolite data are uploaded.
-    output$ui_auto_profile <- renderUI({
-      req(ref_data())
-
-      actionButton(NS(id, "auto_profile"), label = "Profile")
-    })
+    # # Dynamic action button to automatically profile reference metabolite data. Only appears after
+    # # reference metabolite data are uploaded.
+    # output$ui_auto_profile <- renderUI({
+    #   req(ref_data())
+    #
+    #   actionButton(NS(id, "auto_profile"), label = "Profile")
+    # })
 
 
     output$ui_global_profiling_parameters <- renderUI({
@@ -1672,7 +1633,7 @@ ref_data_editingServer <- function(id, xpmt_data, ref_data, ref_db){
     #----------------------------------------------------------------------------------------------------------
 
     # Module output
-    eventReactive(input$profile_confirm, ignoreInit = TRUE, ignoreNULL = TRUE,
+    eventReactive(rv$user_reference_data, ignoreInit = TRUE, ignoreNULL = TRUE,
                   {
                     req(rv$user_reference_data)
 
@@ -1709,8 +1670,7 @@ ref_data_editingServer <- function(id, xpmt_data, ref_data, ref_db){
                     }
                     attr(rv$user_reference_data, "edit_history") <- allres
 
-                    list(profile_confirm     = input$profile_confirm,
-                         user_edited_refdata = rv$user_reference_data,
+                    list(user_edited_refdata = rv$user_reference_data,
                          quantdata           = rv$quantdat,
                          global_parameters   = list(BGdensity                          = input$gpp_BGdensity,
                                                     widthtolerance                     = input$gpp_widthtolerance,

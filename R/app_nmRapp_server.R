@@ -59,80 +59,34 @@ nmRapp_server <- function(input, output, session) {
   # Stores experimental data after any filters/modifications applied
   mod_xpmt_data <- xpmt_data_vizServer(id = "xpmt_viz", xpmt_data = xpmt_data)
 
-  ### Tab: Reference Metabolites ----------------------------------------------
+  # Wizard button to navigate from experimental data upload page to reference data editing page
+  output$wizard_exptoref_ui <- renderUI({
+    req(mod_xpmt_data())
+    tagList(
+      h4(""),
+      fluidRow(
+        column(5, offset = 7,
+               shinyWidgets::actionBttn(
+                 inputId = "wizard_exptoref",
+                 label = "Reference Data Editing",
+                 style = "minimal",
+                 color = "primary",
+                 icon = icon("arrow-right"),
+                 size = "sm"
+               )
+        )
+      )
+    )
+  })
 
-  # observer to show reference metabolite editing tab after experimental data has been uploaded
-  # The code for the ref_data_uploadUI() module is found in ./R/module_ref_data_upload.R
-  # The code for the ref_data_profileUI() module is found in ./R/module_ref_data_modify.R
-  # The code for the ref_data_ROIeditingUI() module is found in ./R/module_ref_data_modify.R
-  # The code for the ref_data_add_delUI() module is found in ./R/module_ref_data_modify.R
-  # The code for the ref_data_quantTab() module is found in ./R/module_ref_data_modify.R
-  observeEvent(xpmt_data(), ignoreNULL = TRUE,
-               {
-                 req(xpmt_data())
-                 removeTab(inputId = "AllTabs",
-                           target  = "RefMetTab")
-                 appendTab(inputId = "AllTabs",
-                           tabPanel(
-                             "Reference Metabolites",
-                             value = "RefMetTab",
-                             sidebarLayout(
-                               sidebarPanel(
-                                 ref_data_uploadUI(id = "ref_data_init", ref_db = bmse_associations)
-                               ),
-                               mainPanel(
-                                 tabsetPanel(
-                                   id = "refout_tabs",
-                                   tabPanel(
-                                     title = "Reference Data Editing",
-                                     tabsetPanel(
-                                       id = "refdat_tab1",
-                                       type = "hidden",
-                                       selected = "tab1_hide",
-                                       tabPanelBody(
-                                         value = "tab1_show",
-                                         ref_data_ROIeditingUI(id = "ref_data_edits")
-                                       ),
-                                       tabPanelBody(
-                                         value = "tab1_hide"
-                                       )
-                                     )
-                                   ),
-                                   tabPanel(
-                                     title = "Add/Remove Metabolites",
-                                     tabsetPanel(
-                                       id = "refdat_tab2",
-                                       type = "hidden",
-                                       selected = "tab2_hide",
-                                       tabPanelBody(
-                                         value = "tab2_show",
-                                         ref_data_add_delUI(id = "ref_data_edits")
-                                       ),
-                                       tabPanelBody(
-                                         value = "tab2_hide"
-                                       )
-                                     )
-                                   ),
-                                   tabPanel(
-                                     title = "Reference Data for Quantification",
-                                     tabsetPanel(
-                                       id = "refdat_tab3",
-                                       type = "hidden",
-                                       selected = "tab3_hide",
-                                       tabPanelBody(
-                                         value = "tab3_show",
-                                         ref_data_quantTab(id = "ref_data_edits")
-                                       ),
-                                       tabPanelBody(
-                                         value = "tab3_hide"
-                                       )
-                                     )
-                                   )
-                                 )
-                               )
-                             )
-                           ))
-               })
+  observeEvent(input$wizard_exptoref, {
+    req(input$wizard_exptoref > 0)
+
+    updateTabsetPanel(session, "AllTabs",
+                      selected = "RefMetTab")
+  })
+
+  ### Tab: Reference Metabolites ----------------------------------------------
 
   # Handle initial upload of reference metabolite datafile and/or initial specification of reference metabolites
   # The code for the ref_data_uploadServer() module is found in ./R/ref_data_upload.R
@@ -163,7 +117,6 @@ nmRapp_server <- function(input, output, session) {
 
     updateTabsetPanel(inputId = "refdat_tab1", selected = "tab1_show")
     updateTabsetPanel(inputId = "refdat_tab2", selected = "tab2_show")
-    updateTabsetPanel(inputId = "refdat_tab3", selected = "tab3_show")
   })
 
   # Creates a datatable that displays entries not found in reference database
@@ -183,6 +136,34 @@ nmRapp_server <- function(input, output, session) {
                                          ref_data  = ref_data,
                                          ref_db    = bmse_associations)
 
+  # Wizard buttons to navigate from reference data editing page to experimental data upload page OR from
+  # reference data editing page to profiling page
+  output$wizard_reftoprof_ui <- renderUI({
+    req(mod_ref_data())
+
+    shinyWidgets::actionBttn(
+      inputId = "wizard_reftoprof",
+      label = "Profiling",
+      style = "minimal",
+      color = "primary",
+      icon = icon("arrow-right"),
+      size = "sm")
+  })
+
+  observeEvent(input$wizard_reftoexp, {
+    req(input$wizard_reftoexp > 0)
+
+    updateTabsetPanel(session, "AllTabs",
+                      selected = "UploadTab")
+  })
+
+  observeEvent(input$wizard_reftoprof, {
+    req(input$wizard_reftoprof > 0)
+
+    updateTabsetPanel(session, "AllTabs",
+                      selected = "ProfilingTab")
+  })
+
 
   ### Tab: Profiling Data ----------------------------------------------------------
 
@@ -190,30 +171,11 @@ nmRapp_server <- function(input, output, session) {
                                        xpmt_data = mod_xpmt_data,
                                        ref_data = mod_ref_data)
 
-  observeEvent(profiling_results(),
-               {
-                 req(mod_xpmt_data())
-                 req(mod_ref_data()$profile_confirm == TRUE)
+  observeEvent(input$wizard_proftoref, {
+    req(input$wizard_proftoref > 0)
 
-                 removeTab(inputId = "AllTabs",
-                           target  = "ProfilingTab")
-                 appendTab(inputId = "AllTabs",
-                           tabPanel(
-                             title = "Profile Data",
-                             value = "ProfilingTab",
-                             tabsetPanel(
-                               tabPanel(
-                                 title = "Signal View",
-                                 profiling_completeviewUI(id = "profiling")
-                               ),
-                               tabPanel(
-                                 title = "Metabolite View",
-                                 profiling_detailedviewUI(id = "profiling")
-                               )
-                             )
-                           )
-                 )
-                 updateTabsetPanel(session, "AllTabs",
-                                   selected = "ProfilingTab")
-               })
+    updateTabsetPanel(session, "AllTabs",
+                      selected = "RefMetTab")
+  })
+
 }
