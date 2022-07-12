@@ -54,7 +54,8 @@ nmRapp_ui <- function(request){
       sidebarLayout(
         # Specify the elements contained in the sidebarPanel
         sidebarPanel(
-          xpmt_data_uploadUI(id = "xpmt", ref_db = bmse_associations)
+          xpmt_data_uploadUI(id = "xpmt", ref_db = bmse_associations),
+          uiOutput("wizard_exptoref_ui")
         ),
 
         # Specify elements to include in main panel
@@ -74,7 +75,84 @@ nmRapp_ui <- function(request){
           )
         )
       )
+    ),
+
+    # The second tab of the UI
+    tabPanel(
+      "Reference Metabolites",
+      value = "RefMetTab",
+      sidebarLayout(
+        sidebarPanel(
+          ref_data_uploadUI(id = "ref_data_init", ref_db = bmse_associations),
+          h4(""),
+          fluidRow(
+            column(6,
+                   shinyWidgets::actionBttn(
+                     inputId = "wizard_reftoexp",
+                     label = "Experimental Data Upload",
+                     style = "minimal",
+                     color = "primary",
+                     icon = icon("arrow-left"),
+                     size = "sm")
+                   ),
+            column(3, offset = 3,
+                   uiOutput("wizard_reftoprof_ui")
+                   )
+          )
+        ),
+        mainPanel(
+          tabsetPanel(
+            id = "refout_tabs",
+            tabPanel(
+              title = "Reference Data Editing",
+              tabsetPanel(
+                id = "refdat_tab1",
+                type = "hidden",
+                selected = "tab1_hide",
+                tabPanelBody(
+                  value = "tab1_show",
+                  ref_data_ROIeditingUI(id = "ref_data_edits")
+                ),
+                tabPanelBody(
+                  value = "tab1_hide"
+                )
+              )
+            ),
+            tabPanel(
+              title = "Add/Remove Metabolites",
+              tabsetPanel(
+                id = "refdat_tab2",
+                type = "hidden",
+                selected = "tab2_hide",
+                tabPanelBody(
+                  value = "tab2_show",
+                  ref_data_add_delUI(id = "ref_data_edits")
+                ),
+                tabPanelBody(
+                  value = "tab2_hide"
+                )
+              )
+            ),
+            tabPanel(
+              title = "Reference Data for Quantification",
+              tabsetPanel(
+                id = "refdat_tab3",
+                type = "hidden",
+                selected = "tab3_hide",
+                tabPanelBody(
+                  value = "tab3_show",
+                  ref_data_quantTab(id = "ref_data_edits")
+                ),
+                tabPanelBody(
+                  value = "tab3_hide"
+                )
+              )
+            )
+          )
+        )
+      )
     )
+
   )
 }
 
