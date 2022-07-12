@@ -30,7 +30,8 @@ Copyright (C) 2022 Battelle Memorial Institute
 This is one of the UI components for the module created to handle all functions related to profiling
 of experimental data, based on user edits to the fitting parameters of a pre-specified list of
 reference (target) metabolites. The value provided for 'id' should be identical across the following:
-profiling_completeviewUI(), profiling_detailedviewUI(), and profilingServer().
+profiling_quant_sidebarUI(), profiling_prequantUI(), profiling_completeviewUI(), profiling_detailedviewUI(),
+and profilingServer().
 
 This module component provides the UI elements that allow users to:
 1) Select from several options to control the shown display

@@ -1633,64 +1633,66 @@ ref_data_editingServer <- function(id, xpmt_data, ref_data, ref_db){
     #----------------------------------------------------------------------------------------------------------
 
     # Module output
-    eventReactive(rv$user_reference_data, ignoreInit = TRUE, ignoreNULL = TRUE,
-                  {
-                    req(rv$user_reference_data)
+    reactive({
+      req(rv$user_reference_data)
+      gpps <- list(BGdensity                          = input$gpp_BGdensity,
+                   widthtolerance                     = input$gpp_widthtolerance,
+                   gaussian                           = input$gpp_gaussian,
+                   j_coupling_variation               = input$gpp_j_coupling_variation,
+                   BG_gaussian_percentage             = input$gpp_BG_gaussian_percentage,
+                   BG_width                           = input$gpp_BG_width,
+                   BG_width_tolerance                 = input$gpp_BG_width_tolerance,
+                   errorprov                          = input$gpp_errorprov,
+                   fitting_maxiter                    = input$gpp_fitting_maxiter,
+                   nls_lm_maxiter                     = input$gpp_nls_lm_maxiter,
+                   ftol                               = input$gpp_ftol,
+                   ptol                               = input$gpp_ptol,
+                   factor                             = input$gpp_factor,
+                   additional_signal_ppm_distance     = input$gpp_additional_signal_ppm_distance,
+                   signals_to_add                     = input$gpp_signals_to_add,
+                   fitting_maxiterrep                 = input$gpp_fitting_maxiterrep,
+                   additional_signal_improvement      = input$gpp_additional_signal_improvement,
+                   additional_signal_percentage_limit = input$gpp_additional_signal_percentage_limit,
+                   peakdet_minimum                    = input$gpp_peakdet_minimum)
 
-                    ## Document all changes relative to original reference data (ref_data()$ref_data)
-                    orig_refdat <- ref_data()$ref_data
-                    # Note also that Metabolite$[[1]] in all rv$refchanges entries correspond to the original data for Metabolite
+      isolate({
+        ## Document all changes relative to original reference data (ref_data()$ref_data)
+        orig_refdat <- ref_data()$ref_data
+        # Note also that Metabolite$[[1]] in all rv$refchanges entries correspond to the original data for Metabolite
 
-                    # Document all metabolites that were added or removed
-                    added_metabolites <- unique(rv$user_reference_data$Metabolite)[unique(rv$user_reference_data$Metabolite) %ni% unique(orig_refdat$Metabolite)]
-                    removed_metabolites <- unique(orig_refdat$Metabolite)[unique(orig_refdat$Metabolite) %ni% unique(rv$user_reference_data$Metabolite)]
-                    attr(rv$user_reference_data, "added_metabolites") <- added_metabolites
-                    attr(rv$user_reference_data, "removed_metabolites") <- removed_metabolites
+        # Document all metabolites that were added or removed
+        added_metabolites <- unique(rv$user_reference_data$Metabolite)[unique(rv$user_reference_data$Metabolite) %ni% unique(orig_refdat$Metabolite)]
+        removed_metabolites <- unique(orig_refdat$Metabolite)[unique(orig_refdat$Metabolite) %ni% unique(rv$user_reference_data$Metabolite)]
+        attr(rv$user_reference_data, "added_metabolites") <- added_metabolites
+        attr(rv$user_reference_data, "removed_metabolites") <- removed_metabolites
 
-                    # Distill refchanges to include only the original entry, and subsequent rows/cols that were changed for
-                    # each metabolite.
-                    tempnames <- names(rv$refchanges)
+        # Distill refchanges to include only the original entry, and subsequent rows/cols that were changed for
+        # each metabolite.
+        tempnames <- names(rv$refchanges)
 
-                    allres <- vector("list", length = length(tempnames))
-                    names(allres) <- tempnames
-                    for(name in tempnames){
-                      templength <- length(rv$refchanges[[name]])
-                      tempres <- list(OriginalEntry = rv$refchanges[[name]][[1]])
-                      if (templength > 1){
-                        for(i in 2:templength){
-                          binary_diffmat <- !(rv$refchanges[[name]][[i]] == rv$refchanges[[name]][[1]])
-                          crows <- which(apply(binary_diffmat,1,any))
-                          ccols <- which(apply(binary_diffmat,2,any))
-                          tempres <- append(tempres, list(rv$refchanges[[name]][[i]][crows, ccols, drop = FALSE]))
-                        }
-                        names(tempres) <- c("OriginalEntry", paste0("Edit_", 1:(templength-1)))
-                      }
-                      currdf <- rv$user_reference_data %>% dplyr::filter(.data$Metabolite == name)
-                      allres[[name]] <- c(tempres, FinalEntry = list(currdf))
-                    }
-                    attr(rv$user_reference_data, "edit_history") <- allres
+        allres <- vector("list", length = length(tempnames))
+        names(allres) <- tempnames
+        for(name in tempnames){
+          templength <- length(rv$refchanges[[name]])
+          tempres <- list(OriginalEntry = rv$refchanges[[name]][[1]])
+          if (templength > 1){
+            for(i in 2:templength){
+              binary_diffmat <- !(rv$refchanges[[name]][[i]] == rv$refchanges[[name]][[1]])
+              crows <- which(apply(binary_diffmat,1,any))
+              ccols <- which(apply(binary_diffmat,2,any))
+              tempres <- append(tempres, list(rv$refchanges[[name]][[i]][crows, ccols, drop = FALSE]))
+            }
+            names(tempres) <- c("OriginalEntry", paste0("Edit_", 1:(templength-1)))
+          }
+          currdf <- rv$user_reference_data %>% dplyr::filter(.data$Metabolite == name)
+          allres[[name]] <- c(tempres, FinalEntry = list(currdf))
+        }
+        attr(rv$user_reference_data, "edit_history") <- allres
 
-                    list(user_edited_refdata = rv$user_reference_data,
-                         quantdata           = rv$quantdat,
-                         global_parameters   = list(BGdensity                          = input$gpp_BGdensity,
-                                                    widthtolerance                     = input$gpp_widthtolerance,
-                                                    gaussian                           = input$gpp_gaussian,
-                                                    j_coupling_variation               = input$gpp_j_coupling_variation,
-                                                    BG_gaussian_percentage             = input$gpp_BG_gaussian_percentage,
-                                                    BG_width                           = input$gpp_BG_width,
-                                                    BG_width_tolerance                 = input$gpp_BG_width_tolerance,
-                                                    errorprov                          = input$gpp_errorprov,
-                                                    fitting_maxiter                    = input$gpp_fitting_maxiter,
-                                                    nls_lm_maxiter                     = input$gpp_nls_lm_maxiter,
-                                                    ftol                               = input$gpp_ftol,
-                                                    ptol                               = input$gpp_ptol,
-                                                    factor                             = input$gpp_factor,
-                                                    additional_signal_ppm_distance     = input$gpp_additional_signal_ppm_distance,
-                                                    signals_to_add                     = input$gpp_signals_to_add,
-                                                    fitting_maxiterrep                 = input$gpp_fitting_maxiterrep,
-                                                    additional_signal_improvement      = input$gpp_additional_signal_improvement,
-                                                    additional_signal_percentage_limit = input$gpp_additional_signal_percentage_limit,
-                                                    peakdet_minimum                    = input$gpp_peakdet_minimum))
-                  })
-  })
+        list(user_edited_refdata = rv$user_reference_data,
+             quantdata           = rv$quantdat,
+             global_parameters   = gpps)
+        })
+      })
+    })
 }

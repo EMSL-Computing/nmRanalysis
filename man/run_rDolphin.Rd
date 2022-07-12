@@ -6,6 +6,7 @@
 \usage{
 run_rDolphin(
   imported_data,
+  write_results = FALSE,
   dir = NULL,
   optimization = TRUE,
   spectra_to_profile = NULL
@@ -13,6 +14,8 @@ run_rDolphin(
 }
 \arguments{
 \item{imported_data}{an rDolphin data object, often created by \code{ppmData_to_rDolphin}}
+
+\item{write_results}{logical, if true, results written to specified directory. Default is FALSE.}
 
 \item{dir}{Directory where to save results, default is NA, which will create a folder in your working directory.}
 

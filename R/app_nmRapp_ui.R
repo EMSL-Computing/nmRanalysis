@@ -35,152 +35,152 @@
 #' @import shiny
 #'
 nmRapp_ui <- function(request){
-  # navBarPage specifies a template for the general page layout of the UI
-  # This template consists of several panels accessible via tabs
-  navbarPage(
-    "nmRanalysis",
-    id = "AllTabs", # unique identifier for navbarPage
+  fluidPage(
+    title = "nmRanalysis",
+    tabsetPanel(
+      id = "AllTabs",
+      type = "hidden",
+      # The first panel/tab of the UI
+      tabPanelBody(
+        # "Data Processing",
+        value = "UploadTab", # unique identifier for panel
 
-    # The first panel/tab of the UI
-    tabPanel(
-      "Data Processing", # Name of panel
-      value = "UploadTab", # unique identifier for panel
+        shinyWidgets::useSweetAlert(), # needed with progressSweetAlert (applies for entire app)
+        shinyFeedback::useShinyFeedback(), # set up shinyFeedback (applies for entire app)
 
-      shinyWidgets::useSweetAlert(), # needed with progressSweetAlert (applies for entire app)
-      shinyFeedback::useShinyFeedback(), # set up shinyFeedback (applies for entire app)
+        # sidebarLayout specifies a template for the layout of the panel.
+        # This template is comprised of a sidebar panel and main panel.
+        sidebarLayout(
+          # Specify the elements contained in the sidebarPanel
+          sidebarPanel(
+            xpmt_data_uploadUI(id = "xpmt", ref_db = bmse_associations),
+            uiOutput("wizard_exptoref_ui")
+          ),
 
-      # sidebarLayout specifies a template for the layout of the panel.
-      # This template is comprised of a sidebar panel and main panel.
-      sidebarLayout(
-        # Specify the elements contained in the sidebarPanel
-        sidebarPanel(
-          xpmt_data_uploadUI(id = "xpmt", ref_db = bmse_associations),
-          uiOutput("wizard_exptoref_ui")
-        ),
-
-        # Specify elements to include in main panel
-        mainPanel(
-          tabsetPanel(
-            id = "xpmtdat_tab1",
-            type = "hidden",
-            selected = "xpmt_tab1_hide",
-            tabPanelBody(
-              value = "xpmt_tab1_show",
-              xpmt_data_vizoptionsUI(id = "xpmt_viz"),
-              xpmt_data_vizUI(id = "xpmt_viz")
-            ),
-            tabPanelBody(
-              value = "xpmt_tab1_hide"
-            )
-          )
-        )
-      )
-    ),
-
-    # The second tab of the UI
-    tabPanel(
-      "Reference Metabolites",
-      value = "RefMetTab",
-      sidebarLayout(
-        sidebarPanel(
-          ref_data_uploadUI(id = "ref_data_init", ref_db = bmse_associations),
-          h4(""),
-          fluidRow(
-            column(6,
-                   shinyWidgets::actionBttn(
-                     inputId = "wizard_reftoexp",
-                     label = "Experimental Data Upload",
-                     style = "minimal",
-                     color = "primary",
-                     icon = icon("arrow-left"),
-                     size = "sm")
-                   ),
-            column(3, offset = 3,
-                   uiOutput("wizard_reftoprof_ui")
-                   )
-          )
-        ),
-        mainPanel(
-          tabsetPanel(
-            id = "refout_tabs",
-            tabPanel(
-              title = "Reference Data Editing",
-              tabsetPanel(
-                id = "refdat_tab1",
-                type = "hidden",
-                selected = "tab1_hide",
-                tabPanelBody(
-                  value = "tab1_show",
-                  ref_data_ROIeditingUI(id = "ref_data_edits")
-                ),
-                tabPanelBody(
-                  value = "tab1_hide"
-                )
-              )
-            ),
-            tabPanel(
-              title = "Add/Remove Metabolites",
-              tabsetPanel(
-                id = "refdat_tab2",
-                type = "hidden",
-                selected = "tab2_hide",
-                tabPanelBody(
-                  value = "tab2_show",
-                  ref_data_add_delUI(id = "ref_data_edits")
-                ),
-                tabPanelBody(
-                  value = "tab2_hide"
-                )
+          # Specify elements to include in main panel
+          mainPanel(
+            tabsetPanel(
+              id = "xpmtdat_tab1",
+              type = "hidden",
+              selected = "xpmt_tab1_hide",
+              tabPanelBody(
+                value = "xpmt_tab1_show",
+                xpmt_data_vizoptionsUI(id = "xpmt_viz"),
+                xpmt_data_vizUI(id = "xpmt_viz")
+              ),
+              tabPanelBody(
+                value = "xpmt_tab1_hide"
               )
             )
           )
         )
-      )
-    ),
+      ),
 
-
-
-
-    # The final tab of the UI
-    tabPanel(
-      title = "Profiling",
-      value = "ProfilingTab",
-      sidebarLayout(
-        sidebarPanel(
-          profiling_quant_sidebarUI(id = "profiling"),
-          h4(""),
-          fluidRow(
-            column(6,
-                   shinyWidgets::actionBttn(
-                     inputId = "wizard_proftoref",
-                     label = "Reference Data Editing",
-                     style = "minimal",
-                     color = "primary",
-                     icon = icon("arrow-left"),
-                     size = "sm")
+      # The second tab of the UI
+      tabPanelBody(
+        # "Reference Metabolites",
+        value = "RefMetTab",
+        sidebarLayout(
+          sidebarPanel(
+            ref_data_uploadUI(id = "ref_data_init", ref_db = bmse_associations),
+            h4(""),
+            fluidRow(
+              column(6,
+                     shinyWidgets::actionBttn(
+                       inputId = "wizard_reftoexp",
+                       label = "Experimental Data Upload",
+                       style = "minimal",
+                       color = "primary",
+                       icon = icon("arrow-left"),
+                       size = "sm")
+              ),
+              column(3, offset = 3,
+                     uiOutput("wizard_reftoprof_ui")
+              )
+            )
+          ),
+          mainPanel(
+            tabsetPanel(
+              id = "refout_tabs",
+              tabPanel(
+                title = "Reference Data Editing",
+                tabsetPanel(
+                  id = "refdat_tab1",
+                  type = "hidden",
+                  selected = "tab1_hide",
+                  tabPanelBody(
+                    value = "tab1_show",
+                    ref_data_ROIeditingUI(id = "ref_data_edits")
+                  ),
+                  tabPanelBody(
+                    value = "tab1_hide"
+                  )
+                )
+              ),
+              tabPanel(
+                title = "Add/Remove Metabolites",
+                tabsetPanel(
+                  id = "refdat_tab2",
+                  type = "hidden",
+                  selected = "tab2_hide",
+                  tabPanelBody(
+                    value = "tab2_show",
+                    ref_data_add_delUI(id = "ref_data_edits")
+                  ),
+                  tabPanelBody(
+                    value = "tab2_hide"
+                  )
+                )
+              )
             )
           )
-        ),
-        mainPanel(
-          tabsetPanel(
-            id = "profout_tabs",
-            tabPanel(
-              title = "Quantification Data",
-              profiling_prequantUI(id = "profiling")
-            ),
-            tabPanel(
-              title = "Signal View",
-              profiling_completeviewUI(id = "profiling")
-            ),
-            tabPanel(
-              title = "Metabolite View",
-              profiling_detailedviewUI(id = "profiling")
+        )
+      ),
+
+
+
+
+      # The final tab of the UI
+      tabPanelBody(
+        # title = "Profiling",
+        value = "ProfilingTab",
+        sidebarLayout(
+          sidebarPanel(
+            profiling_quant_sidebarUI(id = "profiling"),
+            h4(""),
+            fluidRow(
+              column(6,
+                     shinyWidgets::actionBttn(
+                       inputId = "wizard_proftoref",
+                       label = "Reference Data Editing",
+                       style = "minimal",
+                       color = "primary",
+                       icon = icon("arrow-left"),
+                       size = "sm")
+              )
+            )
+          ),
+          mainPanel(
+            tabsetPanel(
+              id = "profout_tabs",
+              tabPanel(
+                title = "Quantification Data",
+                profiling_prequantUI(id = "profiling")
+              ),
+              tabPanel(
+                title = "Signal View",
+                profiling_completeviewUI(id = "profiling")
+              ),
+              tabPanel(
+                title = "Metabolite View",
+                profiling_detailedviewUI(id = "profiling")
+              )
             )
           )
         )
       )
+
     )
-
   )
 }
 
