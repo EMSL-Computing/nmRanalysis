@@ -99,12 +99,16 @@ ref_data_add_delUI <- function(id){
   tagList(
     fluidRow(
       column(
-        width = 2,
+        width = 3,
         h4("Select metabolite(s) to add:")
       ),
       column(
         width = 2,
         uiOutput(ns("ui_refmet_add_options"))
+      ),
+      column(
+        width = 2,
+        uiOutput(ns("ui_refmet_add_new_entry"))
       ),
       column(
         width = 1,
@@ -204,6 +208,11 @@ ref_data_editingServer <- function(id, xpmt_data, ref_data, ref_db){
 
                    updateSelectizeInput(inputId = "which_refmet_dspedt",
                                         choices = unique(rv$user_reference_data$Metabolite))
+
+                   # Reset field for specifying new entries (under add/remove metabolites)
+                   updateSelectizeInput(inputId = "newentry_toadd",
+                                        choices = c(""),
+                                        selected = c(""))
                  })
 
     # Add/Delete Reference Metabolites ---------------------------------
@@ -214,28 +223,60 @@ ref_data_editingServer <- function(id, xpmt_data, ref_data, ref_db){
                    req(ref_data())
                    req(xpmt_data())
 
-                   # specify list object on the user provided metabolite names
-                   added.refchoices <- as.list(input$refmet_toadd)
+                   # Check if any existing metabolites are being added
+                   if(!is.null(input$refmet_toadd)){
 
-                   # create an ROI reference object using nmRanalysis to be rendered as a table in the UI
-                   added_reference_data <- roi_ref_export(name_list           = added.refchoices,
-                                                          solvent_type        = attr(xpmt_data(), "exp_info")$solvent,
-                                                          ph                  = attr(xpmt_data(), "exp_info")$ph,
-                                                          instrument_strength = attr(xpmt_data(), "exp_info")$instrument_strength)
+                     # specify list object on the user provided metabolite names
+                     added.refchoices <- as.list(input$refmet_toadd)
 
-                   shinyFeedback::feedbackDanger("refmet_toadd",
-                                                 nrow(added_reference_data) == 0,
-                                                 "No ROI data available.")
-                   req(nrow(added_reference_data) > 0)
+                     # create an ROI reference object using nmRanalysis to be rendered as a table in the UI
+                     added_reference_data <- roi_ref_export(name_list           = added.refchoices,
+                                                            solvent_type        = attr(xpmt_data(), "exp_info")$solvent,
+                                                            ph                  = attr(xpmt_data(), "exp_info")$ph,
+                                                            instrument_strength = attr(xpmt_data(), "exp_info")$instrument_strength)
 
-                   added_reference_data <- added_reference_data %>% dplyr::group_by(.data$Metabolite) %>%
-                     dplyr::mutate(Quantify = 1,
-                                   rowid = paste0(.data$Metabolite, dplyr::row_number()),
-                                   Multiplicity = as.character(.data$`Multiplicity`),
-                                   `J coupling 2 (Hz)` = 0,
-                                   `Roof effect 2` = 0)
+                     shinyFeedback::feedbackDanger("refmet_toadd",
+                                                   nrow(added_reference_data) == 0,
+                                                   "No ROI data available.")
+                     req(nrow(added_reference_data) > 0)
 
-                   rv$user_reference_data <- dplyr::bind_rows(rv$user_reference_data, added_reference_data)
+                     added_reference_data <- added_reference_data %>% dplyr::group_by(.data$Metabolite) %>%
+                       dplyr::mutate(Quantify = 1,
+                                     rowid = paste0(.data$Metabolite, dplyr::row_number()),
+                                     Multiplicity = as.character(.data$`Multiplicity`),
+                                     `J coupling 2 (Hz)` = 0,
+                                     `Roof effect 2` = 0)
+
+                     rv$user_reference_data <- dplyr::bind_rows(rv$user_reference_data, added_reference_data)
+                   }
+
+                   # Check if any new metabolites are being added
+                   if(!is.null(input$newentry_toadd)){
+                     added_entry_data <- data.frame(`ROI left edge (ppm)` = rep(0.02, length(input$newentry_toadd)),
+                                                    `ROI right edge (ppm)` = rep(-0.02, length(input$newentry_toadd)),
+                                                    `Quantification Mode` = rep("Baseline Fitting", length(input$newentry_toadd)),
+                                                    `Metabolite` = input$newentry_toadd,
+                                                    `Quantification Signal` = rep(1, length(input$newentry_toadd)),
+                                                    `Chemical shift(ppm)` = rep(0, length(input$newentry_toadd)),
+                                                    `Chemical shift tolerance (ppm)` = rep(0.02, length(input$newentry_toadd)),
+                                                    `Half bandwidth (Hz)` = rep(1, length(input$newentry_toadd)),
+                                                    `Multiplicity` = rep("1", length(input$newentry_toadd)),
+                                                    `J coupling (Hz)` = rep(0, length(input$newentry_toadd)),
+                                                    `Roof effect` = rep(0, length(input$newentry_toadd)),
+                                                    `J coupling 2 (Hz)` = rep(0, length(input$newentry_toadd)),
+                                                    `Roof effect 2` = rep(0, length(input$newentry_toadd)),
+                                                    `Quantify` = rep(1, length(input$newentry_toadd)),
+                                                    `HMDB_code` = rep("", length(input$newentry_toadd)),
+                                                    `rowid` = paste0(input$newentry_toadd, "1"),
+                                                    `pH` = rep(attr(xpmt_data(), "exp_info")$ph, length(input$newentry_toadd)),
+                                                    `Instrument strength` = rep(attr(xpmt_data(), "exp_info")$instrument_strength, length(input$newentry_toadd)),
+                                                    `Solvent` = rep(attr(xpmt_data(), "exp_info")$solvent, length(input$newentry_toadd)),
+                                                    check.names = FALSE)
+
+                     rv$user_reference_data <- dplyr::bind_rows(rv$user_reference_data, added_entry_data)
+                   }
+
+
 
                    updateSelectizeInput(session,
                                         "which_refmet_dspedt",
@@ -276,6 +317,18 @@ ref_data_editingServer <- function(id, xpmt_data, ref_data, ref_db){
       selectizeInput(NS(id, "refmet_toadd"),
                      label = NULL,
                      choices = addchoices, multiple = TRUE)
+    })
+
+    # UI element for the option of adding a completely new entry (not contained in the database)
+    output$ui_refmet_add_new_entry <- renderUI({
+
+      req(ref_data())
+
+      selectizeInput(NS(id, "newentry_toadd"),
+                     label = NULL,
+                     choices  = c(""),
+                     multiple = TRUE,
+                     options  = list(create = TRUE))
     })
 
     # UI element for the options of removal of reference metabolites
