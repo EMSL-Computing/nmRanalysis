@@ -100,35 +100,29 @@ ref_data_add_delUI <- function(id){
     fluidRow(
       column(
         width = 3,
-        h4("Select metabolite(s) to add:")
-      ),
-      column(
-        width = 2,
         uiOutput(ns("ui_refmet_add_options"))
       ),
       column(
-        width = 2,
-        uiOutput(ns("ui_refmet_add_new_entry"))
+        width = 1,
+        h4("or", style="text-align: center;")
       ),
       column(
-        width = 1,
-        actionButton(ns("refmet_add"), "Add")
+        width = 3,
+        uiOutput(ns("ui_refmet_add_new_entry"))
       )
     ),
+    actionButton(ns("refmet_add"), "Add"),
+    h4(""),
+
     fluidRow(
       column(
-        width = 2,
-        h4("Select metabolite(s) to remove:")
-      ),
-      column(
-        width = 2,
+        width = 4,
         uiOutput(ns("ui_refmet_remove_options"))
-      ),
-      column(
-        width = 1,
-        actionButton(ns("refmet_remove"), "Remove")
       )
     ),
+    actionButton(ns("refmet_remove"), "Remove"),
+    h4(""),
+
     DT::dataTableOutput(ns("refmet_database"))
   )
 }
@@ -315,7 +309,7 @@ ref_data_editingServer <- function(id, xpmt_data, ref_data, ref_db){
 
       addchoices <- setdiff(unique(ref_db$Solute), unique(rv$user_reference_data$Metabolite))
       selectizeInput(NS(id, "refmet_toadd"),
-                     label = NULL,
+                     label = "Select from Existing:",
                      choices = addchoices, multiple = TRUE)
     })
 
@@ -325,7 +319,7 @@ ref_data_editingServer <- function(id, xpmt_data, ref_data, ref_db){
       req(ref_data())
 
       selectizeInput(NS(id, "newentry_toadd"),
-                     label = NULL,
+                     label = "Specify New:",
                      choices  = c(""),
                      multiple = TRUE,
                      options  = list(create = TRUE))
@@ -337,7 +331,7 @@ ref_data_editingServer <- function(id, xpmt_data, ref_data, ref_db){
       req(ref_data())
 
       selectizeInput(NS(id, "refmet_toremove"),
-                     label = NULL,
+                     label = "Select Metabolite(s) to Remove:",
                      choices = unique(rv$user_reference_data$Metabolite), multiple = TRUE)
     })
 
