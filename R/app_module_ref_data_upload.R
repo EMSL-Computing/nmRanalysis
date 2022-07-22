@@ -51,8 +51,7 @@ ref_data_uploadUI <- function(id, ref_db){
         # Note: may want to later update to make choices only the set of metabolites that we
         # have data for at the supplied experimental conditions.
         selectizeInput(ns("user_refmets"), label = "List reference metabolite(s) of interest:",
-                       choices = unique(ref_db$Solute), multiple = TRUE,
-                       options = list(create = TRUE))
+                       choices = unique(ref_db$Solute), multiple = TRUE)
       )
     ),
     # clickable button
