@@ -100,7 +100,7 @@ ref_data_add_delUI <- function(id){
     fluidRow(
       column(
         width = 2,
-        h4("Specify solute(s) to add:")
+        h4("Select metabolite(s) to add:")
       ),
       column(
         width = 2,
@@ -114,7 +114,7 @@ ref_data_add_delUI <- function(id){
     fluidRow(
       column(
         width = 2,
-        h4("Specify solute(s) to remove:")
+        h4("Select metabolite(s) to remove:")
       ),
       column(
         width = 2,
@@ -1626,6 +1626,10 @@ ref_data_editingServer <- function(id, xpmt_data, ref_data, ref_db){
     output$refmet_database <- DT::renderDataTable({
 
       bmse_associations %>%
+        dplyr::rename(`BMRB ID` = Entry_ID,
+                      `CAS No.` = CASno,
+                      `Spectrometer Frequency (MHz)` = Field_strength,
+                      `Metabolite` = Solute) %>%
         DT::datatable(rownames   = FALSE,
                       extensions = "Responsive")
     })
