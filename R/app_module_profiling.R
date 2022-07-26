@@ -928,7 +928,7 @@ profilingServer <- function(id, xpmt_data, ref_data){
     })
 
     # complete_profres_tab
-    output$complete_profres_tab <- DT::renderDataTable({
+    output$complete_profres_tab <- DT::renderDataTable(server = FALSE, {
 
       req(user_profiling())
 
@@ -990,18 +990,41 @@ profilingServer <- function(id, xpmt_data, ref_data){
                       filter = "top",
                       extensions = c("Responsive", "Buttons", "Scroller"),
                       options = exprToFunction(
-                        list(dom = 'Bf',
+                        list(dom = 'Bfrtip',
                              buttons = list(
-                               list(extend = 'csv',
+                               list(extend = 'csv', text = "Download Current Page (CSV)",
                                     filename =  paste0(lubridate::year(lubridate::now()), "-",
                                                        lubridate::month(lubridate::now()), "-",
                                                        lubridate::day(lubridate::now()), "_",
-                                                       "Detailed_Profiling_Results.csv")),
-                               list(extend = 'excel',
+                                                       "Detailed_Profiling_Results.csv"),
+                                    exportOptions = list(
+                                      modifier = list(page = "current")
+                                    )),
+                               list(extend = 'excel', text = "Download Current Page (XLSX)",
                                     filename =  paste0(lubridate::year(lubridate::now()), "-",
                                                        lubridate::month(lubridate::now()), "-",
                                                        lubridate::day(lubridate::now()), "_",
-                                                       "Detailed_Profiling_Results.xlsx"))))
+                                                       "Detailed_Profiling_Results.xlsx"),
+                                    exportOptions = list(
+                                      modifier = list(page = "current")
+                                    )),
+                               list(extend = 'csv', text = "Download Full Results (CSV)",
+                                    filename =  paste0(lubridate::year(lubridate::now()), "-",
+                                                       lubridate::month(lubridate::now()), "-",
+                                                       lubridate::day(lubridate::now()), "_",
+                                                       "Detailed_Profiling_Results.csv"),
+                                    exportOptions = list(
+                                      modifier = list(page = "all")
+                                    )),
+                               list(extend = 'excel', text = "Download Full Results (XLSX)",
+                                    filename =  paste0(lubridate::year(lubridate::now()), "-",
+                                                       lubridate::month(lubridate::now()), "-",
+                                                       lubridate::day(lubridate::now()), "_",
+                                                       "Detailed_Profiling_Results.xlsx"),
+                                    exportOptions = list(
+                                      modifier = list(page = "all")
+                                    ))
+                             ))
                       ),
                       class = "display")
 
