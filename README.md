@@ -10,7 +10,7 @@
 
 ## Set up
 
-1. Optional: you do not already have it install [Git Bash for Windows](https://git-scm.com/download/win)
+1. Optional: If you do not already have it, install [Git Bash for Windows](https://git-scm.com/download/win)
 
 2. If you don't have docker installed, the easiest way is to [install docker for desktop](https://docs.docker.com/engine/install/)
 
