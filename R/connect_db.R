@@ -1,4 +1,4 @@
-install.packages('RPostgreSQL')
+if (!require('RPostgreSQL')) install.packages('RPostgreSQL')
 library(RPostgreSQL)
 
 dsn_database = "nmRanalysis"
@@ -21,3 +21,49 @@ tryCatch({
 error=function(cond) {
   print("Unable to connect to Database.")
 })
+
+# Query a TABLE
+df <- dbGetQuery(connec, "SELECT * FROM bmse_associations")
+dbReadTable(connec, "bmse_associations")
+
+# Create a new table
+dbCreateTable(connec, "reference", bmse_associations)
+
+#Append to a existing table
+dbAppendTable(conn = connec,
+              name = SQL('"public"."bmse_associations"'),
+              value = test,
+              copy = NULL,
+              row.names = NULL)
+
+append_cmd <- sqlAppendTable(conn = connec,
+              name = "public.bmse_associations",
+              value = test,
+              row.names = FALSE)
+
+
+#Insert row by row
+for(i in seq(nrow(bmse_associations))) {
+  UPDATE_LINE <- sprintf("INSERT INTO bmse_associations (id, entryID, CASno, Field_strength, Solute, Solvent, Reference, pH, Temperature, Concentration) VALUES ('%i','%s','%s','%i','%s','%s','%s','%s','%i','%s');",
+                         i, bmse_associations$Entry_ID[i], bmse_associations$CASno[i], bmse_associations$Field_strength[i],
+                         bmse_associations$Solute[i], bmse_associations$Solvent[i], bmse_associations$Reference[i],
+                         bmse_associations$pH[i], bmse_associations$Temperature[i], bmse_associations$Concentration[i])
+  print(UPDATE_LINE)
+  #D_MASTER_UPDATE <- dbGetQuery(conn = connec, statement = UPDATE_LINE)
+}
+
+test <- subset(bmse_associations[1,])
+test <- cbind(id=1,test)
+test <- as.data.frame(test)
+
+dbGetQuery(conn = connec, statement = "INSERT INTO bmse_associations (id, entryID, CASno, Field_strength, Solute, Solvent, Reference, pH, Temperature, Concentration) VALUES ('10','bmse000005','53624-78-5','500','AMP','D2O','DSS','7.4','298','100mM');")
+
+
+
+
+
+
+
+
+
+dbDisconnect(connec)

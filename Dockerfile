@@ -56,4 +56,4 @@ RUN R -e "remotes::install_github('EMSL-Computing/nmRanalysis')"
 EXPOSE 3838
 
 # run app
-CMD ["R", "-e", "options('shiny.port' = 3838,shiny.host='0.0.0.0');nmRanalysis::nmRapp()"]
+CMD ["R", "-e", "options('shiny.port' = 3838,shiny.host='0.0.0.0', launch.browser = FALSE);nmRanalysis::nmRapp()"]
