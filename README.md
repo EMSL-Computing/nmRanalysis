@@ -28,6 +28,9 @@
     docker-compose up --build
    
     ```
+    ** Note: The build will take ~30 minutes the very first time.
+    ** Subsequent updates where only nmRanalysis and not its dependencies are loaded should take only a couple of minutes.
+
     Once the image is built and the container is running you should get the terminal message: "Listening on http://0.0.0.0:3838"
 
 6. Open a web browser and go to "localhost:3838"
