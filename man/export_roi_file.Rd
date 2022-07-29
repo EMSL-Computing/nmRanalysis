@@ -4,24 +4,14 @@
 \alias{export_roi_file}
 \title{Format spectra data into a proper rDolphin ROI reference file}
 \usage{
-export_roi_file(
-  spectra_df,
-  return_metabs = "exact_match",
-  half_bandwidth = 1.4,
-  roi_tol = 0.02,
-  instrument_strength
-)
+export_roi_file(spectra_df, half_bandwidth = 1.4, roi_tol = 0.005)
 }
 \arguments{
 \item{spectra_df}{data frame of the spectra from get_spectra_data() function}
 
-\item{return_metabs}{string, must be one of "exact_match", "nearest_match", or "all". Defaults to "exact_match". If "exact_match", returns metabolites that exactly match specified experimental conditions (solvent type, pH, and instrument strength). If "nearest_match", returns nearest match metabolites, sorted by Euclidean distance. If "all", returns all entries corresponding to supplied CAS numbers, experimental conditions ignored.}
-
 \item{half_bandwidth}{This will be set to 1.4 unless otherwise specified}
 
-\item{roi_tol}{The ROI tolerance, length from the center of the peak to each edge. Default is 0.02.}
-
-\item{instrument_strength}{the field strength of the instrument used to collect the data}
+\item{roi_tol}{The chemical shift tolerance, tolerance for the location of the peak center. Default is 0.005.}
 }
 \value{
 a data frame formatted for r dolphin use to be exported as excel sheet
