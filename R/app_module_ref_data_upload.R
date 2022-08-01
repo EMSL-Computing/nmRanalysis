@@ -165,6 +165,15 @@ ref_data_uploadServer <- function(id, xpmt_data, ref_db){
                                          req(xpmt_data())
 
                                          if (input$ref_upload_method == 'file') {
+
+                                           req(input$process_ref_inputs > 0)
+
+                                           shinyFeedback::feedbackDanger("uploaded_refmet_file",
+                                                                         is.null(input$uploaded_refmet_file$datapath),
+                                                                         "Please upload a .xlsx file.")
+
+                                           req(refmet_file())
+
                                            metab_names_table           <- refmet_file()
                                            vars                        <- names(metab_names_table)
 
@@ -181,7 +190,9 @@ ref_data_uploadServer <- function(id, xpmt_data, ref_db){
                                            user_reference_data <- roi_ref_export(cas_list            = user.refchoices,
                                                                                  solvent_type        = attr(xpmt_data(), "exp_info")$solvent,
                                                                                  ph                  = attr(xpmt_data(), "exp_info")$ph,
-                                                                                 instrument_strength = attr(xpmt_data(), "exp_info")$instrument_strength)
+                                                                                 instrument_strength = attr(xpmt_data(), "exp_info")$instrument_strength,
+                                                                                 temperature         = attr(xpmt_data(), "exp_info")$temperature,
+                                                                                 concentration       = attr(xpmt_data(), "exp_info")$concentration)
 
                                            shinyFeedback::feedbackDanger("uploaded_refmet_file",
                                                                          nrow(user_reference_data) == 0,
@@ -190,18 +201,17 @@ ref_data_uploadServer <- function(id, xpmt_data, ref_db){
                                            req(nrow(user_reference_data) > 0)
 
                                            user_reference_data <- user_reference_data %>% dplyr::group_by(.data$Metabolite) %>%
-                                             dplyr::mutate(Quantify = 1,
-                                                           rowid    = paste0(.data$Metabolite, dplyr::row_number()),
-                                                           Multiplicity = as.character(.data$`Multiplicity`),
-                                                           `J coupling 2 (Hz)` = 0,
-                                                           `Roof effect 2` = 0,
-                                                           `Chemical shift tolerance (ppm)` = 0.005) %>% # Note that I am manually setting the tolerance here. This should instead be changed in the appropriate nmRanalysis function for retrieving the ref data
+                                             dplyr::mutate(Quantify = ifelse(.data$`Multiplicity` %in% c("1", "2", "3", "4",
+                                                                                                         "s", "d", "t", "q",
+                                                                                                         "dd"), 1, 0),
+                                                           rowid    = paste0(.data$Metabolite, dplyr::row_number())) %>%
                                              dplyr::select(.data$`ROI left edge (ppm)`, .data$`ROI right edge (ppm)`,
                                                            .data$`Quantification Mode`, .data$`Metabolite`, .data$`Quantification Signal`,
                                                            .data$`Chemical shift(ppm)`, .data$`Chemical shift tolerance (ppm)`,
                                                            .data$`Half bandwidth (Hz)`, .data$`Multiplicity`, .data$`J coupling (Hz)`,
                                                            .data$`Roof effect`, .data$`J coupling 2 (Hz)`, .data$`Roof effect 2`,
-                                                           .data$`Quantify`, .data$`HMDB_code`, .data$`rowid`)
+                                                           .data$`Quantify`, .data$`Frequency (MHz)`, .data$`pH`, .data$`Concentration (mM)`,
+                                                           .data$`Temperature (K)`, .data$`Solvent`, .data$`rowid`)
                                            # Note that the ordering of variables above *DOES* matter for
                                            # run_rDolphin()
 
@@ -225,7 +235,9 @@ ref_data_uploadServer <- function(id, xpmt_data, ref_db){
                                            user_reference_data <- roi_ref_export(name_list           = user.refchoices,
                                                                                  solvent_type        = attr(xpmt_data(), "exp_info")$solvent,
                                                                                  ph                  = attr(xpmt_data(), "exp_info")$ph,
-                                                                                 instrument_strength = attr(xpmt_data(), "exp_info")$instrument_strength)
+                                                                                 instrument_strength = attr(xpmt_data(), "exp_info")$instrument_strength,
+                                                                                 temperature         = attr(xpmt_data(), "exp_info")$temperature,
+                                                                                 concentration       = attr(xpmt_data(), "exp_info")$concentration)
 
                                            shinyFeedback::feedbackDanger("user_refmets",
                                                                          nrow(user_reference_data) == 0,
@@ -234,18 +246,17 @@ ref_data_uploadServer <- function(id, xpmt_data, ref_db){
                                            req(nrow(user_reference_data) > 0)
 
                                            user_reference_data <- user_reference_data %>% dplyr::group_by(.data$Metabolite) %>%
-                                             dplyr::mutate(Quantify = 1,
-                                                           rowid    = paste0(.data$Metabolite, dplyr::row_number()),
-                                                           Multiplicity = as.character(.data$`Multiplicity`),
-                                                           `J coupling 2 (Hz)` = 0,
-                                                           `Roof effect 2` = 0,
-                                                           `Chemical shift tolerance (ppm)` = 0.005) %>% # Note that I am manually setting the tolerance here. This should instead be changed in the appropriate nmRanalysis function for retrieving the ref data
+                                             dplyr::mutate(Quantify = ifelse(.data$`Multiplicity` %in% c("1", "2", "3", "4",
+                                                                                                         "s", "d", "t", "q",
+                                                                                                         "dd"), 1, 0),
+                                                           rowid    = paste0(.data$Metabolite, dplyr::row_number())) %>%
                                              dplyr::select(.data$`ROI left edge (ppm)`, .data$`ROI right edge (ppm)`,
                                                            .data$`Quantification Mode`, .data$`Metabolite`, .data$`Quantification Signal`,
                                                            .data$`Chemical shift(ppm)`, .data$`Chemical shift tolerance (ppm)`,
                                                            .data$`Half bandwidth (Hz)`, .data$`Multiplicity`, .data$`J coupling (Hz)`,
                                                            .data$`Roof effect`, .data$`J coupling 2 (Hz)`, .data$`Roof effect 2`,
-                                                           .data$`Quantify`, .data$`HMDB_code`, .data$`rowid`)
+                                                           .data$`Quantify`, .data$`Frequency (MHz)`, .data$`pH`, .data$`Concentration (mM)`,
+                                                           .data$`Temperature (K)`, .data$`Solvent`, .data$`rowid`)
                                            # Note that the ordering of variables above *DOES* matter for
                                            # run_rDolphin()
 
