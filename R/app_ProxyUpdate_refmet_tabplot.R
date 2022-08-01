@@ -53,9 +53,7 @@ ProxyUpdate_refmet_tabplot <- function(tabproxy, pltproxy, newdat){
                   `Signal right edge (ppm)` = .data$`ROI right edge (ppm)`) %>%
     dplyr::select(.data$Signal, .data$Quantify, .data$`Chemical shift(ppm)`, .data$`Signal left edge (ppm)`,
                   .data$`Signal right edge (ppm)`, .data$`Half bandwidth (Hz)`, .data$Multiplicity, .data$`J coupling (Hz)`,
-                  .data$`J coupling 2 (Hz)`, .data$`Roof effect`, .data$`Roof effect 2`,
-                  .data$`Frequency (MHz)`, .data$`pH`, .data$`Concentration (mM)`,
-                  .data$`Temperature (K)`, .data$`Solvent`)
+                  .data$`J coupling 2 (Hz)`, .data$`Roof effect`, .data$`Roof effect 2`)
 
   DT::replaceData(tabproxy, newdat,
                   resetPaging = FALSE,
