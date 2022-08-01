@@ -20,7 +20,7 @@
 
     ```
 
-4. Navigate to the nmRanalysis directory with a ```cd``` command.
+4. Navigate to the nmRanalysis directory with ```cd nmRanalysis```
 
 5. Build images with the following command
 
