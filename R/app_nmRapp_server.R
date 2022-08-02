@@ -178,4 +178,10 @@ nmRapp_server <- function(input, output, session) {
                       selected = "RefMetTab")
   })
 
+  observe({
+    req(profiling_results())
+    updateTabsetPanel(inputId = "profout_tabs", selected = "Signal View")
+  })
+
+
 }
