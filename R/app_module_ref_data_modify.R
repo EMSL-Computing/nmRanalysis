@@ -190,10 +190,12 @@ ref_data_editingServer <- function(id, xpmt_data, ref_data, ref_db){
                          obs_annot_update_suspend = TRUE,
                          obs_annot_update_subplot_suspend = TRUE)
 
-    observe(priority = 1, {
+    observe(priority = 2, {
       req(ref_data())
 
       rv$user_reference_data <- ref_data()$bestmatch_ref_data
+      rv$full_reference_data <- ref_data()$full_ref_data
+
     })
 
     # Observer to populate refmet choices after reference metabolites have been uploaded/specified/added/removed
@@ -318,6 +320,9 @@ ref_data_editingServer <- function(id, xpmt_data, ref_data, ref_db){
 
 
                      rv$user_reference_data <- dplyr::bind_rows(rv$user_reference_data, added_reference_data_bestmatch)
+
+
+                     rv$full_reference_data <- dplyr::bind_rows(rv$full_reference_data, added_reference_data)
                    }
 
                    # Check if any new metabolites are being added
@@ -345,6 +350,8 @@ ref_data_editingServer <- function(id, xpmt_data, ref_data, ref_db){
                                                     check.names = FALSE)
 
                      rv$user_reference_data <- dplyr::bind_rows(rv$user_reference_data, added_entry_data)
+
+                     rv$full_reference_data <- dplyr::bind_rows(rv$full_reference_data, added_reference_data)
                    }
 
 
@@ -368,6 +375,8 @@ ref_data_editingServer <- function(id, xpmt_data, ref_data, ref_db){
                    req(nrow(temp) > 0)
 
                    rv$user_reference_data <- temp
+
+                   rv$full_reference_data <- rv$full_reference_data %>% dplyr::filter(.data$Metabolite %ni% input$refmet_toremove)
 
                    # Also, remove stored changes and counter (from refchanges, change_counter) corresponding to removed metabolite
                    rv$refchanges <- rv$refchanges[names(rv$refchanges) %ni% input$refmet_toremove]
@@ -451,6 +460,7 @@ ref_data_editingServer <- function(id, xpmt_data, ref_data, ref_db){
       req(ref_data())
       req(input$which_refmet_dspedt)
       input$signal_add
+      input$signal_remove
 
       isolate({
         # Note: Remove quantification mode column, but allow users to specify quantification mode on a per-ROI basis on the
@@ -834,6 +844,7 @@ ref_data_editingServer <- function(id, xpmt_data, ref_data, ref_db){
     observeEvent(input$refmet_dspedt_table_cell_edit,
                  {
                    req(ref_data())
+                   browser()
 
                    info <- input$refmet_dspedt_table_cell_edit
                    changed_row <- info$row
@@ -1572,15 +1583,63 @@ ref_data_editingServer <- function(id, xpmt_data, ref_data, ref_db){
                           shinyBS::bsCollapsePanel(title = "Metabolite Signal Options",
 
                                                    fluidRow(
-                                                     column(width = 3,
+                                                     column(width = 4,
                                                             actionButton(NS(id, "signal_add"), "Add New Signal")),
+                                                     column(width = 4,
+                                                            uiOutput(NS(id, "ui_remove_signal"))),
+                                                     column(width = 4,
+                                                            shinyWidgets::materialSwitch(
+                                                              inputId = NS(id, "display_fulldat"),
+                                                              label = "Display All Reference Entries",
+                                                              status = "primary",
+                                                              value = FALSE,
+                                                              inline = TRUE,
+                                                              right = TRUE
+                                                            ))
                                                    ),
-                                                   # Also want to add dnynamic html text that indicates the experimental conditions that the
-                                                   # current signals were collected under.
-                                                   # As well, given selectizeInputs for other available experimental conditions for that
-                                                   # metabolite.
+                                                   h4(""),
+                                                   uiOutput(NS(id, "ui_fulldat_table")),
                                                    style = "primary"
                           ))
+    })
+
+    output$ui_fulldat_table <- renderUI({
+      req(input$display_fulldat)
+      req(rv$full_reference_data)
+      req(input$which_refmet_dspedt)
+
+      rv$full_reference_data %>% dplyr::ungroup() %>%
+        dplyr::filter(.data$Metabolite %in% input$which_refmet_dspedt) %>%
+        dplyr::mutate(Signal = paste0(.data$Metabolite, " [", .data$`Quantification Signal`, "]"),
+                      `Signal left edge (ppm)` = .data$`ROI left edge (ppm)`,
+                      `Signal right edge (ppm)` = .data$`ROI right edge (ppm)`) %>%
+        dplyr::arrange(dplyr::desc(.data$`Quantification Signal`)) %>%
+        dplyr::select(.data$`Frequency (MHz)`, .data$`pH`, .data$`Concentration (mM)`, .data$`Temperature (K)`,
+                      .data$`Solvent`, .data$Signal, .data$`Chemical shift(ppm)`, .data$`Signal left edge (ppm)`,
+                      .data$`Signal right edge (ppm)`, .data$`Half bandwidth (Hz)`, .data$Multiplicity, .data$`J coupling (Hz)`,
+                      .data$`J coupling 2 (Hz)`, .data$`Roof effect`, .data$`Roof effect 2`) %>%
+        DT::datatable(rownames   = FALSE,
+                      editable   = FALSE,
+                      filter     = "top",
+                      options = list(scrollX = TRUE,
+                                     paging = TRUE,
+                                     pageLength = 5)) %>%
+        DT::formatRound(columns = c("Chemical shift(ppm)", "Signal left edge (ppm)", "Signal right edge (ppm)",
+                                    "Half bandwidth (Hz)", "J coupling (Hz)", "J coupling 2 (Hz)", "Roof effect",
+                                    "Roof effect 2", "Frequency (MHz)", "pH", "Concentration (mM)", "Temperature (K)"),
+                        digits = 3)
+
+
+    })
+
+    # Remove (Most Recent) Added Signal
+    output$ui_remove_signal <- renderUI({
+      req(ref_data())
+      req(rv$user_reference_data)
+      req(nrow(rv$user_reference_data %>% dplyr::filter(.data$Metabolite %in% input$which_refmet_dspedt)) >
+            nrow(ref_data()$bestmatch_ref_data %>% dplyr::filter(.data$Metabolite %in% input$which_refmet_dspedt)))
+
+      actionButton(NS(id, "signal_remove"), "Remove Last Added Signal")
     })
 
     # Add Signal
@@ -1618,6 +1677,22 @@ ref_data_editingServer <- function(id, xpmt_data, ref_data, ref_db){
 
                    rv$user_reference_data <- dplyr::bind_rows(rv$user_reference_data, added_entry_data)
 
+                 })
+
+    # Remove Last Added Signal
+    observeEvent(c(input$signal_remove), priority = 1,
+                 {
+                   req(ref_data())
+                   req(xpmt_data())
+                   req(input$which_refmet_dspedt)
+                   req(input$signal_remove > 0)
+                   req(nrow(rv$user_reference_data %>% dplyr::filter(.data$Metabolite %in% input$which_refmet_dspedt)) >
+                         nrow(ref_data()$bestmatch_ref_data %>% dplyr::filter(.data$Metabolite %in% input$which_refmet_dspedt)))
+                   # Count the number of existing signals for the given metabolite
+                   numSigs <- nrow(rv$user_reference_data %>% dplyr::filter(.data$Metabolite %in% input$which_refmet_dspedt))
+
+                   rv$user_reference_data <- rv$user_reference_data %>% dplyr::filter(!(.data$Metabolite %in% input$which_refmet_dspedt &
+                                                                                        .data$`Quantification Signal` == numSigs))
                  })
 
     #----------------------------------------------------------------------------------------------------------

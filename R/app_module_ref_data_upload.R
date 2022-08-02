@@ -172,6 +172,7 @@ ref_data_uploadServer <- function(id, xpmt_data, ref_db){
                                                                          "Please upload a .xlsx file.")
 
                                            req(refmet_file())
+                                           req(input$columns)
 
                                            metab_names_table <- refmet_file()
                                            metab_names_table <- metab_names_table[!is.na(metab_names_table[[input$columns]]),]
