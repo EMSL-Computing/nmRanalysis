@@ -13,6 +13,8 @@ as.ppmData(
   instrument_strength,
   ph,
   solvent,
+  temperature = NA,
+  concentration = NA,
   ...
 )
 }

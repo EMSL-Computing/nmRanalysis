@@ -37,8 +37,12 @@ xpmt_data_uploadUI <- function(id, ref_db){
   tagList(
     shinyBS::bsCollapse(id = ns("experimental_data"), open = "Experimental Data",
                         shinyBS::bsCollapsePanel(title = "Experimental Data",
-                                                 fileInput(ns("uploaded_nmR_edata"),
-                                                           label = "Experimental Data File:"),
+                                                 fluidRow(
+                                                   column(width = 12,
+                                                          fileInput(ns("uploaded_nmR_edata"),
+                                                                    label = "Experimental Data File:")
+                                                          )
+                                                 ),
                                                  fileInput(ns("uploaded_nmR_fdata"),
                                                            label = "(Optional) Experimental Metadata File:"),
                                                  shinyWidgets::switchInput(
@@ -56,32 +60,39 @@ xpmt_data_uploadUI <- function(id, ref_db){
 
                                                  fluidRow(
                                                    column(width = 6,
-                                                          shinyBS::tipify(numericInput(inputId  = ns("pH"),
-                                                                                       label    = "pH:",
-                                                                                       value    = 7.4),
-                                                                          title     = "pH of analytical sample",
-                                                                          placement = "bottom",
-                                                                          trigger   = "hover")),
+                                                          textInput(inputId     = ns("pH"),
+                                                                    label       = "pH:",
+                                                                    value       = "",
+                                                                    placeholder = 7.4)),
 
                                                    column(width = 6,
-                                                          shinyBS::tipify(numericInput(inputId  = ns("instrument_strength"),
-                                                                                       label    = "Spectrometer Frequency (MHz)",
-                                                                                       value    = 600),
-                                                                          title     = "Frequency (i.e. field strength) of spectrometer",
-                                                                          placement = "bottom",
-                                                                          trigger   = "hover"))
+                                                          textInput(inputId     = ns("instrument_strength"),
+                                                                    label       = "Spectrometer Frequency (MHz)",
+                                                                    value       = "",
+                                                                    placeholder = 600))
 
                                                  ),
 
                                                  fluidRow(
                                                    column(width = 6,
-                                                          shinyBS::tipify(selectInput(ns("solvent"), "Solvent:",
-                                                                                      c('H2O' = "h2o",
-                                                                                        "D2O" = "d2o")),
-                                                                          title     = "Solvent used",
-                                                                          placement = "bottom",
-                                                                          trigger   = "click"))
+                                                          selectInput(ns("solvent"), "Solvent:",
+                                                                      c('H2O' = "h2o",
+                                                                        "D2O" = "d2o"))),
+                                                   column(width = 6,
+                                                          textInput(inputId     = ns("temperature"),
+                                                                    label       = "(Optional) Temperature (K)",
+                                                                    value       = "",
+                                                                    placeholder = "298"))
 
+
+                                                 ),
+
+                                                 fluidRow(
+                                                   column(width = 6,
+                                                          textInput(inputId     = ns("concentration"),
+                                                                    label       = "(Optional) Concentration (mM)",
+                                                                    value       = "",
+                                                                    placeholder = "100"))
                                                  ),
                                                  style = "primary"
                         )),
@@ -143,6 +154,19 @@ xpmt_data_uploadServer <- function(id){
     # the eventReactive() will be prompted to invalidate (i.e. re-execute).
     uploaded_xpmt_data <- eventReactive(c(input$process_exp_inputs),
                                         {
+                                          req(input$process_exp_inputs > 0)
+
+                                          shinyFeedback::feedbackDanger("uploaded_nmR_edata",
+                                                                        is.null(input$uploaded_nmR_edata$datapath),
+                                                                        text = "Please provide a datafile.")
+
+                                          shinyFeedback::feedbackDanger("pH",
+                                                                        input$pH == "" | is.na(as.numeric(input$pH)),
+                                                                        text = "Numeric value required.")
+
+                                          shinyFeedback::feedbackDanger("instrument_strength",
+                                                                        input$instrument_strength == "" | is.na(as.numeric(input$instrument_strength)),
+                                                                        text = "Numeric value required.")
 
                                           # Will not evaluate unless edata and fdata are supplied.
                                           # as well as field strength, ph, and solvent
@@ -155,13 +179,29 @@ xpmt_data_uploadServer <- function(id){
                                           xpmt.e_data <- load_file(path    = input$uploaded_nmR_edata$datapath,
                                                                    dataset = "experiment")
 
+                                          xpmt_ph <- as.numeric(input$pH)
+                                          xpmt_freq <- as.numeric(input$instrument_strength)
+                                          xpmt_temp <- NA
+                                          xpmt_conc <- NA
+
+                                          if(input$temperature != ""){
+                                            xpmt_temp <- as.numeric(input$temperature)
+                                          }
+
+                                          if(input$concentration != ""){
+                                            xpmt_conc <- as.numeric(input$concentration)
+                                          }
+
                                           # Create or read in experimental metadata file
                                           if(is.null(input$uploaded_nmR_fdata$datapath)){
+
                                             xpmt.f_data <- data.frame(Sample = colnames(xpmt.e_data)[-1]) %>%
-                                              dplyr::mutate(Experiment = dplyr::row_number(),
-                                                            pH         = input$pH,
-                                                            Solvent    = input$solvent,
-                                                            Frequency  = input$instrument_strength)
+                                              dplyr::mutate(Experiment    = dplyr::row_number(),
+                                                            pH            = xpmt_ph,
+                                                            Solvent       = input$solvent,
+                                                            Frequency     = xpmt_freq,
+                                                            Temperature   = xpmt_temp,
+                                                            Concentration = xpmt_conc)
 
                                             shinyWidgets::show_alert(
                                               title = "Experimental metadata not provided.",
@@ -179,9 +219,11 @@ xpmt_data_uploadServer <- function(id){
                                                                   f_data              = xpmt.f_data,
                                                                   edata_cname         = "PPM",
                                                                   fdata_cname         = "Sample",
-                                                                  instrument_strength = as.numeric(input$instrument_strength),
-                                                                  ph                  = as.numeric(input$pH),
+                                                                  instrument_strength = xpmt_freq,
+                                                                  ph                  = xpmt_ph,
                                                                   solvent             = input$solvent,
+                                                                  temperature         = xpmt_temp,
+                                                                  concentration       = xpmt_conc,
                                                                   align               = input$align_spectra)
                                           return(user.data)
                                         })

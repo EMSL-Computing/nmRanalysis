@@ -7,12 +7,14 @@
 roi_ref_export(
   name_list = NULL,
   cas_list = NULL,
-  return_metabs = "exact_match",
+  return_metabs = "all",
   solvent_type = NULL,
   ph = NULL,
   half_bandwidth = 1.4,
-  roi_tol = 0.02,
-  instrument_strength = NULL
+  roi_tol = 0.005,
+  instrument_strength = NULL,
+  temperature = NULL,
+  concentration = NULL
 )
 }
 \arguments{
@@ -20,7 +22,7 @@ roi_ref_export(
 
 \item{cas_list}{list of CAS registry numbers written as characters if metabolite names are not provided}
 
-\item{return_metabs}{string, must be one of "exact_match" or "all". Defaults to "exact_match". If "exact_match", returns metabolites that exactly match specified experimental conditions (solvent type, pH, and instrument strength). If "all", returns all entries corresponding to supplied CAS numbers, experimental conditions ignored.}
+\item{return_metabs}{string, must be one of "exact_match" or "all". Defaults to "all". If "exact_match", returns metabolites that exactly match specified experimental conditions (solvent type, pH, and instrument strength). If "all", returns all entries corresponding to supplied CAS numbers, experimental conditions ignored.}
 
 \item{solvent_type}{the experimental solvent, choose from available solvents 'D2O', 'H2O', ...}
 
@@ -28,9 +30,13 @@ roi_ref_export(
 
 \item{half_bandwidth}{This will be set to 1.4 unless otherwise specified}
 
-\item{roi_tol}{the tolerance to encompass the region of interest value}
+\item{roi_tol}{The chemical shift tolerance, tolerance for the location of the peak center. Default is 0.005.}
 
 \item{instrument_strength}{the field strength of the instrument used to collect the data}
+
+\item{temperature}{numeric value specifying the temperature}
+
+\item{concentration}{numeric value specifying the concentration}
 }
 \value{
 a data frame formatted for rDolphin use to be exported as excel sheet

@@ -281,7 +281,7 @@ xpmt_data_vizServer <- function(id, xpmt_data){
 
       xpmt_data()$f_data %>%
         DT::datatable(rownames   = FALSE,
-                      extensions = "Responsive")
+                      options = list(scrollX = TRUE))
     })
 
     # Observer to apply filter specified to ALL data, not just the data of the selected sample spectrum.

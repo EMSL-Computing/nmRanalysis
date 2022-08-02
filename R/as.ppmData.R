@@ -49,13 +49,13 @@
 #' @author Allison Thompson
 #'
 #' @export
-as.ppmData <- function(e_data, f_data, edata_cname, fdata_cname, align = FALSE, instrument_strength, ph, solvent, ...){
-  .as.ppmData(e_data, f_data, edata_cname, fdata_cname, align, instrument_strength, ph, solvent, ...)
+as.ppmData <- function(e_data, f_data, edata_cname, fdata_cname, align = FALSE, instrument_strength, ph, solvent, temperature = NA, concentration = NA, ...){
+  .as.ppmData(e_data, f_data, edata_cname, fdata_cname, align, instrument_strength, ph, solvent, temperature = temperature, concentration = concentration, ...)
 }
 
 ## ppm data ##
 .as.ppmData <- function(e_data, f_data, edata_cname, fdata_cname, align,
-                        instrument_strength, ph, solvent,
+                        instrument_strength, ph, solvent, temperature = NA, concentration = NA,
                         check.names = TRUE){
 
   # initial checks #
@@ -124,6 +124,20 @@ as.ppmData <- function(e_data, f_data, edata_cname, fdata_cname, align = FALSE, 
     stop("ph must be a numeric value indicating the pH of the sample")
   }
 
+  if(!is.na(temperature)){
+    # check that temperature is numeric #
+    if(class(temperature) != "numeric"){
+      stop("temperature must be a numeric value indicating the temperature of the sample")
+    }
+  }
+
+  if(!is.na(concentration)){
+    # check that concentration is numeric #
+    if(class(concentration) != "numeric"){
+      stop("concentration must be a numeric value indicating the sample concentration")
+    }
+  }
+
   # check that solvent is appropriate #
   if(!(solvent %in% c("h2o","d2o"))){
     stop("Solvent must be one of 'h2o' or 'd2o'")
@@ -158,7 +172,11 @@ as.ppmData <- function(e_data, f_data, edata_cname, fdata_cname, align = FALSE, 
   }
 
   # set sample set information attributes #
-  attr(res, "exp_info") <- list(instrument_strength = instrument_strength, ph = ph, solvent = solvent)
+  attr(res, "exp_info") <- list(instrument_strength = instrument_strength,
+                                ph = ph,
+                                solvent = solvent,
+                                temperature = temperature,
+                                concentration = concentration)
 
   #set check.names attribute #
   attr(res, "check.names") <- check.names

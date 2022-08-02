@@ -6,22 +6,28 @@
 \usage{
 as.bmseListFromName(
   name_list,
-  return_metabs = "exact_match",
+  return_metabs = "all",
   solvent_type = NULL,
   ph = NULL,
-  instrument_strength
+  instrument_strength,
+  temperature = NULL,
+  concentration = NULL
 )
 }
 \arguments{
 \item{name_list}{list of metabolite names}
 
-\item{return_metabs}{string, must be one of "exact_match" or "all". Defaults to "exact_match". If "exact_match", returns metabolites that exactly match specified experimental conditions (solvent type, pH, and instrument strength). If "all", returns all entries corresponding to supplied CAS numbers, experimental conditions ignored.}
+\item{return_metabs}{string, must be one of "exact_match" or "all". Defaults to "all". If "exact_match", returns metabolites that exactly match specified experimental conditions (solvent type, pH, and instrument strength). If "all", returns all entries corresponding to supplied CAS numbers, experimental conditions ignored.}
 
 \item{solvent_type}{choose from available solvents 'D2O', 'H2O', ...}
 
 \item{ph}{numerical value specifying pH of the experimental conditions}
 
 \item{instrument_strength}{numeric value specifying experimental instrument strength}
+
+\item{temperature}{numeric value specifying the temperature}
+
+\item{concentration}{numeric value specifying the concentration}
 }
 \value{
 a list of BMSE database entry numbers
