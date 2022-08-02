@@ -20,7 +20,7 @@
 
     ```
 
-4. Navigate to the nmRanalysis directory with a ```cd``` command.
+4. Navigate to the nmRanalysis directory with ```cd nmRanalysis```
 
 5. Build images with the following command
 
@@ -36,3 +36,17 @@
 6. Open a web browser and go to "localhost:3838"
 
 7. You are now free to do your analyses through the app!
+
+
+## Troubleshooting
+
+- `renv` failed to install a dependency
+
+If you have trouble with installing dependencies through `renv`. You might need to change the CRAN respository.
+
+ 1. Open the Dockerfile in a text editor
+ 2. Change line 31 from 
+ `RUN R -e "install.packages('remotes', repos = c(CRAN = 'http://cran.us.r-project.org'), dependencies = TRUE)"` 
+ to 
+ `RUN R -e "install.packages('remotes', repos = c(CRAN = 'http://cran.rstudio.com/'), dependencies = TRUE)"`
+ 3. Save the Dockerfile changes and re-run the build command.
