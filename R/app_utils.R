@@ -107,9 +107,9 @@ load_file <- function(path, dataset){
     data$Sample       <- gsub("#", ".", data$Sample)
 
   } else if(dataset == "metabolites"){
-    data           <- readxl::read_excel(path)
-    colnames(data) <- data[2,]
-    data           <- stats::na.omit(data)
+    data           <- suppressMessages(readxl::read_excel(path))
+    colnames(data) <- data[2,] # this is hardcoded...the colnames may not always be the second row of the imported data.
+    data           <- data[-c(1:4),] # this is hardcoded...the data may not always start on the fourth row.
   }
 
   return(data)

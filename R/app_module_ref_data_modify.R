@@ -193,11 +193,11 @@ ref_data_editingServer <- function(id, xpmt_data, ref_data, ref_db){
     observe(priority = 1, {
       req(ref_data())
 
-      rv$user_reference_data <- ref_data()$ref_data
+      rv$user_reference_data <- ref_data()$bestmatch_ref_data
     })
 
     # Observer to populate refmet choices after reference metabolites have been uploaded/specified/added/removed
-    observeEvent(c(input$refmet_add, input$refmet_remove, ref_data()$ref_data),
+    observeEvent(c(input$refmet_add, input$refmet_remove, ref_data()$bestmatch_ref_data),
                  {
                    req(rv$user_reference_data)
 
@@ -228,21 +228,96 @@ ref_data_editingServer <- function(id, xpmt_data, ref_data, ref_db){
                      added_reference_data <- roi_ref_export(name_list           = added.refchoices,
                                                             solvent_type        = attr(xpmt_data(), "exp_info")$solvent,
                                                             ph                  = attr(xpmt_data(), "exp_info")$ph,
-                                                            instrument_strength = attr(xpmt_data(), "exp_info")$instrument_strength)
+                                                            instrument_strength = attr(xpmt_data(), "exp_info")$instrument_strength,
+                                                            temperature         = attr(xpmt_data(), "exp_info")$temperature,
+                                                            concentration       = attr(xpmt_data(), "exp_info")$concentration)
 
                      shinyFeedback::feedbackDanger("refmet_toadd",
                                                    nrow(added_reference_data) == 0,
                                                    "No ROI data available.")
                      req(nrow(added_reference_data) > 0)
 
-                     added_reference_data <- added_reference_data %>% dplyr::group_by(.data$Metabolite) %>%
-                       dplyr::mutate(Quantify = 1,
-                                     rowid = paste0(.data$Metabolite, dplyr::row_number()),
-                                     Multiplicity = as.character(.data$`Multiplicity`),
-                                     `J coupling 2 (Hz)` = 0,
-                                     `Roof effect 2` = 0)
+                     # Filter to get exact or best match
+                     xpmt_conds <- data.frame(`Frequency (MHz)`    = attr(xpmt_data(), "exp_info")$instrument_strength,
+                                              `pH`                 = attr(xpmt_data(), "exp_info")$ph,
+                                              `Concentration (mM)` = attr(xpmt_data(), "exp_info")$concentration,
+                                              `Temperature (K)`    = attr(xpmt_data(), "exp_info")$temperature,
+                                              `Solvent`            = attr(xpmt_data(), "exp_info")$solvent,
+                                              check.names = FALSE)
+                     xpmt_conds <- xpmt_conds[, colSums(is.na(xpmt_conds)) == 0]
+                     cols_to_match <- colnames(xpmt_conds)
 
-                     rv$user_reference_data <- dplyr::bind_rows(rv$user_reference_data, added_reference_data)
+                     unq_metabs <- unique(added_reference_data$Metabolite)
+                     bestmatches <- vector("list")
+                     for(i in 1:length(unq_metabs)){
+
+                       temp <- added_reference_data %>% dplyr::filter(.data$Metabolite == unq_metabs[i])
+
+                       matchsum <- rep(0, times = nrow(temp))
+                       if("pH" %in% cols_to_match){
+                         # Note that we are building in a tolerance of 0.1 for pH matching - this may be too generous
+                         matchvec <- ifelse(temp$pH < xpmt_conds$pH + 0.1 & temp$pH > xpmt_conds$pH - 0.1, 1, 0)
+                         matchsum <- matchsum + matchvec
+                       }
+
+                       if("Frequency (MHz)" %in% cols_to_match){
+                         matchvec <- ifelse(temp$`Frequency (MHz)` == xpmt_conds$`Frequency (MHz)`, 1, 0)
+                         matchsum <- matchsum + matchvec
+                       }
+
+                       if("Concentration (mM)" %in% cols_to_match){
+                         matchvec <- ifelse(temp$`Concentration (mM)` == xpmt_conds$`Concentration (mM)`, 1, 0)
+                         matchsum <- matchsum + matchvec
+                       }
+
+                       if("Temperature (K)" %in% cols_to_match){
+                         matchvec <- ifelse(temp$`Temperature (K)` == xpmt_conds$`Temperature (K)`, 1, 0)
+                         matchsum <- matchsum + matchvec
+                       }
+
+                       if("Solvent" %in% cols_to_match){
+                         matchvec <- ifelse(temp$`Solvent` == xpmt_conds$`Solvent`, 1, 0)
+                         matchsum <- matchsum + matchvec
+                       }
+
+                       temp$Matchsum <- matchsum
+
+                       bestmatches[[unq_metabs[i]]] <- temp %>% dplyr::group_by(.data$`Quantification Signal`) %>%
+                         dplyr::arrange(desc(.data$`Matchsum`)) %>%
+                         dplyr::slice_head()
+
+                       rm(temp, matchvec, matchsum)
+                     }
+
+                     added_reference_data_bestmatch <- Reduce("rbind", bestmatches) %>%
+                       dplyr::arrange(.data$`ROI left edge (ppm)`) %>%
+                       dplyr::group_by(.data$Metabolite) %>%
+                       dplyr::mutate(Quantify = ifelse(.data$`Multiplicity` %in% c("1", "2", "3", "4",
+                                                                                   "s", "d", "t", "q",
+                                                                                   "dd"), 1, 0),
+                                     rowid    = paste0(.data$Metabolite, dplyr::row_number())) %>%
+                       dplyr::select(.data$`ROI left edge (ppm)`, .data$`ROI right edge (ppm)`,
+                                     .data$`Quantification Mode`, .data$`Metabolite`, .data$`Quantification Signal`,
+                                     .data$`Chemical shift(ppm)`, .data$`Chemical shift tolerance (ppm)`,
+                                     .data$`Half bandwidth (Hz)`, .data$`Multiplicity`, .data$`J coupling (Hz)`,
+                                     .data$`Roof effect`, .data$`J coupling 2 (Hz)`, .data$`Roof effect 2`,
+                                     .data$`Quantify`, .data$`Frequency (MHz)`, .data$`pH`, .data$`Concentration (mM)`,
+                                     .data$`Temperature (K)`, .data$`Solvent`, .data$`rowid`)
+
+
+                     added_reference_data <- added_reference_data %>%
+                       dplyr::group_by(.data$Metabolite) %>%
+                       dplyr::select(.data$`ROI left edge (ppm)`, .data$`ROI right edge (ppm)`,
+                                     .data$`Quantification Mode`, .data$`Metabolite`, .data$`Quantification Signal`,
+                                     .data$`Chemical shift(ppm)`, .data$`Chemical shift tolerance (ppm)`,
+                                     .data$`Half bandwidth (Hz)`, .data$`Multiplicity`, .data$`J coupling (Hz)`,
+                                     .data$`Roof effect`, .data$`J coupling 2 (Hz)`, .data$`Roof effect 2`,
+                                     .data$`Frequency (MHz)`, .data$`pH`, .data$`Concentration (mM)`,
+                                     .data$`Temperature (K)`, .data$`Solvent`)
+
+
+
+                     rv$user_reference_data <- dplyr::bind_rows(rv$user_reference_data, added_reference_data_bestmatch)
                    }
 
                    # Check if any new metabolites are being added
@@ -261,11 +336,12 @@ ref_data_editingServer <- function(id, xpmt_data, ref_data, ref_db){
                                                     `J coupling 2 (Hz)` = rep(0, length(input$newentry_toadd)),
                                                     `Roof effect 2` = rep(0, length(input$newentry_toadd)),
                                                     `Quantify` = rep(1, length(input$newentry_toadd)),
-                                                    `HMDB_code` = rep("", length(input$newentry_toadd)),
-                                                    `rowid` = paste0(input$newentry_toadd, "1"),
+                                                    `Frequency (MHz)` = rep(attr(xpmt_data(), "exp_info")$instrument_strength, length(input$newentry_toadd)),
                                                     `pH` = rep(attr(xpmt_data(), "exp_info")$ph, length(input$newentry_toadd)),
-                                                    `Instrument strength` = rep(attr(xpmt_data(), "exp_info")$instrument_strength, length(input$newentry_toadd)),
+                                                    `Concentration (mM)` = rep(attr(xpmt_data(), "exp_info")$concentration, length(input$newentry_toadd)),
+                                                    `Temperature (K)` = rep(attr(xpmt_data(), "exp_info")$temperature, length(input$newentry_toadd)),
                                                     `Solvent` = rep(attr(xpmt_data(), "exp_info")$solvent, length(input$newentry_toadd)),
+                                                    `rowid` = paste0(input$newentry_toadd, "1"),
                                                     check.names = FALSE)
 
                      rv$user_reference_data <- dplyr::bind_rows(rv$user_reference_data, added_entry_data)
@@ -386,10 +462,17 @@ ref_data_editingServer <- function(id, xpmt_data, ref_data, ref_db){
                         `Signal right edge (ppm)` = .data$`ROI right edge (ppm)`) %>%
           dplyr::select(.data$Signal, .data$Quantify, .data$`Chemical shift(ppm)`, .data$`Signal left edge (ppm)`,
                         .data$`Signal right edge (ppm)`, .data$`Half bandwidth (Hz)`, .data$Multiplicity, .data$`J coupling (Hz)`,
-                        .data$`J coupling 2 (Hz)`, .data$`Roof effect`, .data$`Roof effect 2`) %>%
+                        .data$`J coupling 2 (Hz)`, .data$`Roof effect`, .data$`Roof effect 2`,
+                        .data$`Frequency (MHz)`, .data$`pH`, .data$`Concentration (mM)`, .data$`Temperature (K)`,
+                        .data$`Solvent`) %>%
           DT::datatable(rownames   = FALSE,
                         editable   = TRUE,
-                        selection = "none")
+                        selection = "none",
+                        options = list(scrollX = TRUE)) %>%
+          DT::formatRound(columns = c("Chemical shift(ppm)", "Signal left edge (ppm)", "Signal right edge (ppm)",
+                                      "Half bandwidth (Hz)", "J coupling (Hz)", "J coupling 2 (Hz)", "Roof effect",
+                                      "Roof effect 2", "Frequency (MHz)", "pH", "Concentration (mM)", "Temperature (K)"),
+                          digits = 3)
 
       })
     })
@@ -489,7 +572,7 @@ ref_data_editingServer <- function(id, xpmt_data, ref_data, ref_db){
 
         selectizeInput(NS(id, "which_refmet_dspedt"),
                        "Select a metabolite to display and edit:",
-                       choices = unique(ref_data()$ref_data$Metabolite)),
+                       choices = unique(ref_data()$bestmatch_ref_data$Metabolite)),
 
         # Toggle for subplot display
         shinyWidgets::materialSwitch(inputId = NS(id, "show_subplot"),
@@ -765,7 +848,9 @@ ref_data_editingServer <- function(id, xpmt_data, ref_data, ref_db){
                                    `Signal right edge (ppm)` = .data$`ROI right edge (ppm)`) %>%
                      dplyr::select(.data$Signal, .data$Quantify, .data$`Chemical shift(ppm)`, .data$`Signal left edge (ppm)`,
                                    .data$`Signal right edge (ppm)`, .data$`Half bandwidth (Hz)`, .data$Multiplicity, .data$`J coupling (Hz)`,
-                                   .data$`J coupling 2 (Hz)`, .data$`Roof effect`, .data$`Roof effect 2`)
+                                   .data$`J coupling 2 (Hz)`, .data$`Roof effect`, .data$`Roof effect 2`,
+                                   .data$`Frequency (MHz)`, .data$`pH`, .data$`Concentration (mM)`, .data$`Temperature (K)`,
+                                   .data$`Solvent`)
 
 
                    edtd_colname <- names(temp)[changed_col]
@@ -904,6 +989,13 @@ ref_data_editingServer <- function(id, xpmt_data, ref_data, ref_db){
         }
       }
 
+      # Change experimental conditions of final quantification data to reflect that of the current experimental sample
+      tempdf$`Frequency (MHz)`    <- attr(xpmt_data(), "exp_info")$instrument_strength
+      tempdf$pH                   <- attr(xpmt_data(), "exp_info")$ph
+      tempdf$`Concentration (mM)` <- attr(xpmt_data(), "exp_info")$concentration
+      tempdf$`Temperature (K)`    <- attr(xpmt_data(), "exp_info")$temperature
+      tempdf$Solvent              <- attr(xpmt_data(), "exp_info")$solvent
+
       # Create new reactive value to store the ROI-collapsed data
       rv$quantdat <- tempdf
     })
@@ -941,7 +1033,9 @@ ref_data_editingServer <- function(id, xpmt_data, ref_data, ref_db){
                                  fdata_cname         = "Sample",
                                  instrument_strength = attr(xpmt_data(), "exp_info")$instrument_strength,
                                  ph                  = as.numeric(attr(xpmt_data(), "exp_info")$ph),
-                                 solvent             = attr(xpmt_data(), "exp_info")$solvent)
+                                 solvent             = attr(xpmt_data(), "exp_info")$solvent,
+                                 temperature         = attr(xpmt_data(), "exp_info")$temperature,
+                                 concentration       = attr(xpmt_data(), "exp_info")$concentration)
 
         # Formats the data object
         imported_data <- ppmData_to_rDolphin(ppmData = txpmt_data,
@@ -1467,7 +1561,7 @@ ref_data_editingServer <- function(id, xpmt_data, ref_data, ref_db){
                       `Spectrometer Frequency (MHz)` = Field_strength,
                       `Metabolite` = Solute) %>%
         DT::datatable(rownames   = FALSE,
-                      extensions = "Responsive")
+                      options = list(scrollX = TRUE))
     })
 
     # Options for metabolite signals
@@ -1500,26 +1594,26 @@ ref_data_editingServer <- function(id, xpmt_data, ref_data, ref_db){
                    # Count the number of existing signals for the given metabolite
                    numSigs <- nrow(rv$user_reference_data %>% dplyr::filter(.data$Metabolite %in% input$which_refmet_dspedt))
 
-                   # Add a new signal
-                   added_entry_data <- data.frame(`ROI left edge (ppm)` = rep(0.02, 1),
-                                                  `ROI right edge (ppm)` = rep(-0.02, 1),
-                                                  `Quantification Mode` = rep("Baseline Fitting", 1),
-                                                  `Metabolite` = input$which_refmet_dspedt,
-                                                  `Quantification Signal` = rep(numSigs + 1, 1),
-                                                  `Chemical shift(ppm)` = rep(0, 1),
+                   added_entry_data <- data.frame(`ROI left edge (ppm)`            = rep(0.02, 1),
+                                                  `ROI right edge (ppm)`           = rep(-0.02, 1),
+                                                  `Quantification Mode`            = rep("Baseline Fitting", 1),
+                                                  `Metabolite`                     = input$which_refmet_dspedt,
+                                                  `Quantification Signal`          = rep(numSigs + 1, 1),
+                                                  `Chemical shift(ppm)`            = rep(0, 1),
                                                   `Chemical shift tolerance (ppm)` = rep(0.02, 1),
-                                                  `Half bandwidth (Hz)` = rep(1, 1),
-                                                  `Multiplicity` = rep("1", 1),
-                                                  `J coupling (Hz)` = rep(0, 1),
-                                                  `Roof effect` = rep(0, 1),
-                                                  `J coupling 2 (Hz)` = rep(0, 1),
-                                                  `Roof effect 2` = rep(0, 1),
-                                                  `Quantify` = rep(1, 1),
-                                                  `HMDB_code` = rep("", 1),
-                                                  `rowid` = paste0(input$which_refmet_dspedt, numSigs + 1),
-                                                  `pH` = rep(attr(xpmt_data(), "exp_info")$ph, 1),
-                                                  `Instrument strength` = rep(attr(xpmt_data(), "exp_info")$instrument_strength, 1),
-                                                  `Solvent` = rep(attr(xpmt_data(), "exp_info")$solvent, 1),
+                                                  `Half bandwidth (Hz)`            = rep(1.4, 1),
+                                                  `Multiplicity`                   = rep("1", 1),
+                                                  `J coupling (Hz)`                = rep(0, 1),
+                                                  `Roof effect`                    = rep(0, 1),
+                                                  `J coupling 2 (Hz)`              = rep(0, 1),
+                                                  `Roof effect 2`                  = rep(0, 1),
+                                                  `Quantify`                       = rep(1, 1),
+                                                  `Frequency (MHz)`                = rep(attr(xpmt_data(), "exp_info")$instrument_strength, 1),
+                                                  `pH`                             = rep(attr(xpmt_data(), "exp_info")$ph, 1),
+                                                  `Concentration (mM)`             = rep(attr(xpmt_data(), "exp_info")$concentration, 1),
+                                                  `Temperature (K)`                = rep(attr(xpmt_data(), "exp_info")$temperature, 1),
+                                                  `Solvent`                        = rep(attr(xpmt_data(), "exp_info")$solvent, 1),
+                                                  `rowid`                          = paste0(input$which_refmet_dspedt, numSigs + 1),
                                                   check.names = FALSE)
 
                    rv$user_reference_data <- dplyr::bind_rows(rv$user_reference_data, added_entry_data)
@@ -1553,7 +1647,7 @@ ref_data_editingServer <- function(id, xpmt_data, ref_data, ref_db){
 
       isolate({
         ## Document all changes relative to original reference data (ref_data()$ref_data)
-        orig_refdat <- ref_data()$ref_data
+        orig_refdat <- ref_data()$bestmatch_ref_data
         # Note also that Metabolite$[[1]] in all rv$refchanges entries correspond to the original data for Metabolite
 
         # Document all metabolites that were added or removed
@@ -1587,7 +1681,14 @@ ref_data_editingServer <- function(id, xpmt_data, ref_data, ref_db){
         }
         attr(rv$user_reference_data, "edit_history") <- allres
 
-        list(user_edited_refdata = rv$user_reference_data,
+        # Change experimental conditions of final quantification data to reflect that of the current experimental sample
+        # This is already done for quantdat when it is created
+        list(user_edited_refdata = rv$user_reference_data %>%
+               dplyr::mutate(`Frequency (MHz)`    = attr(xpmt_data(), "exp_info")$instrument_strength,
+                             pH                   = attr(xpmt_data(), "exp_info")$ph,
+                             `Concentration (mM)` = attr(xpmt_data(), "exp_info")$concentration,
+                             `Temperature (K)`    = attr(xpmt_data(), "exp_info")$temperature,
+                             Solvent              = attr(xpmt_data(), "exp_info")$solvent),
              quantdata           = rv$quantdat,
              global_parameters   = gpps)
         })

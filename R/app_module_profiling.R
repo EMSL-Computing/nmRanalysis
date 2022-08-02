@@ -243,15 +243,19 @@ profilingServer <- function(id, xpmt_data, ref_data){
         dplyr::mutate(Signal = paste0(.data$Metabolite, " [", .data$`Quantification Signal`, "]")) %>%
         dplyr::filter(.data$Quantify == 1) %>%
         dplyr::arrange(.data$`Chemical shift(ppm)`) %>%
-        dplyr::select(.data$Signal, .data$`Quantification Mode`, .data$`Chemical shift(ppm)`, .data$`Chemical shift tolerance (ppm)`,
+        dplyr::select(.data$Signal, .data$`Quantification Mode`, .data$`Chemical shift(ppm)`, #.data$`Chemical shift tolerance (ppm)`,
                       .data$`Half bandwidth (Hz)`, .data$Multiplicity, .data$`J coupling (Hz)`, .data$`J coupling 2 (Hz)`,
-                      .data$`Roof effect`, .data$`Roof effect 2`)
+                      .data$`Roof effect`, .data$`Roof effect 2`, .data$`Frequency (MHz)`, .data$`pH`, .data$`Concentration (mM)`,
+                      .data$`Temperature (K)`, .data$`Solvent`)
 
       temp2 %>%
         DT::datatable(rownames   = FALSE,
                       editable   = FALSE,
-                      filter = "top",
-                      extensions = "Responsive")
+                      options = list(scrollX = TRUE)) %>%
+        DT::formatRound(columns = c("Chemical shift(ppm)", "Half bandwidth (Hz)", "J coupling (Hz)", "J coupling 2 (Hz)",
+                                    "Roof effect", "Roof effect 2", "Frequency (MHz)", "pH", "Concentration (mM)",
+                                    "Temperature (K)"),
+                        digits = 3)
     })
 
     # Output (in HTML format) to display the filters that are currently applied to the data.
@@ -1000,14 +1004,14 @@ profilingServer <- function(id, xpmt_data, ref_data){
                                     exportOptions = list(
                                       modifier = list(page = "current")
                                     )),
-                               list(extend = 'excel', text = "Download Current Page (XLSX)",
-                                    filename =  paste0(lubridate::year(lubridate::now()), "-",
-                                                       lubridate::month(lubridate::now()), "-",
-                                                       lubridate::day(lubridate::now()), "_",
-                                                       "Detailed_Profiling_Results.xlsx"),
-                                    exportOptions = list(
-                                      modifier = list(page = "current")
-                                    )),
+                               # list(extend = 'excel', text = "Download Current Page (XLSX)",
+                               #      filename =  paste0(lubridate::year(lubridate::now()), "-",
+                               #                         lubridate::month(lubridate::now()), "-",
+                               #                         lubridate::day(lubridate::now()), "_",
+                               #                         "Detailed_Profiling_Results_page.xlsx"),
+                               #      exportOptions = list(
+                               #        modifier = list(page = "current")
+                               #      )),
                                list(extend = 'csv', text = "Download Full Results (CSV)",
                                     filename =  paste0(lubridate::year(lubridate::now()), "-",
                                                        lubridate::month(lubridate::now()), "-",
@@ -1015,18 +1019,21 @@ profilingServer <- function(id, xpmt_data, ref_data){
                                                        "Detailed_Profiling_Results.csv"),
                                     exportOptions = list(
                                       modifier = list(page = "all")
-                                    )),
-                               list(extend = 'excel', text = "Download Full Results (XLSX)",
-                                    filename =  paste0(lubridate::year(lubridate::now()), "-",
-                                                       lubridate::month(lubridate::now()), "-",
-                                                       lubridate::day(lubridate::now()), "_",
-                                                       "Detailed_Profiling_Results.xlsx"),
-                                    exportOptions = list(
-                                      modifier = list(page = "all")
-                                    ))
+                                    ))#,
+                               # list(extend = 'excel', text = "Download Full Results (XLSX)",
+                               #      filename =  paste0(lubridate::year(lubridate::now()), "-",
+                               #                         lubridate::month(lubridate::now()), "-",
+                               #                         lubridate::day(lubridate::now()), "_",
+                               #                         "Detailed_Profiling_Results_full.xlsx"),
+                               #      exportOptions = list(
+                               #        modifier = list(page = "all")
+                               #      ))
                              ))
                       ),
-                      class = "display")
+                      class = "display") %>%
+        DT::formatRound(columns = c("Fitted Chemical Shift (ppm)", "Fitted Intensity", "Fitted Half Bandwidth (Hz)",
+                                    "Quantity", "Fitting Error", "Signal to Area Ratio"),
+                        digits = 3)
 
     })
 

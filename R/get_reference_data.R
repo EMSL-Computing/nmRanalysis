@@ -608,10 +608,10 @@ export_roi_file <- function(spectra_df,
                              as.numeric(roof_effect),
                              as.numeric(jcoupl2),
                              as.numeric(roof_effect2),
-                             metab_name$instrument_strength,
-                             metab_name$pH,
-                             metab_name$Concentration,
-                             metab_name$Temperature,
+                             as.numeric(metab_name$instrument_strength),
+                             as.numeric(metab_name$pH),
+                             as.numeric(metab_name$Concentration),
+                             as.numeric(metab_name$Temperature),
                              metab_name$Solvent)
   colnames(roi_df) <- header
 
