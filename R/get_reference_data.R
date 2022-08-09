@@ -17,10 +17,12 @@
 #'  51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
 #'
 #'@param casno_list list of CAS registry numbers written as characters
-#'@param return_metabs string, must be one of "exact_match" or "all". Defaults to "exact_match". If "exact_match", returns metabolites that exactly match specified experimental conditions (solvent type, pH, and instrument strength). If "all", returns all entries corresponding to supplied CAS numbers, experimental conditions ignored.
+#'@param return_metabs string, must be one of "exact_match" or "all". Defaults to "all". If "exact_match", returns metabolites that exactly match specified experimental conditions (solvent type, pH, and instrument strength). If "all", returns all entries corresponding to supplied CAS numbers, experimental conditions ignored.
 #'@param solvent_type choose from available solvents 'D2O', 'H2O', ...
 #'@param ph numeric value specifying pH of experimental conditions
 #'@param instrument_strength numeric value specifying experimental instrument strength
+#'@param temperature numeric value specifying the temperature
+#'@param concentration numeric value specifying the concentration
 #'
 #'@return a list of BMSE database entry numbers
 #'
@@ -31,7 +33,13 @@
 #'@examples
 #'# test <- as.bmseList(list("56-41-7","2613-02-7"), solvent_type = 'D2O', ph = 7.4)
 #'
-as.bmseList <- function(casno_list, return_metabs = "exact_match", solvent_type = NULL, ph = NULL, instrument_strength){
+as.bmseList <- function(casno_list,
+                        return_metabs = "all",
+                        solvent_type = NULL,
+                        ph = NULL,
+                        instrument_strength = NULL,
+                        temperature         = NULL,
+                        concentration       = NULL){
 
   # Initial Checks
   if(!inherits(casno_list, "list")){
@@ -42,8 +50,8 @@ as.bmseList <- function(casno_list, return_metabs = "exact_match", solvent_type 
     stop('return_metabs must be one of "exact_match" or "all"')
   }
 
-  if(return_metabs == "exact_match" & (is.null(solvent_type) | is.null(ph))){
-    stop('Solvent type and ph must be specified if return_metabs = "exact_match"')
+  if(return_metabs == "exact_match" & (is.null(solvent_type) | is.null(ph) | is.null(instrument_strength))){
+    stop('Solvent type, ph, and spectrometer frequency must be specified if return_metabs = "exact_match"')
   }
 
   # if(return_metabs == "nearest_match" & (is.null(solvent_type) | is.null(ph))){
@@ -57,36 +65,50 @@ as.bmseList <- function(casno_list, return_metabs = "exact_match", solvent_type 
     }
   }
 
+  misscheck <- vector("numeric", length = length(casno_list))
   if (return_metabs == "all") {
     #create list without filtering by exp conditions
     bmse_list <- list()
-    for (item in casno_list){
-      subset    <- bmse_associations[bmse_associations$CASno == item, ]
+    for (i in 1:length(casno_list)){
+      subset    <- bmse_associations[bmse_associations$CASno == casno_list[[i]], ]
       bmse_val  <- subset$Entry_ID
       bmse_list <- append(bmse_list, bmse_val)
+      misscheck[i] <- ifelse(length(bmse_val) > 0, 0, 1)
     }
 
   } else if (return_metabs == "exact_match") {
-    #check solvent types, convert to acceptable types
-    if(solvent_type != "D2O"){
-      solvent_type <- "D2O"
-    }
+    # The code chunk below was commented out because it forced all solvent types to D20.
+    # #check solvent types, convert to acceptable types
+    # if(solvent_type != "D2O"){
+    #   solvent_type <- "D2O"
+    # }
 
     #create list filtered by solvent type and pH
     bmse_list <- list()
-    for (item in casno_list){
-      subset1   <- bmse_associations[bmse_associations$CASno == item, ]
-      subset2   <- subset1[subset1$Solvent == solvent_type, ]
-      subset3   <- subset2[subset2$pH == ph, ]
-      bmse_val  <- subset3$Entry_ID
+    for (i in 1:length(casno_list)){
+      subset <- bmse_associations %>% dplyr::filter(.data$CASno == casno_list[[i]],
+                                                    .data$Solvent == solvent_type,
+                                                    .data$pH == ph)
+
+      if(!is.na(temperature)){
+        subset <- subset %>% dplyr::filter(.data$Temperature == temperature)
+      }
+
+      if(!is.na(concentration)){
+        subset <- subset %>% dplyr::filter(.data$Concentration == concentration)
+      }
+
+      bmse_val  <- subset$Entry_ID
       bmse_list <- append(bmse_list, bmse_val)
     }
   }
 
-  # Note: Ideally, this final check should be one where we assess whether each provided casno has at least one
-  # corresponding bmse entry.
-  if (length(casno_list) > length(bmse_list)){
-    message("Not all metabolites were referenced with the set specifications!")
+  if (sum(misscheck) > 0 & return_metabs == "all"){
+    message("Data not available for all provided CAS numbers.")
+  }
+
+  if (sum(misscheck) > 0 & return_metabs == "exact_match"){
+    message("Data not available for all provided CAS numbers at the specified conditions.")
   }
 
   return(bmse_list)
@@ -112,17 +134,26 @@ as.bmseList <- function(casno_list, return_metabs = "exact_match", solvent_type 
 #'  51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
 #'
 #'@param name_list list of metabolite names
-#'@param return_metabs string, must be one of "exact_match" or "all". Defaults to "exact_match". If "exact_match", returns metabolites that exactly match specified experimental conditions (solvent type, pH, and instrument strength). If "all", returns all entries corresponding to supplied CAS numbers, experimental conditions ignored.
+#'@param return_metabs string, must be one of "exact_match" or "all". Defaults to "all". If "exact_match", returns metabolites that exactly match specified experimental conditions (solvent type, pH, and instrument strength). If "all", returns all entries corresponding to supplied CAS numbers, experimental conditions ignored.
 #'@param solvent_type choose from available solvents 'D2O', 'H2O', ...
 #'@param ph numerical value specifying pH of the experimental conditions
 #'@param instrument_strength numeric value specifying experimental instrument strength
+#'@param temperature numeric value specifying the temperature
+#'@param concentration numeric value specifying the concentration
+#'
 #'@return a list of BMSE database entry numbers
 #'@importFrom utils data
 #'@export as.bmseListFromName
 #'@examples
 #'# test <- as.bmseListFromName(list("ATP","Maltose" "Oxalate"), solvent_type = 'D2O', ph = 7.4)
 #'
-as.bmseListFromName <- function(name_list, return_metabs = "exact_match", solvent_type = NULL, ph = NULL, instrument_strength){
+as.bmseListFromName <- function(name_list,
+                                return_metabs = "all",
+                                solvent_type = NULL,
+                                ph = NULL,
+                                instrument_strength,
+                                temperature         = NULL,
+                                concentration       = NULL){
 
   # Initial Checks
   if(!inherits(name_list, "list")){
@@ -133,8 +164,8 @@ as.bmseListFromName <- function(name_list, return_metabs = "exact_match", solven
     stop('return_metabs must be either "exact_match" or "all"')
   }
 
-  if(return_metabs == "exact_match" & (is.null(solvent_type) | is.null(ph))){
-    stop('Solvent type and ph must be specified if return_metabs = "exact_match"')
+  if(return_metabs == "exact_match" & (is.null(solvent_type) | is.null(ph) | is.null(instrument_strength))){
+    stop('Solvent type, ph, and spectrometer frequency must be specified if return_metabs = "exact_match"')
   }
 
   # fail check if one metabolite name is not in the db
@@ -144,40 +175,55 @@ as.bmseListFromName <- function(name_list, return_metabs = "exact_match", solven
     }
   }
 
+  misscheck <- vector("numeric", length = length(name_list))
   if (return_metabs == "all") {
     #create list without filtering by exp conditions
     bmse_list <- list()
 
-    for (item in name_list){
-      subset    <- bmse_associations[bmse_associations$Solute == item, ]
+    for (i in 1:length(name_list)){
+      subset    <- bmse_associations[bmse_associations$Solute == name_list[[i]], ]
       bmse_val  <- subset$Entry_ID
       bmse_list <- append(bmse_list, bmse_val)
+      misscheck[i] <- ifelse(length(bmse_val) > 0, 0, 1)
     }
   } else if (return_metabs == "exact_match") {
-    #check solvent types, convert to acceptable types
-    if(solvent_type != "D2O"){
-      solvent_type <- "D2O"
-    }
+    # The code chunk below was commented out because it forced all solvent types to D20.
+    # #check solvent types, convert to acceptable types
+    # if(solvent_type != "D2O"){
+    #   solvent_type <- "D2O"
+    # }
 
     #create list
     bmse_list <- list()
-    for (item in name_list){
-      subset1   <- bmse_associations[bmse_associations$Solute == item, ]
-      subset2   <- subset1[subset1$Solvent == solvent_type, ]
-      subset3   <- subset2[subset2$pH == ph, ]
-      bmse_val  <- subset3$Entry_ID
+    for (i in 1:length(name_list)){
+      subset <- bmse_associations %>% dplyr::filter(.data$Solute == name_list[[i]],
+                                                    .data$Solvent == solvent_type,
+                                                    .data$pH == ph)
+      if(!is.na(temperature)){
+        subset <- subset %>% dplyr::filter(.data$Temperature == temperature)
+      }
+
+      if(!is.na(concentration)){
+        subset <- subset %>% dplyr::filter(.data$Concentration == concentration)
+      }
+
+      bmse_val  <- subset$Entry_ID
       bmse_list <- append(bmse_list, bmse_val)
+      misscheck[i] <- ifelse(length(bmse_val) > 0, 0, 1)
     }
   }
 
   bmse_list <- unique(bmse_list)
 
-  # Note: Ideally, this final check should be one where we assess whether each provided name has at least one
-  # corresponding bmse entry.
-  #final check
-  if (length(name_list) > length(bmse_list)){
-    message("Not all metabolites were referenced with the set specifications!")
+
+  if (sum(misscheck) > 0 & return_metabs == "all"){
+    message("Data not available for all metabolites.")
   }
+
+  if (sum(misscheck) > 0 & return_metabs == "exact_match"){
+    message("Data not available for all metabolites at the specified conditions.")
+  }
+
   return(bmse_list)
 }
 
@@ -430,7 +476,7 @@ get_spectra_data <- function(ID_list){
 
         if(length(pg) == 1){
           #singlet
-          Jcoupling[i] <- 1
+          Jcoupling[i] <- 0 # J-coupling should be 0 if a singlet
         }
 
         if(length(pg) == 2){
@@ -506,30 +552,34 @@ get_spectra_data <- function(ID_list){
 #'  with this program; if not, write to the Free Software Foundation, Inc.,
 #'  51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
 #'
-#' @param spectra_df `data.frame` containing spectral data
-#' @param return_metabs string, must be one of "exact_match", "nearest_match", or "all". Defaults to "exact_match". If "exact_match", returns metabolites that exactly match specified experimental conditions (solvent type, pH, and instrument strength). If "nearest_match", returns nearest match metabolites, sorted by Euclidean distance. If "all", returns all entries corresponding to supplied CAS numbers, experimental conditions ignored.
-#' @param half_bandwidth This will be set to 1.4 unless otherwise specified
-#' @param roi_tol The ROI tolerance, length from the center of the peak to each edge. Default is 0.02.
 #' @param spectra_df data frame of the spectra from get_spectra_data() function
 #' @param half_bandwidth This will be set to 1.4 unless otherwise specified
-#' @param roi_tol The ROI tolerance, length from the center of the peak to each edge. Default is 0.02.
-#' @param instrument_strength the field strength of the instrument used to collect the data
+#' @param roi_tol The chemical shift tolerance, tolerance for the location of the peak center. Default is 0.005.
+#'
 #' @return a data frame formatted for r dolphin use to be exported as excel sheet
 #' @export export_roi_file
-export_roi_file <- function(spectra_df, return_metabs = "exact_match", half_bandwidth = 1.4, roi_tol = 0.02, instrument_strength){
+export_roi_file <- function(spectra_df,
+                            half_bandwidth = 1.4,
+                            roi_tol        = 0.005){
+
+  # (Note that HMDB_code is removed and NOT returned)
+
   # create column names vector
   header <- c('ROI left edge (ppm)', 'ROI right edge (ppm)', 'Quantification Mode',
               'Metabolite',	'Quantification Signal', 'Chemical shift(ppm)',	'Chemical shift tolerance (ppm)',
-              'Half bandwidth (Hz)', 'Multiplicity', 'J coupling (Hz)',	'Roof effect', 'HMDB_code')
+              'Half bandwidth (Hz)', 'Multiplicity', 'J coupling (Hz)',	'Roof effect', 'J coupling 2 (Hz)',
+              'Roof effect 2', 'Frequency (MHz)', 'pH', 'Concentration (mM)', 'Temperature (K)', 'Solvent')
 
 
   # reference the entry ID to the bmse metadata
-  metab_name <- unique(merge(x = spectra_df, y = bmse_associations[, c("Entry_ID","Solute")], by="Entry_ID", all.x=TRUE))
+  metab_name <- unique(merge(x = spectra_df, y = bmse_associations[, c("Entry_ID", "Solute", "Solvent", "pH", "Temperature", "Concentration")], by="Entry_ID", all.x=TRUE))
 
   #set default constants for columns (quantification mode, roof effect, and tolerance)
-  q_mode      <- rep("Baseline Fitting", nrow(metab_name))
-  roof_effect <- rep(0, nrow(metab_name))
-  tolerance   <- rep(roi_tol, nrow(metab_name))
+  q_mode       <- rep("Baseline Fitting", nrow(metab_name))
+  roof_effect  <- rep(0, nrow(metab_name))
+  roof_effect2 <- roof_effect
+  jcoupl2      <- rep(0, nrow(metab_name))
+  tolerance    <- rep(roi_tol, nrow(metab_name))
 
   # if the user did not provide a custom bandwidth, set default
   if (missing(half_bandwidth)){
@@ -542,54 +592,45 @@ export_roi_file <- function(spectra_df, return_metabs = "exact_match", half_band
   roi_right <- unlist(metab_name$Val) - roi_tol
 
   # Coupling
-  if (return_metabs == "all") {
-    # get inst strength for metabs from reference
-    inst_strength <- vector()
-    for (i in 1:nrow(spectra_df)) {
-      inst_strength[i] <- spectra_df$instrument_strength[i]
-    }
-    # Is this correct? Shouldn't we multiply by the user- supplied instrument strength (i.e. instrument_strength)
-    # regardless? Unless I'm misunderstanding, below we are multiplying by the reference-specific instrument strength.
-    coupling <- as.numeric(metab_name$Jcoupling) * as.numeric(inst_strength)
-  } else {
-    coupling <- as.numeric(metab_name$Jcoupling) * as.numeric(instrument_strength)
-  }
+  coupling <- as.numeric(metab_name$Jcoupling) * as.numeric(metab_name$instrument_strength)
 
   # combine all the columns
-  roi_df <- cbind(as.numeric(roi_left),
-                  as.numeric(roi_right),
-                  q_mode,
-                  metab_name$Solute,
-                  as.numeric(metab_name$quant_sig),
-                  as.numeric(metab_name$Val),
-                  as.numeric(tolerance),
-                  as.numeric(half_bandwidth_col),
-                  as.numeric(metab_name$multiplicity),
-                  as.numeric(coupling),
-                  as.numeric(roof_effect),
-                  metab_name$Entry_ID)
+  roi_df <- cbind.data.frame(as.numeric(roi_left),
+                             as.numeric(roi_right),
+                             q_mode,
+                             metab_name$Solute,
+                             as.numeric(metab_name$quant_sig),
+                             as.numeric(metab_name$Val),
+                             as.numeric(tolerance),
+                             as.numeric(half_bandwidth_col),
+                             as.character(metab_name$multiplicity),
+                             as.numeric(coupling),
+                             as.numeric(roof_effect),
+                             as.numeric(jcoupl2),
+                             as.numeric(roof_effect2),
+                             as.numeric(metab_name$instrument_strength),
+                             as.numeric(metab_name$pH),
+                             as.numeric(metab_name$Concentration),
+                             as.numeric(metab_name$Temperature),
+                             metab_name$Solvent)
   colnames(roi_df) <- header
 
+  # Average duplicate entries by experimental conditions
+  avg_roi_df <- roi_df %>%
+    dplyr::group_by(.data$`Quantification Mode`, .data$`Metabolite`, .data$`Quantification Signal`, .data$`Frequency (MHz)`,
+                    .data$`pH`, .data$`Concentration (mM)`, .data$`Temperature (K)`, .data$`Solvent`) %>%
+    dplyr::summarise(dplyr::across(dplyr::all_of(c('ROI left edge (ppm)', 'ROI right edge (ppm)', 'Chemical shift(ppm)',	'Chemical shift tolerance (ppm)',
+                                                   'Half bandwidth (Hz)', 'J coupling (Hz)',	'Roof effect', 'J coupling 2 (Hz)',
+                                                   'Roof effect 2')), mean, na.rm = TRUE),
+                     dplyr::across(dplyr::all_of(c('Multiplicity')), getmode, useNA = "no")) %>%
+    dplyr::select(.data$`ROI left edge (ppm)`, .data$`ROI right edge (ppm)`, .data$`Quantification Mode`,
+                  .data$`Metabolite`,	.data$`Quantification Signal`, .data$`Chemical shift(ppm)`,
+                  .data$`Chemical shift tolerance (ppm)`, .data$`Half bandwidth (Hz)`, .data$`Multiplicity`,
+                  .data$`J coupling (Hz)`,	.data$`Roof effect`, .data$`J coupling 2 (Hz)`, .data$`Roof effect 2`,
+                  .data$`Frequency (MHz)`, .data$`pH`, .data$`Concentration (mM)`, .data$`Temperature (K)`, .data$`Solvent`) %>%
+    dplyr::arrange(.data$`ROI left edge (ppm)`)
 
-  #remove duplicate metabolite/multiplicity combinations
-  roi_df <- as.data.frame(roi_df)
-  roi_df <- roi_df[!duplicated(roi_df[4:5]),]
-
-  #convert columns to their correct type
-  roi_df$'ROI left edge (ppm)'            <- as.numeric(as.character(roi_df$'ROI left edge (ppm)'))
-  roi_df$'ROI right edge (ppm)'           <- as.numeric(as.character(roi_df$'ROI right edge (ppm)'))
-  roi_df$'Quantification Signal'          <- as.numeric(as.character(roi_df$'Quantification Signal'))
-  roi_df$'Chemical shift(ppm)'            <- as.numeric(as.character(roi_df$'Chemical shift(ppm)'))
-  roi_df$'Chemical shift tolerance (ppm)' <- as.numeric(as.character(roi_df$'Chemical shift tolerance (ppm)'))
-  roi_df$'Half bandwidth (Hz)'            <- as.numeric(as.character(roi_df$'Half bandwidth (Hz)'))
-  roi_df$'Multiplicity'                   <- as.numeric(as.character(roi_df$'Multiplicity'))
-  roi_df$'J coupling (Hz)'                <- as.numeric(as.character(roi_df$'J coupling (Hz)'))
-  roi_df$'Roof effect'                    <- as.numeric(as.character(roi_df$'Roof effect'))
-
-  #sort roi_df by the ROI left edge
-  roi_df <- roi_df[order(roi_df$`ROI left edge (ppm)`),]
-
-  return(roi_df)
+  return(avg_roi_df)
 }
 
 #' Wrap the generating and exporting functions into one
@@ -612,22 +653,27 @@ export_roi_file <- function(spectra_df, return_metabs = "exact_match", half_band
 #'
 #' @param name_list list of metabolite names if cas numbers are not provided
 #' @param cas_list list of CAS registry numbers written as characters if metabolite names are not provided
-#' @param return_metabs string, must be one of "exact_match" or "all". Defaults to "exact_match". If "exact_match", returns metabolites that exactly match specified experimental conditions (solvent type, pH, and instrument strength). If "all", returns all entries corresponding to supplied CAS numbers, experimental conditions ignored.
+#' @param return_metabs string, must be one of "exact_match" or "all". Defaults to "all". If "exact_match", returns metabolites that exactly match specified experimental conditions (solvent type, pH, and instrument strength). If "all", returns all entries corresponding to supplied CAS numbers, experimental conditions ignored.
 #' @param ph the experimental pH
 #' @param solvent_type the experimental solvent, choose from available solvents 'D2O', 'H2O', ...
 #' @param half_bandwidth This will be set to 1.4 unless otherwise specified
-#' @param roi_tol the tolerance to encompass the region of interest value
+#' @param roi_tol The chemical shift tolerance, tolerance for the location of the peak center. Default is 0.005.
 #' @param instrument_strength the field strength of the instrument used to collect the data
+#' @param temperature numeric value specifying the temperature
+#' @param concentration numeric value specifying the concentration
+#'
 #' @return a data frame formatted for rDolphin use to be exported as excel sheet
 #' @export roi_ref_export
 roi_ref_export <- function(name_list           = NULL,
                            cas_list            = NULL,
-                           return_metabs       = "exact_match",
+                           return_metabs       = "all",
                            solvent_type        = NULL,
                            ph                  = NULL,
                            half_bandwidth      = 1.4,
-                           roi_tol             = 0.02,
-                           instrument_strength = NULL){
+                           roi_tol             = 0.005,
+                           instrument_strength = NULL,
+                           temperature         = NULL,
+                           concentration       = NULL){
 
   # set ID list object
   id_list <- NULL
@@ -636,13 +682,17 @@ roi_ref_export <- function(name_list           = NULL,
                                    return_metabs       = return_metabs,
                                    solvent_type        = solvent_type,
                                    ph                  = ph,
-                                   instrument_strength = instrument_strength)
+                                   instrument_strength = instrument_strength,
+                                   temperature         = temperature,
+                                   concentration       = concentration)
   } else{
     id_list <- as.bmseList(casno_list          = cas_list,
                            return_metabs       = return_metabs,
                            solvent_type        = solvent_type,
                            ph                  = ph,
-                           instrument_strength = instrument_strength)
+                           instrument_strength = instrument_strength,
+                           temperature         = temperature,
+                           concentration       = concentration)
   }
 
   # get spectra data
@@ -650,20 +700,9 @@ roi_ref_export <- function(name_list           = NULL,
 
   # return the ROI file formatted object and export CSV
   roi_df <- export_roi_file(spectra_df          = saveframe,
-                            return_metabs       = return_metabs,
                             half_bandwidth      = half_bandwidth,
-                            roi_tol             = roi_tol,
-                            instrument_strength = instrument_strength)
+                            roi_tol             = roi_tol)
 
-  if(nrow(roi_df) != 0){
-    if (return_metabs == "exact_match") {
-      roi_df$pH                    <- ph
-      roi_df$`Instrument strength` <- instrument_strength
-      roi_df$Solvent               <- solvent_type
-    } else {
-
-    }
-  }
   return(roi_df)
 }
 

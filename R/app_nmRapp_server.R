@@ -97,9 +97,9 @@ nmRapp_server <- function(input, output, session) {
   # Output a warning if any of uploaded reference metabolites not contained within database
   observe({
     req(ref_data())
-    refwarn <-ref_data()$casno_not_in_db
+    refwarn <- ref_data()$casno_not_in_db$CASno
 
-    if(!is.null(refwarn)){
+    if(length(refwarn) != 0){
       removeTab(inputId = "refout_tabs", target = "Warnings")
 
       appendTab(inputId = "refout_tabs",
@@ -107,7 +107,7 @@ nmRapp_server <- function(input, output, session) {
                          h4("The following entries were not found in our database:"),
                          DT::dataTableOutput("user_refmet_nomatch"),
                          h4("Please visit the Add/Remove Metabolites tab to manually search our database.")))
-    } else if(is.null(refwarn)){
+    } else if(length(refwarn) == 0){
       removeTab(inputId = "refout_tabs", target = "Warnings")
     }
   })
@@ -177,5 +177,11 @@ nmRapp_server <- function(input, output, session) {
     updateTabsetPanel(session, "AllTabs",
                       selected = "RefMetTab")
   })
+
+  observe({
+    req(profiling_results())
+    updateTabsetPanel(inputId = "profout_tabs", selected = "Signal View")
+  })
+
 
 }
