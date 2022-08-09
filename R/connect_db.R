@@ -1,21 +1,29 @@
-if (!require('RPostgreSQL')) install.packages('RPostgreSQL')
-library(RPostgreSQL)
+## Requirements
 
+if (!require('devtools')) install.packages('devtools')
+if (!require('remotes')) install.packages('remotes')
+if (!require("DBI")) install.packages("DBI")
+remotes::install_github("r-dbi/RPostgres")
+
+library(RPostgres)
+
+# Set environmental variables
 dsn_database = "nmRanalysis"
 dsn_hostname = "localhost"
 dsn_port = "5432"
-dsn_uid = "prym311"
-dsn_pwd = "dbtest1"
+dsn_uid = "developer"
+dsn_pwd = "developer"
 
+# Connect to Database
 tryCatch({
   drv <- dbDriver("PostgreSQL")
   print("Connecting to Database…")
-  connec <- dbConnect(drv,
+  connec <- dbConnect(RPostgres::Postgres(),
                       dbname = dsn_database,
-                      host = dsn_hostname,
-                      port = dsn_port,
-                      user = dsn_uid,
-                      password = dsn_pwd)
+                      host=dsn_hostname,
+                      port=dsn_port,
+                      user=dsn_uid,
+                      password=dsn_pwd)
   print("Database Connected!")
 },
 error=function(cond) {
@@ -31,13 +39,13 @@ dbCreateTable(connec, "reference", bmse_associations)
 
 #Append to a existing table
 dbAppendTable(conn = connec,
-              name = SQL('"public"."bmse_associations"'),
+              name = SQL("bmse_associations"),
               value = test,
               copy = NULL,
               row.names = NULL)
 
 append_cmd <- sqlAppendTable(conn = connec,
-              name = "public.bmse_associations",
+              name = "bmse_associations",
               value = test,
               row.names = FALSE)
 
