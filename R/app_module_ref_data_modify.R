@@ -844,7 +844,6 @@ ref_data_editingServer <- function(id, xpmt_data, ref_data, ref_db){
     observeEvent(input$refmet_dspedt_table_cell_edit,
                  {
                    req(ref_data())
-                   browser()
 
                    info <- input$refmet_dspedt_table_cell_edit
                    changed_row <- info$row
