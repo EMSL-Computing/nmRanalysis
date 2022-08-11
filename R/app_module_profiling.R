@@ -452,7 +452,7 @@ profilingServer <- function(id, xpmt_data, ref_data){
 
                                                        column(width = 6,
                                                               numericInput(inputId  = NS(id, "gpp_gaussian"),
-                                                                           label    = "Gaussian Ratio:",
+                                                                           label    = "Pseudo-Voigt Lineshape Gaussian Ratio (0 < ratio < 1):",
                                                                            value    = 0))
                                                      ),
                                                      fluidRow(
@@ -464,64 +464,64 @@ profilingServer <- function(id, xpmt_data, ref_data){
 
                                                        column(width = 6,
                                                               numericInput(inputId  = NS(id, "gpp_errorprov"),
-                                                                           label    = "Fitting error threshold:",
+                                                                           label    = "Acceptable Fitting Error (%):",
                                                                            value    = 3))
 
                                                      ),
                                                      fluidRow(
                                                        column(width = 6,
                                                               numericInput(inputId  = NS(id, "gpp_fitting_maxiter"),
-                                                                           label    = "Max iterations of optimization subroutine:",
+                                                                           label    = "Maximum fitting parameter optimization iterations:",
                                                                            value    = 8)),
 
 
-                                                       column(width = 6,
-                                                              numericInput(inputId  = NS(id, "gpp_nls_lm_maxiter"),
-                                                                           label    = "Max iterations of Levenberg Marquardt (LM) algorithm:",
-                                                                           value    = 200))
-
-                                                     ),
-                                                     fluidRow(
-                                                       column(width = 6,
-                                                              numericInput(inputId  = NS(id, "gpp_ftol"),
-                                                                           label    = "LM algorithm sum of squares error threshold:",
-                                                                           value    = 1e-06)),
-
-
-                                                       column(width = 6,
-                                                              numericInput(inputId  = NS(id, "gpp_ptol"),
-                                                                           label    = "LM algorithm relative error threshold:",
-                                                                           value    = 1e-06))
-
-                                                     ),
-                                                     fluidRow(
-                                                       column(width = 6,
-                                                              numericInput(inputId  = NS(id, "gpp_factor"),
-                                                                           label    = "LM algorithm control factor:",
-                                                                           value    = 0.01)),
-
-
-                                                       column(width = 6,
-                                                              numericInput(inputId  = NS(id, "gpp_fitting_maxiterrep"),
-                                                                           label    = "fitting_maxiterrep:",
-                                                                           value    = 0))
-
-                                                     ),
-                                                     fluidRow(
-                                                       column(width = 6,
-                                                              numericInput(inputId  = NS(id, "gpp_peakdet_minimum"),
-                                                                           label    = "peakdet_minimum:",
-                                                                           value    = 0.01))
-
-                                                       # These only apply to the "fitting error / signal area ratio analyses"
-                                                       # performed in the rDolphin GUI. We do not implement them, so these
-                                                       # parameters are unnecessary.
                                                        # column(width = 6,
-                                                       #        selectInput(inputId   = NS(id, "gpp_automatic_removal"),
-                                                       #                    label     = "automatic_removal:",
-                                                       #                    choices   = c("Yes" = "Y", "No" = "N"),
-                                                       #                    selected  = "Y"))
+                                                       #        numericInput(inputId  = NS(id, "gpp_nls_lm_maxiter"),
+                                                       #                     label    = "Max iterations of Levenberg Marquardt (LM) algorithm:",
+                                                       #                     value    = 200))
+
                                                      ),
+                                                     # fluidRow(
+                                                     #   column(width = 6,
+                                                     #          numericInput(inputId  = NS(id, "gpp_ftol"),
+                                                     #                       label    = "LM algorithm sum of squares error threshold:",
+                                                     #                       value    = 1e-06)),
+                                                     #
+                                                     #
+                                                     #   column(width = 6,
+                                                     #          numericInput(inputId  = NS(id, "gpp_ptol"),
+                                                     #                       label    = "LM algorithm relative error threshold:",
+                                                     #                       value    = 1e-06))
+                                                     #
+                                                     # ),
+                                                     # fluidRow(
+                                                     #   column(width = 6,
+                                                     #          numericInput(inputId  = NS(id, "gpp_factor"),
+                                                     #                       label    = "LM algorithm control factor:",
+                                                     #                       value    = 0.01)),
+                                                     #
+                                                     #
+                                                     #   column(width = 6,
+                                                     #          numericInput(inputId  = NS(id, "gpp_fitting_maxiterrep"),
+                                                     #                       label    = "fitting_maxiterrep:",
+                                                     #                       value    = 0))
+                                                     #
+                                                     # ),
+                                                     # fluidRow(
+                                                     #   column(width = 6,
+                                                     #          numericInput(inputId  = NS(id, "gpp_peakdet_minimum"),
+                                                     #                       label    = "peakdet_minimum:",
+                                                     #                       value    = 0.01))
+                                                     #
+                                                     #   # These only apply to the "fitting error / signal area ratio analyses"
+                                                     #   # performed in the rDolphin GUI. We do not implement them, so these
+                                                     #   # parameters are unnecessary.
+                                                     #   # column(width = 6,
+                                                     #   #        selectInput(inputId   = NS(id, "gpp_automatic_removal"),
+                                                     #   #                    label     = "automatic_removal:",
+                                                     #   #                    choices   = c("Yes" = "Y", "No" = "N"),
+                                                     #   #                    selected  = "Y"))
+                                                     # ),
                                                      # fluidRow(
                                                      #   column(width = 6,
                                                      #          numericInput(inputId  = NS(id, "gpp_fitting_error_analysis_limit"),
@@ -541,7 +541,7 @@ profilingServer <- function(id, xpmt_data, ref_data){
 
                                                        column(width = 6,
                                                               numericInput(inputId  = NS(id, "gpp_BG_gaussian_percentage"),
-                                                                           label    = "BGS Gaussian Ratio:",
+                                                                           label    = "BGS Pseudo-Voigt Lineshape Gaussian Ratio (0 < ratio < 1):",
                                                                            value    = 0))
 
                                                      ),
@@ -559,32 +559,32 @@ profilingServer <- function(id, xpmt_data, ref_data){
 
                                                      ),
 
-                                                     fluidRow(
-                                                       column(width = 6,
-                                                              numericInput(inputId  = NS(id, "gpp_additional_signal_ppm_distance"),
-                                                                           label    = "additional_signal_ppm_distance:",
-                                                                           value    = 0.002)),
-
-
-                                                       column(width = 6,
-                                                              numericInput(inputId  = NS(id, "gpp_signals_to_add"),
-                                                                           label    = "signals_to_add:",
-                                                                           value    = 2))
-
-                                                     ),
-
-                                                     fluidRow(
-                                                       column(width = 6,
-                                                              numericInput(inputId  = NS(id, "gpp_additional_signal_improvement"),
-                                                                           label    = "additional_signal_improvement:",
-                                                                           value    = 0.75)),
-
-                                                       column(width = 6,
-                                                              numericInput(inputId  = NS(id, "gpp_additional_signal_percentage_limit"),
-                                                                           label    = "additional_signal_percentage_limit:",
-                                                                           value    = 3))
-
-                                                     ),
+                                                     # fluidRow(
+                                                     #   column(width = 6,
+                                                     #          numericInput(inputId  = NS(id, "gpp_additional_signal_ppm_distance"),
+                                                     #                       label    = "additional_signal_ppm_distance:",
+                                                     #                       value    = 0.002)),
+                                                     #
+                                                     #
+                                                     #   column(width = 6,
+                                                     #          numericInput(inputId  = NS(id, "gpp_signals_to_add"),
+                                                     #                       label    = "signals_to_add:",
+                                                     #                       value    = 2))
+                                                     #
+                                                     # ),
+                                                     #
+                                                     # fluidRow(
+                                                     #   column(width = 6,
+                                                     #          numericInput(inputId  = NS(id, "gpp_additional_signal_improvement"),
+                                                     #                       label    = "additional_signal_improvement:",
+                                                     #                       value    = 0.75)),
+                                                     #
+                                                     #   column(width = 6,
+                                                     #          numericInput(inputId  = NS(id, "gpp_additional_signal_percentage_limit"),
+                                                     #                       label    = "additional_signal_percentage_limit:",
+                                                     #                       value    = 3))
+                                                     #
+                                                     # ),
                                                      style = "primary"
                             ))
       } else{
@@ -610,7 +610,7 @@ profilingServer <- function(id, xpmt_data, ref_data){
 
                                                        column(width = 6,
                                                               numericInput(inputId  = NS(id, "gpp_gaussian"),
-                                                                           label    = "Gaussian Ratio:",
+                                                                           label    = "Pseudo-Voigt Lineshape Gaussian Ratio (0 < ratio < 1):",
                                                                            value    = ref_data()$global_parameters$gaussian))
 
                                                      ),
@@ -623,7 +623,7 @@ profilingServer <- function(id, xpmt_data, ref_data){
 
                                                        column(width = 6,
                                                               numericInput(inputId  = NS(id, "gpp_errorprov"),
-                                                                           label    = "Fitting error threshold:",
+                                                                           label    = "Acceptable Fitting Error (%):",
                                                                            value    = ref_data()$global_parameters$errorprov))
 
 
@@ -631,61 +631,61 @@ profilingServer <- function(id, xpmt_data, ref_data){
                                                      fluidRow(
                                                        column(width = 6,
                                                               numericInput(inputId  = NS(id, "gpp_fitting_maxiter"),
-                                                                           label    = "Max iterations of optimization subroutine:",
+                                                                           label    = "Maximum fitting parameter optimization iterations:",
                                                                            value    = ref_data()$global_parameters$fitting_maxiter)),
 
 
-                                                       column(width = 6,
-                                                              numericInput(inputId  = NS(id, "gpp_nls_lm_maxiter"),
-                                                                           label    = "Max iterations of Levenberg Marquardt (LM) algorithm:",
-                                                                           value    = ref_data()$global_parameters$nls_lm_maxiter))
-
-
-                                                     ),
-                                                     fluidRow(
-                                                       column(width = 6,
-                                                              numericInput(inputId  = NS(id, "gpp_ftol"),
-                                                                           label    = "LM algorithm sum of squares error threshold:",
-                                                                           value    = ref_data()$global_parameters$ftol)),
-
-
-                                                       column(width = 6,
-                                                              numericInput(inputId  = NS(id, "gpp_ptol"),
-                                                                           label    = "LM algorithm relative error threshold:",
-                                                                           value    = ref_data()$global_parameters$ptol))
-
-
-                                                     ),
-                                                     fluidRow(
-                                                       column(width = 6,
-                                                              numericInput(inputId  = NS(id, "gpp_factor"),
-                                                                           label    = "LM algorithm control factor:",
-                                                                           value    = ref_data()$global_parameters$factor)),
-
-
-                                                       column(width = 6,
-                                                              numericInput(inputId  = NS(id, "gpp_fitting_maxiterrep"),
-                                                                           label    = "fitting_maxiterrep:",
-                                                                           value    = ref_data()$global_parameters$fitting_maxiterrep))
-
-
-                                                     ),
-                                                     fluidRow(
-                                                       column(width = 6,
-                                                              numericInput(inputId  = NS(id, "gpp_peakdet_minimum"),
-                                                                           label    = "peakdet_minimum:",
-                                                                           value    = ref_data()$global_parameters$peakdet_minimum))
-
-
-                                                       # These only apply to the "fitting error / signal area ratio analyses"
-                                                       # performed in the rDolphin GUI. We do not implement them, so these
-                                                       # parameters are unnecessary.
                                                        # column(width = 6,
-                                                       #        selectInput(inputId   = NS(id, "gpp_automatic_removal"),
-                                                       #                    label     = "automatic_removal:",
-                                                       #                    choices   = c("Yes" = "Y", "No" = "N"),
-                                                       #                    selected  = "Y"))
+                                                       #        numericInput(inputId  = NS(id, "gpp_nls_lm_maxiter"),
+                                                       #                     label    = "Max iterations of Levenberg Marquardt (LM) algorithm:",
+                                                       #                     value    = ref_data()$global_parameters$nls_lm_maxiter))
+
+
                                                      ),
+                                                     # fluidRow(
+                                                     #   column(width = 6,
+                                                     #          numericInput(inputId  = NS(id, "gpp_ftol"),
+                                                     #                       label    = "LM algorithm sum of squares error threshold:",
+                                                     #                       value    = ref_data()$global_parameters$ftol)),
+                                                     #
+                                                     #
+                                                     #   column(width = 6,
+                                                     #          numericInput(inputId  = NS(id, "gpp_ptol"),
+                                                     #                       label    = "LM algorithm relative error threshold:",
+                                                     #                       value    = ref_data()$global_parameters$ptol))
+                                                     #
+                                                     #
+                                                     # ),
+                                                     # fluidRow(
+                                                     #   column(width = 6,
+                                                     #          numericInput(inputId  = NS(id, "gpp_factor"),
+                                                     #                       label    = "LM algorithm control factor:",
+                                                     #                       value    = ref_data()$global_parameters$factor)),
+                                                     #
+                                                     #
+                                                     #   column(width = 6,
+                                                     #          numericInput(inputId  = NS(id, "gpp_fitting_maxiterrep"),
+                                                     #                       label    = "fitting_maxiterrep:",
+                                                     #                       value    = ref_data()$global_parameters$fitting_maxiterrep))
+                                                     #
+                                                     #
+                                                     # ),
+                                                     # fluidRow(
+                                                     #   column(width = 6,
+                                                     #          numericInput(inputId  = NS(id, "gpp_peakdet_minimum"),
+                                                     #                       label    = "peakdet_minimum:",
+                                                     #                       value    = ref_data()$global_parameters$peakdet_minimum))
+                                                     #
+                                                     #
+                                                     #   # These only apply to the "fitting error / signal area ratio analyses"
+                                                     #   # performed in the rDolphin GUI. We do not implement them, so these
+                                                     #   # parameters are unnecessary.
+                                                     #   # column(width = 6,
+                                                     #   #        selectInput(inputId   = NS(id, "gpp_automatic_removal"),
+                                                     #   #                    label     = "automatic_removal:",
+                                                     #   #                    choices   = c("Yes" = "Y", "No" = "N"),
+                                                     #   #                    selected  = "Y"))
+                                                     # ),
                                                      # fluidRow(
                                                      #   column(width = 6,
                                                      #          numericInput(inputId  = NS(id, "gpp_fitting_error_analysis_limit"),
@@ -705,7 +705,7 @@ profilingServer <- function(id, xpmt_data, ref_data){
 
                                                        column(width = 6,
                                                               numericInput(inputId  = NS(id, "gpp_BG_gaussian_percentage"),
-                                                                           label    = "BGS Gaussian Ratio:",
+                                                                           label    = "BGS Pseudo-Voigt Lineshape Gaussian Ratio (0 < ratio < 1):",
                                                                            value    = ref_data()$global_parameters$BG_gaussian_percentage))
 
 
@@ -725,35 +725,35 @@ profilingServer <- function(id, xpmt_data, ref_data){
 
                                                      ),
 
-                                                     fluidRow(
-                                                       column(width = 6,
-                                                              numericInput(inputId  = NS(id, "gpp_additional_signal_ppm_distance"),
-                                                                           label    = "additional_signal_ppm_distance:",
-                                                                           value    = ref_data()$global_parameters$additional_signal_ppm_distance)),
-
-
-                                                       column(width = 6,
-                                                              numericInput(inputId  = NS(id, "gpp_signals_to_add"),
-                                                                           label    = "signals_to_add:",
-                                                                           value    = ref_data()$global_parameters$signals_to_add))
-
-
-                                                     ),
-
-                                                     fluidRow(
-                                                       column(width = 6,
-                                                              numericInput(inputId  = NS(id, "gpp_additional_signal_improvement"),
-                                                                           label    = "additional_signal_improvement:",
-                                                                           value    = ref_data()$global_parameters$additional_signal_improvement)),
-
-
-                                                       column(width = 6,
-                                                              numericInput(inputId  = NS(id, "gpp_additional_signal_percentage_limit"),
-                                                                           label    = "additional_signal_percentage_limit:",
-                                                                           value    = ref_data()$global_parameters$additional_signal_percentage_limit))
-
-
-                                                     ),
+                                                     # fluidRow(
+                                                     #   column(width = 6,
+                                                     #          numericInput(inputId  = NS(id, "gpp_additional_signal_ppm_distance"),
+                                                     #                       label    = "additional_signal_ppm_distance:",
+                                                     #                       value    = ref_data()$global_parameters$additional_signal_ppm_distance)),
+                                                     #
+                                                     #
+                                                     #   column(width = 6,
+                                                     #          numericInput(inputId  = NS(id, "gpp_signals_to_add"),
+                                                     #                       label    = "signals_to_add:",
+                                                     #                       value    = ref_data()$global_parameters$signals_to_add))
+                                                     #
+                                                     #
+                                                     # ),
+                                                     #
+                                                     # fluidRow(
+                                                     #   column(width = 6,
+                                                     #          numericInput(inputId  = NS(id, "gpp_additional_signal_improvement"),
+                                                     #                       label    = "additional_signal_improvement:",
+                                                     #                       value    = ref_data()$global_parameters$additional_signal_improvement)),
+                                                     #
+                                                     #
+                                                     #   column(width = 6,
+                                                     #          numericInput(inputId  = NS(id, "gpp_additional_signal_percentage_limit"),
+                                                     #                       label    = "additional_signal_percentage_limit:",
+                                                     #                       value    = ref_data()$global_parameters$additional_signal_percentage_limit))
+                                                     #
+                                                     #
+                                                     # ),
                                                      style = "primary"
                             ))
 
@@ -1493,16 +1493,16 @@ profilingServer <- function(id, xpmt_data, ref_data){
                                                BG_width_tolerance                 = input$gpp_BG_width_tolerance,
                                                errorprov                          = input$gpp_errorprov,
                                                fitting_maxiter                    = input$gpp_fitting_maxiter,
-                                               nls_lm_maxiter                     = input$gpp_nls_lm_maxiter,
-                                               ftol                               = input$gpp_ftol,
-                                               ptol                               = input$gpp_ptol,
-                                               factor                             = input$gpp_factor,
-                                               additional_signal_ppm_distance     = input$gpp_additional_signal_ppm_distance,
-                                               signals_to_add                     = input$gpp_signals_to_add,
-                                               fitting_maxiterrep                 = input$gpp_fitting_maxiterrep,
-                                               additional_signal_improvement      = input$gpp_additional_signal_improvement,
-                                               additional_signal_percentage_limit = input$gpp_additional_signal_percentage_limit,
-                                               peakdet_minimum                    = input$gpp_peakdet_minimum)
+                                               nls_lm_maxiter                     = 200, # from rDolphin defaults
+                                               ftol                               = 1e-06, # from rDolphin defaults
+                                               ptol                               = 1e-06, # from rDolphin defaults
+                                               factor                             = 0.01, # from rDolphin defaults
+                                               additional_signal_ppm_distance     = 0.002, # from rDolphin defaults
+                                               signals_to_add                     = 2, # from rDolphin defaults
+                                               fitting_maxiterrep                 = 0, # from rDolphin defaults
+                                               additional_signal_improvement      = 0.75, # from rDolphin defaults
+                                               additional_signal_percentage_limit = 3, # from rDolphin defaults
+                                               peakdet_minimum                    = 0.01) # from rDolphin defaults
 
 
       ROI_data           = imported_data$ROI_data
