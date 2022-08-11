@@ -1021,8 +1021,30 @@ ref_data_editingServer <- function(id, xpmt_data, ref_data, ref_db){
         .$`ROI right edge (ppm)`
       signalROIdat <- rv$quantdat %>% dplyr::filter(.data$`ROI right edge (ppm)` == signalROI_right)
 
+      temp_gpps <- list(BGdensity                          = input$gpp_BGdensity,
+                        widthtolerance                     = input$gpp_widthtolerance,
+                        gaussian                           = input$gpp_gaussian,
+                        j_coupling_variation               = input$gpp_j_coupling_variation,
+                        BG_gaussian_percentage             = input$gpp_BG_gaussian_percentage,
+                        BG_width                           = input$gpp_BG_width,
+                        BG_width_tolerance                 = input$gpp_BG_width_tolerance,
+                        errorprov                          = input$gpp_errorprov,
+                        fitting_maxiter                    = input$gpp_fitting_maxiter,
+                        nls_lm_maxiter                     = 200, # from rDolphin defaults
+                        ftol                               = 1e-06, # from rDolphin defaults
+                        ptol                               = 1e-06, # from rDolphin defaults
+                        factor                             = 0.01, # from rDolphin defaults
+                        additional_signal_ppm_distance     = 0.002, # from rDolphin defaults
+                        signals_to_add                     = 2, # from rDolphin defaults
+                        fitting_maxiterrep                 = 0, # from rDolphin defaults
+                        additional_signal_improvement      = 0.75, # from rDolphin defaults
+                        additional_signal_percentage_limit = 3, # from rDolphin defaults
+                        peakdet_minimum                    = 0.01) # from rDolphin defaults
+
       if(is.null(rv$dspedt_profiling_data[[input$sample_to_plot]][[input$signal_to_check]]) |
-         !identical(rv$curr_ROI_profile[[input$sample_to_plot]][[input$signal_to_check]], signalROIdat)){
+         !identical(rv$curr_ROI_profile[[input$sample_to_plot]][[input$signal_to_check]], signalROIdat) |
+         !identical(rv$fitcheck_gpps, temp_gpps)){
+
         shinyWidgets::progressSweetAlert(
           session = session,
           id = "metquant_profiling_progress",
@@ -1050,25 +1072,9 @@ ref_data_editingServer <- function(id, xpmt_data, ref_data, ref_db){
         # Formats the data object
         imported_data <- ppmData_to_rDolphin(ppmData = txpmt_data,
                                              metabs  = signalROIdat)
-        imported_data$program_parameters <- list(BGdensity                          = input$gpp_BGdensity,
-                                                 widthtolerance                     = input$gpp_widthtolerance,
-                                                 gaussian                           = input$gpp_gaussian,
-                                                 j_coupling_variation               = input$gpp_j_coupling_variation,
-                                                 BG_gaussian_percentage             = input$gpp_BG_gaussian_percentage,
-                                                 BG_width                           = input$gpp_BG_width,
-                                                 BG_width_tolerance                 = input$gpp_BG_width_tolerance,
-                                                 errorprov                          = input$gpp_errorprov,
-                                                 fitting_maxiter                    = input$gpp_fitting_maxiter,
-                                                 nls_lm_maxiter                     = 200, # from rDolphin defaults
-                                                 ftol                               = 1e-06, # from rDolphin defaults
-                                                 ptol                               = 1e-06, # from rDolphin defaults
-                                                 factor                             = 0.01, # from rDolphin defaults
-                                                 additional_signal_ppm_distance     = 0.002, # from rDolphin defaults
-                                                 signals_to_add                     = 2, # from rDolphin defaults
-                                                 fitting_maxiterrep                 = 0, # from rDolphin defaults
-                                                 additional_signal_improvement      = 0.75, # from rDolphin defaults
-                                                 additional_signal_percentage_limit = 3, # from rDolphin defaults
-                                                 peakdet_minimum                    = 0.01) # from rDolphin defaults
+        imported_data$program_parameters <- temp_gpps
+
+        rv$fitcheck_gpps <- imported_data$program_parameters
 
         ROI_data           <- imported_data$ROI_data
         spectra_to_profile <- which(rownames(imported_data$dataset) %in% input$sample_to_plot)
@@ -1182,6 +1188,7 @@ ref_data_editingServer <- function(id, xpmt_data, ref_data, ref_db){
         reproducibility_data <- output$reproducibility_data
 
         shinyWidgets::closeSweetAlert(session = session)
+
 
         rv$dspedt_profiling_data[[input$sample_to_plot]][[input$signal_to_check]] <-
           list(final_output = lapply(final_output,
