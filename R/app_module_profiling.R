@@ -1608,15 +1608,28 @@ profilingServer <- function(id, xpmt_data, ref_data){
             value   = trunc(sumit/totit*100)
           )
 
-          output=profiling_func(spectrum_index, signals_codes,
-                                imported_data,
-                                ROI_buckets, fitting_type,
-                                program_parameters, Xdata, Ydata = NULL,
-                                final_output,
-                                reproducibility_data,
-                                ROI_profile, baselinedataset,
-                                signals_to_quantify,
-                                pb = NULL)
+          output=profiling_func(spectrum_index       = spectrum_index,
+                                signals_codes        = signals_codes,
+                                imported_data        = imported_data,
+                                ROI_buckets          = ROI_buckets,
+                                fitting_type         = fitting_type,
+                                program_parameters   = program_parameters,
+                                Xdata                = Xdata,
+                                Ydata                = NULL,
+                                final_output         = final_output,
+                                reproducibility_data = reproducibility_data,
+                                ROI_profile          = ROI_profile,
+                                baselinedataset      = baselinedataset,
+                                signals_to_quantify  = signals_to_quantify,
+                                pb                   = NULL,
+                                reimplementation     = FALSE,
+                                max_shift            = NULL,
+                                min_shift            = NULL,
+                                max_intensity        = NULL,
+                                min_intensity        = NULL,
+                                max_width            = NULL,
+                                min_width            = NULL,
+                                signal_index         = NULL)
           # Note that Ydata is internally defined by profiling function despite
           # what is supplied to the argument above. See automatic_profiling.R and
           # profiling_func().
@@ -1627,6 +1640,7 @@ profilingServer <- function(id, xpmt_data, ref_data){
       }
       shinyWidgets::closeSweetAlert(session = shiny::getDefaultReactiveDomain())
 
+      # Need to swap out rDolphin::automatic_profiling_improv() with our own version.(8/10/22)
       tryCatch({
         if (optimization == TRUE & length(spectra_to_profile) > 20 & nrow(ROI_data) > 20) {
           optimized_profiling_data <-
