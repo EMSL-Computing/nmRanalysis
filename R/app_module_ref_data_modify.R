@@ -1021,8 +1021,30 @@ ref_data_editingServer <- function(id, xpmt_data, ref_data, ref_db){
         .$`ROI right edge (ppm)`
       signalROIdat <- rv$quantdat %>% dplyr::filter(.data$`ROI right edge (ppm)` == signalROI_right)
 
+      temp_gpps <- list(BGdensity                          = input$gpp_BGdensity,
+                        widthtolerance                     = input$gpp_widthtolerance,
+                        gaussian                           = input$gpp_gaussian,
+                        j_coupling_variation               = input$gpp_j_coupling_variation,
+                        BG_gaussian_percentage             = input$gpp_BG_gaussian_percentage,
+                        BG_width                           = input$gpp_BG_width,
+                        BG_width_tolerance                 = input$gpp_BG_width_tolerance,
+                        errorprov                          = input$gpp_errorprov,
+                        fitting_maxiter                    = input$gpp_fitting_maxiter,
+                        nls_lm_maxiter                     = 200, # from rDolphin defaults
+                        ftol                               = 1e-06, # from rDolphin defaults
+                        ptol                               = 1e-06, # from rDolphin defaults
+                        factor                             = 0.01, # from rDolphin defaults
+                        additional_signal_ppm_distance     = 0.002, # from rDolphin defaults
+                        signals_to_add                     = 2, # from rDolphin defaults
+                        fitting_maxiterrep                 = 0, # from rDolphin defaults
+                        additional_signal_improvement      = 0.75, # from rDolphin defaults
+                        additional_signal_percentage_limit = 3, # from rDolphin defaults
+                        peakdet_minimum                    = 0.01) # from rDolphin defaults
+
       if(is.null(rv$dspedt_profiling_data[[input$sample_to_plot]][[input$signal_to_check]]) |
-         !identical(rv$curr_ROI_profile[[input$sample_to_plot]][[input$signal_to_check]], signalROIdat)){
+         !identical(rv$curr_ROI_profile[[input$sample_to_plot]][[input$signal_to_check]], signalROIdat) |
+         !identical(rv$fitcheck_gpps, temp_gpps)){
+
         shinyWidgets::progressSweetAlert(
           session = session,
           id = "metquant_profiling_progress",
@@ -1050,25 +1072,9 @@ ref_data_editingServer <- function(id, xpmt_data, ref_data, ref_db){
         # Formats the data object
         imported_data <- ppmData_to_rDolphin(ppmData = txpmt_data,
                                              metabs  = signalROIdat)
-        imported_data$program_parameters <- list(BGdensity                          = input$gpp_BGdensity,
-                                                 widthtolerance                     = input$gpp_widthtolerance,
-                                                 gaussian                           = input$gpp_gaussian,
-                                                 j_coupling_variation               = input$gpp_j_coupling_variation,
-                                                 BG_gaussian_percentage             = input$gpp_BG_gaussian_percentage,
-                                                 BG_width                           = input$gpp_BG_width,
-                                                 BG_width_tolerance                 = input$gpp_BG_width_tolerance,
-                                                 errorprov                          = input$gpp_errorprov,
-                                                 fitting_maxiter                    = input$gpp_fitting_maxiter,
-                                                 nls_lm_maxiter                     = 200, # from rDolphin defaults
-                                                 ftol                               = 1e-06, # from rDolphin defaults
-                                                 ptol                               = 1e-06, # from rDolphin defaults
-                                                 factor                             = 0.01, # from rDolphin defaults
-                                                 additional_signal_ppm_distance     = 0.002, # from rDolphin defaults
-                                                 signals_to_add                     = 2, # from rDolphin defaults
-                                                 fitting_maxiterrep                 = 0, # from rDolphin defaults
-                                                 additional_signal_improvement      = 0.75, # from rDolphin defaults
-                                                 additional_signal_percentage_limit = 3, # from rDolphin defaults
-                                                 peakdet_minimum                    = 0.01) # from rDolphin defaults
+        imported_data$program_parameters <- temp_gpps
+
+        rv$fitcheck_gpps <- imported_data$program_parameters
 
         ROI_data           <- imported_data$ROI_data
         spectra_to_profile <- which(rownames(imported_data$dataset) %in% input$sample_to_plot)
@@ -1182,6 +1188,7 @@ ref_data_editingServer <- function(id, xpmt_data, ref_data, ref_db){
         reproducibility_data <- output$reproducibility_data
 
         shinyWidgets::closeSweetAlert(session = session)
+
 
         rv$dspedt_profiling_data[[input$sample_to_plot]][[input$signal_to_check]] <-
           list(final_output = lapply(final_output,
@@ -1582,10 +1589,24 @@ ref_data_editingServer <- function(id, xpmt_data, ref_data, ref_db){
                           shinyBS::bsCollapsePanel(title = "Metabolite Signal Options",
 
                                                    fluidRow(
-                                                     column(width = 4,
+                                                     column(width = 2,
                                                             actionButton(NS(id, "signal_add"), "Add New Signal")),
-                                                     column(width = 4,
+                                                     column(width = 3,
                                                             uiOutput(NS(id, "ui_remove_signal"))),
+                                                     column(width = 3,
+                                                            shinyWidgets::materialSwitch(
+                                                              inputId = NS(id, "set_metbwidth"),
+                                                              label = "Set Signal-Wide Half Bandwidth",
+                                                              status = "primary",
+                                                              value = FALSE,
+                                                              inline = TRUE,
+                                                              right = TRUE
+                                                            )),
+                                                     column(width = 3,
+                                                            uiOutput(NS(id, "ui_set_metbwidth")))
+                                                   ),
+                                                   h4(""),
+                                                   fluidRow({
                                                      column(width = 4,
                                                             shinyWidgets::materialSwitch(
                                                               inputId = NS(id, "display_fulldat"),
@@ -1595,13 +1616,14 @@ ref_data_editingServer <- function(id, xpmt_data, ref_data, ref_db){
                                                               inline = TRUE,
                                                               right = TRUE
                                                             ))
-                                                   ),
+                                                   }),
                                                    h4(""),
                                                    uiOutput(NS(id, "ui_fulldat_table")),
                                                    style = "primary"
                           ))
     })
 
+    # Dynamically displaying table containing all entries for a given reference metabolite
     output$ui_fulldat_table <- renderUI({
       req(input$display_fulldat)
       req(rv$full_reference_data)
@@ -1628,6 +1650,16 @@ ref_data_editingServer <- function(id, xpmt_data, ref_data, ref_db){
                                     "Roof effect 2", "Frequency (MHz)", "pH", "Concentration (mM)", "Temperature (K)"),
                         digits = 3)
 
+
+    })
+
+    # Dynamically displaying text box for signal-wide halfbandwidth
+    output$ui_set_metbwidth <- renderUI({
+      req(input$set_metbwidth)
+
+      textInput(inputId  = NS(id, "sigwide_bwidth"),
+                label    = "Half Bandwidth (Hz):",
+                value    = "")
 
     })
 
@@ -1693,6 +1725,33 @@ ref_data_editingServer <- function(id, xpmt_data, ref_data, ref_db){
                    rv$user_reference_data <- rv$user_reference_data %>% dplyr::filter(!(.data$Metabolite %in% input$which_refmet_dspedt &
                                                                                         .data$`Quantification Signal` == numSigs))
                  })
+
+    # Set the specified halfbandwidth for all signals of the metabolite
+    observeEvent(c(input$sigwide_bwidth),{
+      req(input$set_metbwidth)
+      req(input$sigwide_bwidth)
+
+      newbw <- as.numeric(input$sigwide_bwidth)
+
+      if(!is.na(newbw)){
+        rv$dspedt_user_reference_data[["Half bandwidth (Hz)"]] <- newbw
+
+        ProxyUpdate_refmet_tabplot(tabproxy = refmet_dspedt_table_proxy,
+                                   pltproxy = refmet_dspedt_plot_proxy,
+                                   newdat = rv$dspedt_user_reference_data)
+
+        # Store the unsaved changes
+        rv$unsaved_change[[input$which_refmet_dspedt]] <- rv$dspedt_user_reference_data
+      } else{
+        shinyWidgets::show_alert(
+          title = "Invalid Entry.",
+          text = "The supplied value must be numeric.",
+          type = "error"
+        )
+      }
+
+
+    })
 
     #----------------------------------------------------------------------------------------------------------
 
