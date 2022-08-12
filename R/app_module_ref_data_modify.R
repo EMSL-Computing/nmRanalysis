@@ -844,7 +844,6 @@ ref_data_editingServer <- function(id, xpmt_data, ref_data, ref_db){
     observeEvent(input$refmet_dspedt_table_cell_edit,
                  {
                    req(ref_data())
-                   browser()
 
                    info <- input$refmet_dspedt_table_cell_edit
                    changed_row <- info$row
@@ -1060,16 +1059,16 @@ ref_data_editingServer <- function(id, xpmt_data, ref_data, ref_db){
                                                  BG_width_tolerance                 = input$gpp_BG_width_tolerance,
                                                  errorprov                          = input$gpp_errorprov,
                                                  fitting_maxiter                    = input$gpp_fitting_maxiter,
-                                                 nls_lm_maxiter                     = input$gpp_nls_lm_maxiter,
-                                                 ftol                               = input$gpp_ftol,
-                                                 ptol                               = input$gpp_ptol,
-                                                 factor                             = input$gpp_factor,
-                                                 additional_signal_ppm_distance     = input$gpp_additional_signal_ppm_distance,
-                                                 signals_to_add                     = input$gpp_signals_to_add,
-                                                 fitting_maxiterrep                 = input$gpp_fitting_maxiterrep,
-                                                 additional_signal_improvement      = input$gpp_additional_signal_improvement,
-                                                 additional_signal_percentage_limit = input$gpp_additional_signal_percentage_limit,
-                                                 peakdet_minimum                    = input$gpp_peakdet_minimum)
+                                                 nls_lm_maxiter                     = 200, # from rDolphin defaults
+                                                 ftol                               = 1e-06, # from rDolphin defaults
+                                                 ptol                               = 1e-06, # from rDolphin defaults
+                                                 factor                             = 0.01, # from rDolphin defaults
+                                                 additional_signal_ppm_distance     = 0.002, # from rDolphin defaults
+                                                 signals_to_add                     = 2, # from rDolphin defaults
+                                                 fitting_maxiterrep                 = 0, # from rDolphin defaults
+                                                 additional_signal_improvement      = 0.75, # from rDolphin defaults
+                                                 additional_signal_percentage_limit = 3, # from rDolphin defaults
+                                                 peakdet_minimum                    = 0.01) # from rDolphin defaults
 
         ROI_data           <- imported_data$ROI_data
         spectra_to_profile <- which(rownames(imported_data$dataset) %in% input$sample_to_plot)
@@ -1357,7 +1356,7 @@ ref_data_editingServer <- function(id, xpmt_data, ref_data, ref_db){
 
                                                      column(width = 6,
                                                             numericInput(inputId  = NS(id, "gpp_gaussian"),
-                                                                         label    = "Gaussian Ratio:",
+                                                                         label    = "Pseudo-Voigt Lineshape Gaussian Ratio (0 < ratio < 1):",
                                                                          value    = 0)),
                                                      shinyBS::bsTooltip(id        = NS(id, "gpp_gaussian"),
                                                                         title     = "Controls the gaussian ratio used for lineshape fitting. May be any value between zero and one. Default value is zero.",
@@ -1376,10 +1375,10 @@ ref_data_editingServer <- function(id, xpmt_data, ref_data, ref_db){
 
                                                      column(width = 6,
                                                             numericInput(inputId  = NS(id, "gpp_errorprov"),
-                                                                         label    = "Fitting error threshold:",
+                                                                         label    = "Acceptable Fitting Error (%):",
                                                                          value    = 3)),
                                                      shinyBS::bsTooltip(id        = NS(id, "gpp_errorprov"),
-                                                                        title     = "Minimum acceptable fitting error of optimized fit. Optimization stops when the error falls below this threshold. Default value is 3.",
+                                                                        title     = "Minimum acceptable fitting error of optimized fit. Optimization stops when the error falls below this threshold. Default value is 3%.",
                                                                         placement = "bottom",
                                                                         trigger   = "hover")
 
@@ -1387,82 +1386,82 @@ ref_data_editingServer <- function(id, xpmt_data, ref_data, ref_db){
                                                    fluidRow(
                                                      column(width = 6,
                                                             numericInput(inputId  = NS(id, "gpp_fitting_maxiter"),
-                                                                         label    = "Max iterations of optimization subroutine:",
+                                                                         label    = "Maximum fitting parameter optimization iterations:",
                                                                          value    = 8)),
                                                      shinyBS::bsTooltip(id        = NS(id, "gpp_fitting_maxiter"),
-                                                                        title     = "(Optional) The maximum number of iterations for a subroutine of an algorithm to optimize fitting parameters.",
+                                                                        title     = "The maximum number of iterations for the algorithm to optimize fitting parameters.",
                                                                         placement = "bottom",
                                                                         trigger   = "hover"),
 
-                                                     column(width = 6,
-                                                            numericInput(inputId  = NS(id, "gpp_nls_lm_maxiter"),
-                                                                         label    = "Max iterations of Levenberg Marquardt (LM) algorithm:",
-                                                                         value    = 200)),
-                                                     shinyBS::bsTooltip(id        = NS(id, "gpp_nls_lm_maxiter"),
-                                                                        title     = "The maximum number of iterations for the Levenberg Marquardt algorithm used to optimize fitting parameters. Default value is 200.",
-                                                                        placement = "bottom",
-                                                                        trigger   = "hover")
-
-                                                   ),
-                                                   fluidRow(
-                                                     column(width = 6,
-                                                            numericInput(inputId  = NS(id, "gpp_ftol"),
-                                                                         label    = "LM algorithm sum of squares error threshold:",
-                                                                         value    = 1e-06)),
-                                                     shinyBS::bsTooltip(id        = NS(id, "gpp_ftol"),
-                                                                        title     = "Minimum sum of squared errors threshold for LM algorithm. Default value is 0.000001.",
-                                                                        placement = "bottom",
-                                                                        trigger   = "hover"),
-
-                                                     column(width = 6,
-                                                            numericInput(inputId  = NS(id, "gpp_ptol"),
-                                                                         label    = "LM algorithm relative error threshold:",
-                                                                         value    = 1e-06)),
-                                                     shinyBS::bsTooltip(id        = NS(id, "gpp_ptol"),
-                                                                        title     = "Minimum relative error threshold for LM algorithm. Default value is 0.000001.",
-                                                                        placement = "bottom",
-                                                                        trigger   = "hover")
-
-                                                   ),
-                                                   fluidRow(
-                                                     column(width = 6,
-                                                            numericInput(inputId  = NS(id, "gpp_factor"),
-                                                                         label    = "LM algorithm control factor:",
-                                                                         value    = 0.01)),
-                                                     shinyBS::bsTooltip(id        = NS(id, "gpp_factor"),
-                                                                        title     = "Control parameter used to determine the initial step bound for the LM algorithm. Default value is 0.01.",
-                                                                        placement = "bottom",
-                                                                        trigger   = "hover"),
-
-                                                     column(width = 6,
-                                                            numericInput(inputId  = NS(id, "gpp_fitting_maxiterrep"),
-                                                                         label    = "fitting_maxiterrep:",
-                                                                         value    = 0)),
-                                                     shinyBS::bsTooltip(id        = NS(id, "gpp_fitting_maxiterrep"),
-                                                                        title     = "Default value is zero.",
-                                                                        placement = "bottom",
-                                                                        trigger   = "hover")
-
-                                                   ),
-                                                   fluidRow(
-                                                     column(width = 6,
-                                                            numericInput(inputId  = NS(id, "gpp_peakdet_minimum"),
-                                                                         label    = "peakdet_minimum:",
-                                                                         value    = 0.01)),
-                                                     shinyBS::bsTooltip(id        = NS(id, "gpp_peakdet_minimum"),
-                                                                        title     = "Default value is 0.01.",
-                                                                        placement = "bottom",
-                                                                        trigger   = "hover")
-
-                                                     # These only apply to the "fitting error / signal area ratio analyses"
-                                                     # performed in the rDolphin GUI. We do not implement them, so these
-                                                     # parameters are unnecessary.
                                                      # column(width = 6,
-                                                     #        selectInput(inputId   = NS(id, "gpp_automatic_removal"),
-                                                     #                    label     = "automatic_removal:",
-                                                     #                    choices   = c("Yes" = "Y", "No" = "N"),
-                                                     #                    selected  = "Y"))
+                                                     #        numericInput(inputId  = NS(id, "gpp_nls_lm_maxiter"),
+                                                     #                     label    = "Max iterations of Levenberg Marquardt (LM) algorithm:",
+                                                     #                     value    = 200)),
+                                                     # shinyBS::bsTooltip(id        = NS(id, "gpp_nls_lm_maxiter"),
+                                                     #                    title     = "The maximum number of iterations for the Levenberg Marquardt algorithm used to optimize fitting parameters. Default value is 200.",
+                                                     #                    placement = "bottom",
+                                                     #                    trigger   = "hover")
+
                                                    ),
+                                                   # fluidRow(
+                                                   #   column(width = 6,
+                                                   #          numericInput(inputId  = NS(id, "gpp_ftol"),
+                                                   #                       label    = "LM algorithm sum of squares error threshold:",
+                                                   #                       value    = 1e-06)),
+                                                   #   shinyBS::bsTooltip(id        = NS(id, "gpp_ftol"),
+                                                   #                      title     = "Minimum sum of squared errors threshold for LM algorithm. Default value is 0.000001.",
+                                                   #                      placement = "bottom",
+                                                   #                      trigger   = "hover"),
+                                                   #
+                                                   #   column(width = 6,
+                                                   #          numericInput(inputId  = NS(id, "gpp_ptol"),
+                                                   #                       label    = "LM algorithm relative error threshold:",
+                                                   #                       value    = 1e-06)),
+                                                   #   shinyBS::bsTooltip(id        = NS(id, "gpp_ptol"),
+                                                   #                      title     = "Minimum relative error threshold for LM algorithm. Default value is 0.000001.",
+                                                   #                      placement = "bottom",
+                                                   #                      trigger   = "hover")
+                                                   #
+                                                   # ),
+                                                   # fluidRow(
+                                                   #   column(width = 6,
+                                                   #          numericInput(inputId  = NS(id, "gpp_factor"),
+                                                   #                       label    = "LM algorithm control factor:",
+                                                   #                       value    = 0.01)),
+                                                   #   shinyBS::bsTooltip(id        = NS(id, "gpp_factor"),
+                                                   #                      title     = "Control parameter used to determine the initial step bound for the LM algorithm. Default value is 0.01.",
+                                                   #                      placement = "bottom",
+                                                   #                      trigger   = "hover"),
+                                                   #
+                                                   #   column(width = 6,
+                                                   #          numericInput(inputId  = NS(id, "gpp_fitting_maxiterrep"),
+                                                   #                       label    = "fitting_maxiterrep:",
+                                                   #                       value    = 0)),
+                                                   #   shinyBS::bsTooltip(id        = NS(id, "gpp_fitting_maxiterrep"),
+                                                   #                      title     = "Default value is zero.",
+                                                   #                      placement = "bottom",
+                                                   #                      trigger   = "hover")
+                                                   #
+                                                   # ),
+                                                   # fluidRow(
+                                                   #   column(width = 6,
+                                                   #          numericInput(inputId  = NS(id, "gpp_peakdet_minimum"),
+                                                   #                       label    = "peakdet_minimum:",
+                                                   #                       value    = 0.01)),
+                                                   #   shinyBS::bsTooltip(id        = NS(id, "gpp_peakdet_minimum"),
+                                                   #                      title     = "Default value is 0.01.",
+                                                   #                      placement = "bottom",
+                                                   #                      trigger   = "hover")
+                                                   #
+                                                   #   # These only apply to the "fitting error / signal area ratio analyses"
+                                                   #   # performed in the rDolphin GUI. We do not implement them, so these
+                                                   #   # parameters are unnecessary.
+                                                   #   # column(width = 6,
+                                                   #   #        selectInput(inputId   = NS(id, "gpp_automatic_removal"),
+                                                   #   #                    label     = "automatic_removal:",
+                                                   #   #                    choices   = c("Yes" = "Y", "No" = "N"),
+                                                   #   #                    selected  = "Y"))
+                                                   # ),
                                                    # fluidRow(
                                                    #   column(width = 6,
                                                    #          numericInput(inputId  = NS(id, "gpp_fitting_error_analysis_limit"),
@@ -1485,7 +1484,7 @@ ref_data_editingServer <- function(id, xpmt_data, ref_data, ref_db){
 
                                                      column(width = 6,
                                                             numericInput(inputId  = NS(id, "gpp_BG_gaussian_percentage"),
-                                                                         label    = "BGS Gaussian Ratio:",
+                                                                         label    = "BGS Pseudo-Voigt Lineshape Gaussian Ratio (0 < ratio < 1):",
                                                                          value    = 0)),
                                                      shinyBS::bsTooltip(id        = NS(id, "gpp_BG_gaussian_percentage"),
                                                                         title     = "Controls the gaussian ratio used for lineshape fitting of background signals. May be any value between zero and one. Default value is zero.",
@@ -1514,47 +1513,47 @@ ref_data_editingServer <- function(id, xpmt_data, ref_data, ref_db){
 
                                                    ),
 
-                                                   fluidRow(
-                                                     column(width = 6,
-                                                            numericInput(inputId  = NS(id, "gpp_additional_signal_ppm_distance"),
-                                                                         label    = "additional_signal_ppm_distance:",
-                                                                         value    = 0.002)),
-                                                     shinyBS::bsTooltip(id        = NS(id, "gpp_additional_signal_ppm_distance"),
-                                                                        title     = "Default value is 0.002.",
-                                                                        placement = "bottom",
-                                                                        trigger   = "hover"),
-
-                                                     column(width = 6,
-                                                            numericInput(inputId  = NS(id, "gpp_signals_to_add"),
-                                                                         label    = "signals_to_add:",
-                                                                         value    = 2)),
-                                                     shinyBS::bsTooltip(id        = NS(id, "gpp_signals_to_add"),
-                                                                        title     = "Default value is two.",
-                                                                        placement = "bottom",
-                                                                        trigger   = "hover")
-
-                                                   ),
-
-                                                   fluidRow(
-                                                     column(width = 6,
-                                                            numericInput(inputId  = NS(id, "gpp_additional_signal_improvement"),
-                                                                         label    = "additional_signal_improvement:",
-                                                                         value    = 0.75)),
-                                                     shinyBS::bsTooltip(id        = NS(id, "gpp_additional_signal_improvement"),
-                                                                        title     = "Default value is 0.75.",
-                                                                        placement = "bottom",
-                                                                        trigger   = "hover"),
-
-                                                     column(width = 6,
-                                                            numericInput(inputId  = NS(id, "gpp_additional_signal_percentage_limit"),
-                                                                         label    = "additional_signal_percentage_limit:",
-                                                                         value    = 3)),
-                                                     shinyBS::bsTooltip(id        = NS(id, "gpp_additional_signal_percentage_limit"),
-                                                                        title     = "Default value is three.",
-                                                                        placement = "bottom",
-                                                                        trigger   = "hover")
-
-                                                   ),
+                                                   # fluidRow(
+                                                   #   column(width = 6,
+                                                   #          numericInput(inputId  = NS(id, "gpp_additional_signal_ppm_distance"),
+                                                   #                       label    = "additional_signal_ppm_distance:",
+                                                   #                       value    = 0.002)),
+                                                   #   shinyBS::bsTooltip(id        = NS(id, "gpp_additional_signal_ppm_distance"),
+                                                   #                      title     = "Default value is 0.002.",
+                                                   #                      placement = "bottom",
+                                                   #                      trigger   = "hover"),
+                                                   #
+                                                   #   column(width = 6,
+                                                   #          numericInput(inputId  = NS(id, "gpp_signals_to_add"),
+                                                   #                       label    = "signals_to_add:",
+                                                   #                       value    = 2)),
+                                                   #   shinyBS::bsTooltip(id        = NS(id, "gpp_signals_to_add"),
+                                                   #                      title     = "Default value is two.",
+                                                   #                      placement = "bottom",
+                                                   #                      trigger   = "hover")
+                                                   #
+                                                   # ),
+                                                   #
+                                                   # fluidRow(
+                                                   #   column(width = 6,
+                                                   #          numericInput(inputId  = NS(id, "gpp_additional_signal_improvement"),
+                                                   #                       label    = "additional_signal_improvement:",
+                                                   #                       value    = 0.75)),
+                                                   #   shinyBS::bsTooltip(id        = NS(id, "gpp_additional_signal_improvement"),
+                                                   #                      title     = "Default value is 0.75.",
+                                                   #                      placement = "bottom",
+                                                   #                      trigger   = "hover"),
+                                                   #
+                                                   #   column(width = 6,
+                                                   #          numericInput(inputId  = NS(id, "gpp_additional_signal_percentage_limit"),
+                                                   #                       label    = "additional_signal_percentage_limit:",
+                                                   #                       value    = 3)),
+                                                   #   shinyBS::bsTooltip(id        = NS(id, "gpp_additional_signal_percentage_limit"),
+                                                   #                      title     = "Default value is three.",
+                                                   #                      placement = "bottom",
+                                                   #                      trigger   = "hover")
+                                                   #
+                                                   # ),
                                                    style = "primary"
                           ))
     })
@@ -1709,16 +1708,16 @@ ref_data_editingServer <- function(id, xpmt_data, ref_data, ref_db){
                    BG_width_tolerance                 = input$gpp_BG_width_tolerance,
                    errorprov                          = input$gpp_errorprov,
                    fitting_maxiter                    = input$gpp_fitting_maxiter,
-                   nls_lm_maxiter                     = input$gpp_nls_lm_maxiter,
-                   ftol                               = input$gpp_ftol,
-                   ptol                               = input$gpp_ptol,
-                   factor                             = input$gpp_factor,
-                   additional_signal_ppm_distance     = input$gpp_additional_signal_ppm_distance,
-                   signals_to_add                     = input$gpp_signals_to_add,
-                   fitting_maxiterrep                 = input$gpp_fitting_maxiterrep,
-                   additional_signal_improvement      = input$gpp_additional_signal_improvement,
-                   additional_signal_percentage_limit = input$gpp_additional_signal_percentage_limit,
-                   peakdet_minimum                    = input$gpp_peakdet_minimum)
+                   nls_lm_maxiter                     = 200, # from rDolphin defaults
+                   ftol                               = 1e-06, # from rDolphin defaults
+                   ptol                               = 1e-06, # from rDolphin defaults
+                   factor                             = 0.01, # from rDolphin defaults
+                   additional_signal_ppm_distance     = 0.002, # from rDolphin defaults
+                   signals_to_add                     = 2, # from rDolphin defaults
+                   fitting_maxiterrep                 = 0, # from rDolphin defaults
+                   additional_signal_improvement      = 0.75, # from rDolphin defaults
+                   additional_signal_percentage_limit = 3, # from rDolphin defaults
+                   peakdet_minimum                    = 0.01) # from rDolphin defaults
 
       isolate({
         ## Document all changes relative to original reference data (ref_data()$ref_data)
