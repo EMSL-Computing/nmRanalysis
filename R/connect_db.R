@@ -68,8 +68,14 @@ dbGetQuery(conn = connec, statement = "INSERT INTO bmse_associations (id, entryI
 #############################################################################
 
 
+# function for updating from user specified table in app UI
 
+#dbCreateTable(connec, "profiling_parameters", User_defined_params)
 
-
+dbAppendTable(conn = connec,
+              name = SQL("profiling_parameters"),
+              value = User_defined_params,
+              copy = NULL,
+              row.names = NULL)
 
 dbDisconnect(connec)
