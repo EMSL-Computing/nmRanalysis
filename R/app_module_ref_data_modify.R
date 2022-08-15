@@ -1230,7 +1230,7 @@ ref_data_editingServer <- function(id, xpmt_data, ref_data, ref_db){
           dplyr::mutate(Signal = paste0(.data$Metabolite, " [", .data$`Quantification Signal`, "]"),
                         Signal2 = make.names(paste(.data$Metabolite, .data$`Quantification Signal`, sep='_')))
         whichrow <- which(temp$Signal == input$signal_to_check)
-        whichsig <- which(signals_names %in% temp$Signal2)
+        whichsig <- which(signals_names %in% make.names(gsub("\\]", "", gsub("\\ \\[", "_", input$signal_to_check))))
 
         opt_signal_params <- reproducibility_data[[1]][[whichsig]]$signals_parameters[, whichsig, drop = FALSE]
 
@@ -1840,18 +1840,9 @@ ref_data_editingServer <- function(id, xpmt_data, ref_data, ref_db){
                    # clear any unsaved changes
                    rv$unsaved_change <- list()
 
-                   # Line shape update
-                   ROI_lines <- ROI_line_gen(data = rv$dspedt_user_reference_data)
-
-                   # Annotation update
-                   ROI_annots <- ROI_annot_gen(data = rv$dspedt_user_reference_data)
-
-                   # Update plot
-                   plotly::plotlyProxyInvoke(refmet_dspedt_plot_proxy, "relayout",
-                                             list(title = paste("Experimental Data:", input$sample_to_plot, "<br>", "<sup>",
-                                                                input$which_refmet_dspedt, "Peak Location(s) displayed", "</sup>"),
-                                                  annotations = ROI_annots,
-                                                  shapes = ROI_lines))
+                   ProxyUpdate_refmet_tabplot(tabproxy = refmet_dspedt_table_proxy,
+                                              pltproxy = refmet_dspedt_plot_proxy,
+                                              newdat = rv$dspedt_user_reference_data)
 
 
                  })
@@ -1878,18 +1869,9 @@ ref_data_editingServer <- function(id, xpmt_data, ref_data, ref_db){
                    # clear any unsaved changes
                    rv$unsaved_change <- list()
 
-                   # Line shape update
-                   ROI_lines <- ROI_line_gen(data = rv$dspedt_user_reference_data)
-
-                   # Annotation update
-                   ROI_annots <- ROI_annot_gen(data = rv$dspedt_user_reference_data)
-
-                   # Update plot
-                   plotly::plotlyProxyInvoke(refmet_dspedt_plot_proxy, "relayout",
-                                             list(title = paste("Experimental Data:", input$sample_to_plot, "<br>", "<sup>",
-                                                                input$which_refmet_dspedt, "Peak Location(s) displayed", "</sup>"),
-                                                  annotations = ROI_annots,
-                                                  shapes = ROI_lines))
+                   ProxyUpdate_refmet_tabplot(tabproxy = refmet_dspedt_table_proxy,
+                                              pltproxy = refmet_dspedt_plot_proxy,
+                                              newdat = rv$dspedt_user_reference_data)
                  })
 
     # Set the specified halfbandwidth for all signals of the metabolite
