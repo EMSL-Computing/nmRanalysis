@@ -486,6 +486,7 @@ ref_data_editingServer <- function(id, xpmt_data, ref_data, ref_db){
       req(ref_data())
       req(input$which_refmet_dspedt)
 
+
       isolate({
         # Note: Remove quantification mode column, but allow users to specify quantification mode on a per-ROI basis on the
         # separate subtab (Reference Data for Quantification) where reference data are grouped by ROIs
@@ -522,34 +523,34 @@ ref_data_editingServer <- function(id, xpmt_data, ref_data, ref_db){
       isolate({
         req(ref_data())
         req(xpmt_data())
-      })
 
-      # Code to resume the observer that was started in a suspended state. We also update the value of
-      # rv$obs_show_subplot_suspend so that $resume() is not called every time this plot is rendered,
-      # but only after the first rendering of the plot.
-      if(rv$obs_show_subplot_suspend){
-        obs_show_subplot$resume()
-        rv$obs_show_subplot_suspend <- FALSE
-      }
-      if(rv$obs_annot_update_suspend){
-        obs_annot_update$resume()
-        rv$obs_annot_update_suspend <- FALSE
-      }
-      plotly::plot_ly(source = "id_refmet_dspedt_selected_plot", type = "scatter", mode = "lines") %>%
-        plotly::event_register("plotly_relayout") %>%
-        plotly::config(displaylogo = FALSE,
-                       modeBarButtons = list(list("select2d"), list("zoom2d"), list("zoomIn2d"),
-                                             list("zoomOut2d"), list("pan2d"), list("autoScale2d"),
-                                             list("resetScale2d"), list("toImage"))) %>%
-        plotly::layout(title = paste("Experimental Data:"),
-                       xaxis = list(title     = "PPM",
-                                    autorange = "reversed"),
-                       yaxis = list(title     = "Intensity"),
-                       dragmode = "zoom2d") %>%
-        plotly::config(edits = list(annotationTail     = TRUE,
-                                    annotationText     = FALSE,
-                                    annotationPosition = FALSE,
-                                    shapePosition      = TRUE))
+        # Code to resume the observer that was started in a suspended state. We also update the value of
+        # rv$obs_show_subplot_suspend so that $resume() is not called every time this plot is rendered,
+        # but only after the first rendering of the plot.
+        if(rv$obs_show_subplot_suspend){
+          obs_show_subplot$resume()
+          rv$obs_show_subplot_suspend <- FALSE
+        }
+        if(rv$obs_annot_update_suspend){
+          obs_annot_update$resume()
+          rv$obs_annot_update_suspend <- FALSE
+        }
+        plotly::plot_ly(source = "id_refmet_dspedt_selected_plot", type = "scatter", mode = "lines") %>%
+          plotly::event_register("plotly_relayout") %>%
+          plotly::config(displaylogo = FALSE,
+                         modeBarButtons = list(list("select2d"), list("zoom2d"), list("zoomIn2d"),
+                                               list("zoomOut2d"), list("pan2d"), list("autoScale2d"),
+                                               list("resetScale2d"), list("toImage"))) %>%
+          plotly::layout(title = paste("Experimental Data:"),
+                         xaxis = list(title     = "PPM",
+                                      autorange = "reversed"),
+                         yaxis = list(title     = "Intensity"),
+                         dragmode = "zoom2d") %>%
+          plotly::config(edits = list(annotationTail     = TRUE,
+                                      annotationText     = FALSE,
+                                      annotationPosition = FALSE,
+                                      shapePosition      = TRUE))
+      })
 
     })
 
