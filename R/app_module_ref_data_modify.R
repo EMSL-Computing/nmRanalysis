@@ -224,6 +224,7 @@ ref_data_editingServer <- function(id, xpmt_data, ref_data, ref_db){
                    req(ref_data())
                    req(xpmt_data())
 
+
                    # Check if any existing metabolites are being added
                    if(!is.null(input$refmet_toadd)){
 
@@ -355,7 +356,7 @@ ref_data_editingServer <- function(id, xpmt_data, ref_data, ref_db){
 
                      rv$user_reference_data <- dplyr::bind_rows(rv$user_reference_data, added_entry_data)
 
-                     rv$full_reference_data <- dplyr::bind_rows(rv$full_reference_data, added_reference_data)
+                     rv$full_reference_data <- dplyr::bind_rows(rv$full_reference_data, added_entry_data)
                    }
 
 
@@ -364,6 +365,16 @@ ref_data_editingServer <- function(id, xpmt_data, ref_data, ref_db){
                                         "which_refmet_dspedt",
                                         "Select Reference Metabolite(s) to Display/Edit:",
                                         choices = unique(rv$user_reference_data$Metabolite))
+
+                   updateSelectizeInput(session,
+                                        "refmet_toadd",
+                                        "Select from Existing:",
+                                        choices = setdiff(unique(ref_db$Solute), unique(rv$user_reference_data$Metabolite)))
+
+                   updateSelectizeInput(session,
+                                        "refmet_toremove",
+                                        "Select Metabolite(s) to Remove:",
+                                        choices = unique(rv$user_reference_data$Metabolite))
                  })
 
     # Observer to remove specified reference metabolite(s) from the set of reference metabolites already under consideration
@@ -371,6 +382,7 @@ ref_data_editingServer <- function(id, xpmt_data, ref_data, ref_db){
                  {
                    req(ref_data())
                    req(xpmt_data())
+
 
                    temp <- rv$user_reference_data %>% dplyr::filter(.data$Metabolite %ni% input$refmet_toremove)
                    shinyFeedback::feedbackDanger("refmet_toremove",
@@ -390,6 +402,16 @@ ref_data_editingServer <- function(id, xpmt_data, ref_data, ref_db){
                                         "which_refmet_dspedt",
                                         "Select Reference Metabolite(s) to Display/Edit:",
                                         choices = unique(rv$user_reference_data$Metabolite))
+
+                   updateSelectizeInput(session,
+                                        "refmet_toadd",
+                                        "Select from Existing:",
+                                        choices = setdiff(unique(ref_db$Solute), unique(rv$user_reference_data$Metabolite)))
+
+                   updateSelectizeInput(session,
+                                        "refmet_toremove",
+                                        "Select Metabolite(s) to Remove:",
+                                        choices = unique(rv$user_reference_data$Metabolite))
                  })
 
     # UI element for the options of adding of reference metabolites
@@ -397,7 +419,7 @@ ref_data_editingServer <- function(id, xpmt_data, ref_data, ref_db){
 
       req(ref_data())
 
-      addchoices <- setdiff(unique(ref_db$Solute), unique(rv$user_reference_data$Metabolite))
+      addchoices <- setdiff(unique(ref_db$Solute), unique(ref_data()$bestmatch_ref_data$Metabolite))
       selectizeInput(NS(id, "refmet_toadd"),
                      label = "Select from Existing:",
                      choices = addchoices, multiple = TRUE)
@@ -422,7 +444,7 @@ ref_data_editingServer <- function(id, xpmt_data, ref_data, ref_db){
 
       selectizeInput(NS(id, "refmet_toremove"),
                      label = "Select Metabolite(s) to Remove:",
-                     choices = unique(rv$user_reference_data$Metabolite), multiple = TRUE)
+                     choices = unique(ref_data()$bestmatch_ref_data$Metabolite), multiple = TRUE)
     })
 
     #----------------------------------------------------------------------------------------------------------
