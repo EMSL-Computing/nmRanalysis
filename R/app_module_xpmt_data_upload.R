@@ -63,13 +63,13 @@ xpmt_data_uploadUI <- function(id, ref_db){
                                                           textInput(inputId     = ns("pH"),
                                                                     label       = "pH:",
                                                                     value       = "",
-                                                                    placeholder = 7.4)),
+                                                                    placeholder = "e.g. 7.4")),
 
                                                    column(width = 6,
                                                           textInput(inputId     = ns("instrument_strength"),
                                                                     label       = "Spectrometer Frequency (MHz)",
                                                                     value       = "",
-                                                                    placeholder = 600))
+                                                                    placeholder = "e.g. 600"))
 
                                                  ),
 
@@ -82,7 +82,7 @@ xpmt_data_uploadUI <- function(id, ref_db){
                                                           textInput(inputId     = ns("temperature"),
                                                                     label       = "(Optional) Temperature (K)",
                                                                     value       = "",
-                                                                    placeholder = "298"))
+                                                                    placeholder = "e.g. 298"))
 
 
                                                  ),
@@ -92,7 +92,7 @@ xpmt_data_uploadUI <- function(id, ref_db){
                                                           textInput(inputId     = ns("concentration"),
                                                                     label       = "(Optional) Concentration (mM)",
                                                                     value       = "",
-                                                                    placeholder = "100"))
+                                                                    placeholder = "e.g. 100"))
                                                  ),
                                                  style = "primary"
                         )),

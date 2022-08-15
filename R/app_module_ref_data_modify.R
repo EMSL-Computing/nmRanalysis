@@ -53,6 +53,10 @@ ref_data_ROIeditingUI <- function(id){
       column(
         width = 2,
         uiOutput(ns("ui_refmet_dspedt_revert_all_savechanges"))
+      ),
+      column(
+        width = 4, offset = 3,
+        htmlOutput(ns("distance_text"))
       )
     ),
     h5(tags$b("Select a Signal:")),
@@ -470,7 +474,8 @@ ref_data_editingServer <- function(id, xpmt_data, ref_data, ref_db){
           dplyr::mutate(Signal = paste0(.data$Metabolite, " [", .data$`Quantification Signal`, "]"),
                         `Signal left edge (ppm)` = .data$`ROI left edge (ppm)`,
                         `Signal right edge (ppm)` = .data$`ROI right edge (ppm)`) %>%
-          dplyr::select(.data$Signal, .data$Quantify, .data$`Chemical shift(ppm)`, .data$`Signal left edge (ppm)`,
+          dplyr::select(.data$Signal, .data$Quantify, .data$`Chemical shift(ppm)`, .data$`Chemical shift tolerance (ppm)`,
+                        .data$`Signal left edge (ppm)`,
                         .data$`Signal right edge (ppm)`, .data$`Half bandwidth (Hz)`, .data$Multiplicity, .data$`J coupling (Hz)`,
                         .data$`J coupling 2 (Hz)`, .data$`Roof effect`, .data$`Roof effect 2`,
                         .data$`Frequency (MHz)`, .data$`pH`, .data$`Concentration (mM)`, .data$`Temperature (K)`,
@@ -479,7 +484,8 @@ ref_data_editingServer <- function(id, xpmt_data, ref_data, ref_db){
                         editable   = TRUE,
                         selection = "none",
                         options = list(scrollX = TRUE)) %>%
-          DT::formatRound(columns = c("Chemical shift(ppm)", "Signal left edge (ppm)", "Signal right edge (ppm)",
+          DT::formatRound(columns = c("Chemical shift(ppm)", "Chemical shift tolerance (ppm)",
+                                      "Signal left edge (ppm)", "Signal right edge (ppm)",
                                       "Half bandwidth (Hz)", "J coupling (Hz)", "J coupling 2 (Hz)", "Roof effect",
                                       "Roof effect 2", "Frequency (MHz)", "pH", "Concentration (mM)", "Temperature (K)"),
                           digits = 3)
@@ -856,7 +862,8 @@ ref_data_editingServer <- function(id, xpmt_data, ref_data, ref_db){
                      dplyr::mutate(Signal = paste0(.data$Metabolite, " [", .data$`Quantification Signal`, "]"),
                                    `Signal left edge (ppm)` = .data$`ROI left edge (ppm)`,
                                    `Signal right edge (ppm)` = .data$`ROI right edge (ppm)`) %>%
-                     dplyr::select(.data$Signal, .data$Quantify, .data$`Chemical shift(ppm)`, .data$`Signal left edge (ppm)`,
+                     dplyr::select(.data$Signal, .data$Quantify, .data$`Chemical shift(ppm)`, .data$`Chemical shift tolerance (ppm)`,
+                                   .data$`Signal left edge (ppm)`,
                                    .data$`Signal right edge (ppm)`, .data$`Half bandwidth (Hz)`, .data$Multiplicity, .data$`J coupling (Hz)`,
                                    .data$`J coupling 2 (Hz)`, .data$`Roof effect`, .data$`Roof effect 2`,
                                    .data$`Frequency (MHz)`, .data$`pH`, .data$`Concentration (mM)`, .data$`Temperature (K)`,
@@ -881,7 +888,7 @@ ref_data_editingServer <- function(id, xpmt_data, ref_data, ref_db){
                      # Store the unsaved changes
                      rv$unsaved_change[[input$which_refmet_dspedt]] <- rv$dspedt_user_reference_data
 
-                   } else if(edtd_colname %in% c("Half bandwidth (Hz)", "J coupling (Hz)",
+                   } else if(edtd_colname %in% c("Half bandwidth (Hz)", "J coupling (Hz)", "Chemical shift tolerance (ppm)",
                                                  "J coupling 2 (Hz)", "Roof effect", "Roof effect 2")) {
 
                      rv$dspedt_user_reference_data[[edtd_colname]][changed_row] <- as.numeric(v)
@@ -1196,6 +1203,42 @@ ref_data_editingServer <- function(id, xpmt_data, ref_data, ref_db){
                reproducibility_data = reproducibility_data[[which(rownames(imported_data$dataset) %in% input$sample_to_plot)]])
 
         rv$curr_ROI_profile[[input$sample_to_plot]][[input$signal_to_check]] <- signalROIdat
+
+        temp <- rv$dspedt_user_reference_data %>%
+          dplyr::mutate(Signal = paste0(.data$Metabolite, " [", .data$`Quantification Signal`, "]"),
+                        Signal2 = make.names(paste(.data$Metabolite, .data$`Quantification Signal`, sep='_')))
+        whichrow <- which(temp$Signal == input$signal_to_check)
+        whichsig <- which(signals_names %in% temp$Signal2)
+
+        opt_signal_params <- reproducibility_data[[1]][[whichsig]]$signals_parameters[, whichsig, drop = FALSE]
+
+        dist <- (rv$dspedt_user_reference_data[["ROI left edge (ppm)"]][[whichrow]] -
+                   rv$dspedt_user_reference_data[["ROI right edge (ppm)"]][[whichrow]])/2
+
+        new_chemshift <- as.numeric(opt_signal_params[2,])
+
+        rv$dspedt_user_reference_data[["Chemical shift(ppm)"]][[whichrow]]  <- round(new_chemshift,3)
+        rv$dspedt_user_reference_data[["ROI left edge (ppm)"]][[whichrow]]  <- round(new_chemshift + dist,3)
+        rv$dspedt_user_reference_data[["ROI right edge (ppm)"]][[whichrow]] <- round(new_chemshift - dist,3)
+        rv$dspedt_user_reference_data[["Chemical shift tolerance (ppm)"]][[whichrow]] <- round(min(dist/2,
+                                                                                                   rv$dspedt_user_reference_data[["Chemical shift tolerance (ppm)"]][[whichrow]]),
+                                                                                               3)
+
+
+        rv$dspedt_user_reference_data[["Half bandwidth (Hz)"]][[whichrow]] <- as.numeric(opt_signal_params[3,])
+        rv$dspedt_user_reference_data[["J coupling (Hz)"]][[whichrow]]     <- as.numeric(opt_signal_params[5,])
+
+        if(rv$dspedt_user_reference_data[["Multiplicity"]][[whichrow]] == "dd"){
+          rv$dspedt_user_reference_data[["J coupling 2 (Hz)"]][[whichrow]] <- as.numeric(opt_signal_params[6,])
+        }
+
+        ProxyUpdate_refmet_tabplot(tabproxy = refmet_dspedt_table_proxy,
+                                   pltproxy = refmet_dspedt_plot_proxy,
+                                   newdat = rv$dspedt_user_reference_data)
+
+        # Store the unsaved changes
+        rv$unsaved_change[[input$which_refmet_dspedt]] <- rv$dspedt_user_reference_data
+
       }
 
     })
@@ -1204,15 +1247,56 @@ ref_data_editingServer <- function(id, xpmt_data, ref_data, ref_db){
       req(input$show_metquant)
       req(rv$dspedt_profiling_data[[input$sample_to_plot]][[input$signal_to_check]])
 
+
       profiling_data <- rv$dspedt_profiling_data[[input$sample_to_plot]][[input$signal_to_check]]
 
       fmtted_signal_to_check <- rv$quantdat %>%
         dplyr::filter(paste0(.data$Metabolite, " [", .data$`Quantification Signal`, "]") == input$signal_to_check) %>%
         dplyr::mutate(SigName = paste0(.data$Metabolite, "_", .data$`Quantification Signal`)) %>% .$SigName
-      roidat <- rv$quantdat %>%
+
+      # This recomputes a version of quantdat based on the (not yet saved) optimized tweaks to the signal parameters that
+      # resulted from the fit check.
+      # Retain only those signals that will be quantified.
+      tempdf <- rv$user_reference_data %>%
+        dplyr::filter(.data$Quantify == 1)
+      tempdf[tempdf$rowid %in% rv$dspedt_user_reference_data$rowid,] <-
+        rv$dspedt_user_reference_data[rv$dspedt_user_reference_data$rowid %in% tempdf$rowid,]
+
+      # Merge metabolite signals whose bounds overlap into single ROIs
+      tempdf <- tempdf %>% dplyr::arrange(.data$`Chemical shift(ppm)`)
+      if(nrow(tempdf) > 1){
+        for(i in 1:(nrow(tempdf) - 1)){
+          if(tempdf$`ROI left edge (ppm)`[i] - tempdf$`ROI right edge (ppm)`[i+1] >= 0){
+            # If there is an overlap, update the right end (lower value) of the subsequent, overlapped ROI to that of
+            # the minimum between the two.
+            tempdf$`ROI right edge (ppm)`[i+1] <- min(tempdf$`ROI right edge (ppm)`[i], tempdf$`ROI right edge (ppm)`[i+1])
+            # Also update the ith right end and all others that share the same right end value to the same minimum.
+            tempdf$`ROI right edge (ppm)`[which(tempdf$`ROI right edge (ppm)` == tempdf$`ROI right edge (ppm)`[i])] <-
+              tempdf$`ROI right edge (ppm)`[i+1]
+            # Last, update the left end (higher value) of any other ROIs with the maximum right end value among all that share the
+            # updated ROI right edge
+            tempdf$`ROI left edge (ppm)`[which(tempdf$`ROI right edge (ppm)` == tempdf$`ROI right edge (ppm)`[i])] <-
+              max(tempdf$`ROI left edge (ppm)`[which(tempdf$`ROI right edge (ppm)` == tempdf$`ROI right edge (ppm)`[i])])
+          }
+        }
+      }
+
+      # Change experimental conditions of final quantification data to reflect that of the current experimental sample
+      tempdf$`Frequency (MHz)`    <- attr(xpmt_data(), "exp_info")$instrument_strength
+      tempdf$pH                   <- attr(xpmt_data(), "exp_info")$ph
+      tempdf$`Concentration (mM)` <- attr(xpmt_data(), "exp_info")$concentration
+      tempdf$`Temperature (K)`    <- attr(xpmt_data(), "exp_info")$temperature
+      tempdf$Solvent              <- attr(xpmt_data(), "exp_info")$solvent
+
+      # End recompute version of quantdat
+
+
+
+
+      roidat <- tempdf %>%
         dplyr::mutate(Signal = paste0(.data$Metabolite, " [", .data$`Quantification Signal`, "]")) %>%
         dplyr::filter(Signal == input$signal_to_check)
-      signames <- rv$quantdat %>%
+      signames <- tempdf %>%
         dplyr::mutate(Signal = paste0(.data$Metabolite, " [", .data$`Quantification Signal`, "]")) %>%
         dplyr::filter(.data$`ROI left edge (ppm)` == roidat$`ROI left edge (ppm)`) %>% .$Signal
 
@@ -1243,7 +1327,10 @@ ref_data_editingServer <- function(id, xpmt_data, ref_data, ref_db){
       ROI_data <- profiling_data$reproducibility_data[[1]]$ROI_profile
 
 
+
       tempdat <- rv$user_reference_data
+      tempdat[tempdat$rowid %in% rv$dspedt_user_reference_data$rowid,] <-
+        rv$dspedt_user_reference_data[rv$dspedt_user_reference_data$rowid %in% tempdat$rowid,]
       sigidx <- which(paste0(tempdat$Metabolite, " [", tempdat$`Quantification Signal`, "]") == input$signal_to_check)
 
       ROI_annots <- list(
@@ -1569,6 +1656,22 @@ ref_data_editingServer <- function(id, xpmt_data, ref_data, ref_db){
 
     # Misc ----------------------------------------------------------------------------------------------------
 
+    # Observer to measure distances with box select
+    output$distance_text <- renderUI({
+
+      brushedData <- plotly::event_data("plotly_brushed", source = "id_refmet_dspedt_selected_plot")
+      if(is.null(brushedData)){
+        return(NULL)
+      } else{
+        distppm <- abs(diff(brushedData$x))
+        disthz  <- distppm*attr(xpmt_data(), "exp_info")$instrument_strength
+        intensity_diff <- abs(diff(brushedData$y))
+        htmltools::HTML(paste0("<strong>Difference (ppm):</strong> ", round(distppm, 3), "<br/>",
+                               "<strong>Difference (Hz):</strong> ", round(disthz, 3), "<br/>",
+                               "<strong>Intensity Difference:</strong> ", round(intensity_diff, 3)))
+      }
+    })
+
     # Creates a datatable that displays reference database
     output$refmet_database <- DT::renderDataTable({
 
@@ -1636,7 +1739,8 @@ ref_data_editingServer <- function(id, xpmt_data, ref_data, ref_db){
                       `Signal right edge (ppm)` = .data$`ROI right edge (ppm)`) %>%
         dplyr::arrange(dplyr::desc(.data$`Quantification Signal`)) %>%
         dplyr::select(.data$`Frequency (MHz)`, .data$`pH`, .data$`Concentration (mM)`, .data$`Temperature (K)`,
-                      .data$`Solvent`, .data$Signal, .data$`Chemical shift(ppm)`, .data$`Signal left edge (ppm)`,
+                      .data$`Solvent`, .data$Signal, .data$`Chemical shift(ppm)`, .data$`Chemical shift tolerance (ppm)`,
+                      .data$`Signal left edge (ppm)`,
                       .data$`Signal right edge (ppm)`, .data$`Half bandwidth (Hz)`, .data$Multiplicity, .data$`J coupling (Hz)`,
                       .data$`J coupling 2 (Hz)`, .data$`Roof effect`, .data$`Roof effect 2`) %>%
         DT::datatable(rownames   = FALSE,
@@ -1645,7 +1749,7 @@ ref_data_editingServer <- function(id, xpmt_data, ref_data, ref_db){
                       options = list(scrollX = TRUE,
                                      paging = TRUE,
                                      pageLength = 5)) %>%
-        DT::formatRound(columns = c("Chemical shift(ppm)", "Signal left edge (ppm)", "Signal right edge (ppm)",
+        DT::formatRound(columns = c("Chemical shift(ppm)", "Chemical shift tolerance (ppm)", "Signal left edge (ppm)", "Signal right edge (ppm)",
                                     "Half bandwidth (Hz)", "J coupling (Hz)", "J coupling 2 (Hz)", "Roof effect",
                                     "Roof effect 2", "Frequency (MHz)", "pH", "Concentration (mM)", "Temperature (K)"),
                         digits = 3)

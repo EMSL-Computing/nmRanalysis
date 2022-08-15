@@ -85,7 +85,9 @@ refmet_data_change_fromplot <- function(dspedt_refmet_data, event_data, x0_field
       round(dspedt_refmet_data$"Chemical shift(ppm)"[changed_row] - dist, round_num)
     dspedt_refmet_data$"ROI left edge (ppm)"[changed_row]  <-
       round(dspedt_refmet_data$"Chemical shift(ppm)"[changed_row] + dist, round_num)
-    dspedt_refmet_data$"Chemical shift tolerance (ppm)"[changed_row] <- round(min(dist/2, 0.005), round_num)
+    dspedt_refmet_data$"Chemical shift tolerance (ppm)"[changed_row] <- round(min(dist/2,
+                                                                                  dspedt_refmet_data$"Chemical shift tolerance (ppm)"[changed_row]),
+                                                                              round_num)
 
   } else if(is.na(x1_fields)){
 
@@ -109,7 +111,9 @@ refmet_data_change_fromplot <- function(dspedt_refmet_data, event_data, x0_field
       round(dspedt_refmet_data$"Chemical shift(ppm)"[changed_row] - dist, round_num)
     dspedt_refmet_data$"ROI left edge (ppm)"[changed_row]  <-
       round(dspedt_refmet_data$"Chemical shift(ppm)"[changed_row] + dist, round_num)
-    dspedt_refmet_data$"Chemical shift tolerance (ppm)"[changed_row] <- round(min(dist/2, 0.005), round_num)
+    dspedt_refmet_data$"Chemical shift tolerance (ppm)"[changed_row] <- round(min(dist/2,
+                                                                                  dspedt_refmet_data$"Chemical shift tolerance (ppm)"[changed_row]),
+                                                                              round_num)
   }
 
   return(dspedt_refmet_data)
