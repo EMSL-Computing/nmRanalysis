@@ -224,6 +224,7 @@ ref_data_editingServer <- function(id, xpmt_data, ref_data, ref_db){
                    req(ref_data())
                    req(xpmt_data())
 
+
                    # Check if any existing metabolites are being added
                    if(!is.null(input$refmet_toadd)){
 
@@ -355,7 +356,7 @@ ref_data_editingServer <- function(id, xpmt_data, ref_data, ref_db){
 
                      rv$user_reference_data <- dplyr::bind_rows(rv$user_reference_data, added_entry_data)
 
-                     rv$full_reference_data <- dplyr::bind_rows(rv$full_reference_data, added_reference_data)
+                     rv$full_reference_data <- dplyr::bind_rows(rv$full_reference_data, added_entry_data)
                    }
 
 
@@ -364,6 +365,16 @@ ref_data_editingServer <- function(id, xpmt_data, ref_data, ref_db){
                                         "which_refmet_dspedt",
                                         "Select Reference Metabolite(s) to Display/Edit:",
                                         choices = unique(rv$user_reference_data$Metabolite))
+
+                   updateSelectizeInput(session,
+                                        "refmet_toadd",
+                                        "Select from Existing:",
+                                        choices = setdiff(unique(ref_db$Solute), unique(rv$user_reference_data$Metabolite)))
+
+                   updateSelectizeInput(session,
+                                        "refmet_toremove",
+                                        "Select Metabolite(s) to Remove:",
+                                        choices = unique(rv$user_reference_data$Metabolite))
                  })
 
     # Observer to remove specified reference metabolite(s) from the set of reference metabolites already under consideration
@@ -371,6 +382,7 @@ ref_data_editingServer <- function(id, xpmt_data, ref_data, ref_db){
                  {
                    req(ref_data())
                    req(xpmt_data())
+
 
                    temp <- rv$user_reference_data %>% dplyr::filter(.data$Metabolite %ni% input$refmet_toremove)
                    shinyFeedback::feedbackDanger("refmet_toremove",
@@ -390,6 +402,16 @@ ref_data_editingServer <- function(id, xpmt_data, ref_data, ref_db){
                                         "which_refmet_dspedt",
                                         "Select Reference Metabolite(s) to Display/Edit:",
                                         choices = unique(rv$user_reference_data$Metabolite))
+
+                   updateSelectizeInput(session,
+                                        "refmet_toadd",
+                                        "Select from Existing:",
+                                        choices = setdiff(unique(ref_db$Solute), unique(rv$user_reference_data$Metabolite)))
+
+                   updateSelectizeInput(session,
+                                        "refmet_toremove",
+                                        "Select Metabolite(s) to Remove:",
+                                        choices = unique(rv$user_reference_data$Metabolite))
                  })
 
     # UI element for the options of adding of reference metabolites
@@ -397,7 +419,7 @@ ref_data_editingServer <- function(id, xpmt_data, ref_data, ref_db){
 
       req(ref_data())
 
-      addchoices <- setdiff(unique(ref_db$Solute), unique(rv$user_reference_data$Metabolite))
+      addchoices <- setdiff(unique(ref_db$Solute), unique(ref_data()$bestmatch_ref_data$Metabolite))
       selectizeInput(NS(id, "refmet_toadd"),
                      label = "Select from Existing:",
                      choices = addchoices, multiple = TRUE)
@@ -422,7 +444,7 @@ ref_data_editingServer <- function(id, xpmt_data, ref_data, ref_db){
 
       selectizeInput(NS(id, "refmet_toremove"),
                      label = "Select Metabolite(s) to Remove:",
-                     choices = unique(rv$user_reference_data$Metabolite), multiple = TRUE)
+                     choices = unique(ref_data()$bestmatch_ref_data$Metabolite), multiple = TRUE)
     })
 
     #----------------------------------------------------------------------------------------------------------
@@ -693,6 +715,7 @@ ref_data_editingServer <- function(id, xpmt_data, ref_data, ref_db){
                    req(input$which_refmet_dspedt)
                    req(input$save_refmet_plot_changes > 0)
 
+
                    rv <- refmet_save_update(updated_refmet = input$which_refmet_dspedt,
                                             rvlist = rv)
 
@@ -704,6 +727,7 @@ ref_data_editingServer <- function(id, xpmt_data, ref_data, ref_db){
                    req(ref_data())
                    req(input$which_refmet_dspedt)
                    req(input$revert_last_refmet_save_changes > 0)
+
 
                    rv <- refmet_revert_update(updated_refmet = input$which_refmet_dspedt,
                                               rvlist = rv)
@@ -719,6 +743,7 @@ ref_data_editingServer <- function(id, xpmt_data, ref_data, ref_db){
                    req(ref_data())
                    req(input$which_refmet_dspedt)
                    req(input$revert_all_refmet_save_changes > 0)
+
 
                    rv <- refmet_revert_update(updated_refmet = input$which_refmet_dspedt,
                                               rvlist = rv,
@@ -942,7 +967,6 @@ ref_data_editingServer <- function(id, xpmt_data, ref_data, ref_db){
     output$fitcheck <- renderUI({
 
       req(input$which_refmet_dspedt)
-      req(ref_data())
       req(rv$user_reference_data)
 
       temp <- rv$user_reference_data %>% dplyr::ungroup() %>%
@@ -968,7 +992,6 @@ ref_data_editingServer <- function(id, xpmt_data, ref_data, ref_db){
     # Update selection options for quantification checks to be one of the signals for the selected metabolite
     observeEvent(c(input$which_refmet_dspedt), ignoreNULL = TRUE, ignoreInit = TRUE,
                  {
-                   req(ref_data())
                    req(rv$user_reference_data)
 
                    temp <- rv$user_reference_data %>% dplyr::ungroup() %>%
@@ -981,7 +1004,6 @@ ref_data_editingServer <- function(id, xpmt_data, ref_data, ref_db){
 
     # Defines new, "collapsed" or "merged" ROIs to be used for quantification.
     observe({
-      req(ref_data())
       req(rv$user_reference_data)
 
       # Retain only those signals that will be quantified.
@@ -1769,7 +1791,6 @@ ref_data_editingServer <- function(id, xpmt_data, ref_data, ref_db){
 
     # Remove (Most Recent) Added Signal
     output$ui_remove_signal <- renderUI({
-      req(ref_data())
       req(rv$user_reference_data)
       req(nrow(rv$user_reference_data %>% dplyr::filter(.data$Metabolite %in% input$which_refmet_dspedt)) >
             nrow(ref_data()$bestmatch_ref_data %>% dplyr::filter(.data$Metabolite %in% input$which_refmet_dspedt)))
