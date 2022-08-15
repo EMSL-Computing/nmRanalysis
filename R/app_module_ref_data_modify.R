@@ -53,6 +53,10 @@ ref_data_ROIeditingUI <- function(id){
       column(
         width = 2,
         uiOutput(ns("ui_refmet_dspedt_revert_all_savechanges"))
+      ),
+      column(
+        width = 4, offset = 3,
+        htmlOutput(ns("distance_text"))
       )
     ),
     h5(tags$b("Select a Signal:")),
@@ -1196,6 +1200,40 @@ ref_data_editingServer <- function(id, xpmt_data, ref_data, ref_db){
                reproducibility_data = reproducibility_data[[which(rownames(imported_data$dataset) %in% input$sample_to_plot)]])
 
         rv$curr_ROI_profile[[input$sample_to_plot]][[input$signal_to_check]] <- signalROIdat
+
+        # temp <- rv$dspedt_user_reference_data %>%
+        #   dplyr::mutate(Signal = paste0(.data$Metabolite, " [", .data$`Quantification Signal`, "]"),
+        #                 Signal2 = make.names(paste(.data$Metabolite, .data$`Quantification Signal`, sep='_')))
+        # whichrow <- which(temp$Signal == input$signal_to_check)
+        # whichsig <- which(signals_names %in% temp$Signal2)
+        #
+        # opt_signal_params <- reproducibility_data[[1]][[whichsig]]$signals_parameters[, whichsig, drop = FALSE]
+        #
+        # dist <- (rv$dspedt_user_reference_data[["ROI left edge (ppm)"]][[whichrow]] -
+        #            rv$dspedt_user_reference_data[["ROI right edge (ppm)"]][[whichrow]])/2
+        #
+        # new_chemshift <- as.numeric(opt_signal_params[2,])
+        #
+        # rv$dspedt_user_reference_data[["Chemical shift(ppm)"]][[whichrow]]  <- round(new_chemshift,3)
+        # rv$dspedt_user_reference_data[["ROI left edge (ppm)"]][[whichrow]]  <- round(new_chemshift + dist,3)
+        # rv$dspedt_user_reference_data[["ROI right edge (ppm)"]][[whichrow]] <- round(new_chemshift - dist,3)
+        # rv$dspedt_user_reference_data[["Chemical shift tolerance (ppm)"]][[whichrow]] <- round(min(dist/2, 0.005), 3)
+        #
+        #
+        # rv$dspedt_user_reference_data[["Half bandwidth (Hz)"]][[whichrow]] <- as.numeric(opt_signal_params[3,])
+        # rv$dspedt_user_reference_data[["J coupling (Hz)"]][[whichrow]]     <- as.numeric(opt_signal_params[5,])
+        #
+        # if(rv$dspedt_user_reference_data[["Multiplicity"]][[whichrow]] == "dd"){
+        #   rv$dspedt_user_reference_data[["J coupling 2 (Hz)"]][[whichrow]] <- as.numeric(opt_signal_params[6,])
+        # }
+        #
+        # ProxyUpdate_refmet_tabplot(tabproxy = refmet_dspedt_table_proxy,
+        #                            pltproxy = refmet_dspedt_plot_proxy,
+        #                            newdat = rv$dspedt_user_reference_data)
+        #
+        # # Store the unsaved changes
+        # rv$unsaved_change[[input$which_refmet_dspedt]] <- rv$dspedt_user_reference_data
+
       }
 
     })
@@ -1568,6 +1606,22 @@ ref_data_editingServer <- function(id, xpmt_data, ref_data, ref_db){
     #----------------------------------------------------------------------------------------------------------
 
     # Misc ----------------------------------------------------------------------------------------------------
+
+    # Observer to measure distances with box select
+    output$distance_text <- renderUI({
+
+      brushedData <- plotly::event_data("plotly_brushed", source = "id_refmet_dspedt_selected_plot")
+      if(is.null(brushedData)){
+        return(NULL)
+      } else{
+        distppm <- abs(diff(brushedData$x))
+        disthz  <- distppm*attr(xpmt_data(), "exp_info")$instrument_strength
+        intensity_diff <- abs(diff(brushedData$y))
+        htmltools::HTML(paste0("<strong>Difference (ppm):</strong> ", round(distppm, 3), "<br/>",
+                               "<strong>Difference (Hz):</strong> ", round(disthz, 3), "<br/>",
+                               "<strong>Intensity Difference:</strong> ", round(intensity_diff, 3)))
+      }
+    })
 
     # Creates a datatable that displays reference database
     output$refmet_database <- DT::renderDataTable({
