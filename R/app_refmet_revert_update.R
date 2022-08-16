@@ -39,13 +39,43 @@ refmet_revert_update <- function(updated_refmet, rvlist, all = FALSE){
   cmet <- updated_refmet
 
   if(all){
-    unedited_version <- rvlist$unedited_bestmatch_ref_data %>% dplyr::filter(.data$Metabolite %in% updated_refmet)
+    unedited_version <- rvlist$unedited_bestmatch_ref_data %>% dplyr::filter(.data$Metabolite %in% cmet)
+    current_version <- rvlist$user_reference_data[rvlist$user_reference_data$Metabolite == cmet,]
+    added_signals <- nrow(current_version) - nrow(unedited_version)
 
-    rvlist$user_reference_data[rvlist$user_reference_data$Metabolite == cmet,] <-
+    rvlist$user_reference_data[rvlist$user_reference_data$Metabolite == cmet &
+                                 rvlist$user_reference_data$`Quantification Signal` %in% unedited_version$`Quantification Signal`,] <-
       unedited_version
 
+    if(added_signals > 0){
+      added_entry_data <- data.frame(`ROI left edge (ppm)`            = rep(0.02, added_signals),
+                                     `ROI right edge (ppm)`           = rep(-0.02, added_signals),
+                                     `Quantification Mode`            = rep("Baseline Fitting", added_signals),
+                                     `Metabolite`                     = input$which_refmet_dspedt,
+                                     `Quantification Signal`          = c((nrow(unedited_version) + 1):(nrow(unedited_version) + added_signals)),
+                                     `Chemical shift(ppm)`            = rep(0, added_signals),
+                                     `Chemical shift tolerance (ppm)` = rep(0.02, added_signals),
+                                     `Half bandwidth (Hz)`            = rep(1.4, added_signals),
+                                     `Multiplicity`                   = rep("1", added_signals),
+                                     `J coupling (Hz)`                = rep(0, added_signals),
+                                     `Roof effect`                    = rep(0, added_signals),
+                                     `J coupling 2 (Hz)`              = rep(0, added_signals),
+                                     `Roof effect 2`                  = rep(0, added_signals),
+                                     `Quantify`                       = rep(1, added_signals),
+                                     `Frequency (MHz)`                = rep(attr(xpmt_data(), "exp_info")$instrument_strength, added_signals),
+                                     `pH`                             = rep(attr(xpmt_data(), "exp_info")$ph, added_signals),
+                                     `Concentration (mM)`             = rep(attr(xpmt_data(), "exp_info")$concentration, added_signals),
+                                     `Temperature (K)`                = rep(attr(xpmt_data(), "exp_info")$temperature, added_signals),
+                                     `Solvent`                        = rep(attr(xpmt_data(), "exp_info")$solvent, added_signals),
+                                     `rowid`                          = paste0(input$which_refmet_dspedt, c((nrow(unedited_version) + 1):(nrow(unedited_version) + added_signals))),
+                                     check.names = FALSE)
+
+      rvlist$user_reference_data[rvlist$user_reference_data$Metabolite == cmet &
+                                   rvlist$user_reference_data$`Quantification Signal` %ni% unedited_version$`Quantification Signal`,] <-
+        added_entry_data
+    }
     rvlist$dspedt_user_reference_data <-
-      unedited_version
+      rvlist$user_reference_data %>% dplyr::filter(.data$Metabolite %in% cmet)
 
     rvlist$change_counter[[cmet]] <- 0
 
