@@ -32,27 +32,31 @@
 #'
 #' @return A list containing the same elements as rvlist, but with values updated accordingly.
 #'
+#' @importFrom magrittr %>%
+#' @importFrom rlang .data
+#'
 refmet_revert_update <- function(updated_refmet, rvlist, all = FALSE){
   cmet <- updated_refmet
 
   if(all){
-    changed_rows <- rvlist$refchanges[[cmet]][[1]]$rowid
+    unedited_version <- rvlist$unedited_bestmatch_ref_data %>% dplyr::filter(.data$Metabolite %in% updated_refmet)
 
-    rvlist$user_reference_data[rvlist$user_reference_data$rowid %in% changed_rows,] <-
-      rvlist$refchanges[[cmet]][[1]]
+    rvlist$user_reference_data[rvlist$user_reference_data$Metabolite == cmet,] <-
+      unedited_version
 
     rvlist$dspedt_user_reference_data <-
-      rvlist$user_reference_data[rvlist$user_reference_data$rowid %in% changed_rows,]
+      unedited_version
 
     rvlist$change_counter[[cmet]] <- 0
 
   } else {
+
     changed_rows <- rvlist$refchanges[[cmet]][[rvlist$change_counter[[cmet]]]]$rowid
 
     rvlist$user_reference_data[rvlist$user_reference_data$rowid %in% changed_rows,] <-
       rvlist$refchanges[[cmet]][[rvlist$change_counter[[cmet]]]] # revert to previous values
 
-    rvlist$dspedt_user_reference_data <-
+    rvlist$dspedt_user_reference_data[rvlist$dspedt_user_reference_data$rowid %in% changed_rows,] <-
       rvlist$user_reference_data[rvlist$user_reference_data$rowid %in% changed_rows,] # similarly revert dspedt copy
 
     rvlist$change_counter[[cmet]] <- rvlist$change_counter[[cmet]] - 1 # move the change counter down a tick

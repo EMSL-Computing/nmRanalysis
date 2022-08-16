@@ -197,6 +197,7 @@ ref_data_editingServer <- function(id, xpmt_data, ref_data, ref_db){
     observe(priority = 2, {
       req(ref_data())
 
+      rv$unedited_bestmatch_ref_data <- ref_data()$bestmatch_ref_data # Needed for 'revert all changes'
       rv$user_reference_data <- ref_data()$bestmatch_ref_data
       rv$full_reference_data <- ref_data()$full_ref_data
 
@@ -470,26 +471,12 @@ ref_data_editingServer <- function(id, xpmt_data, ref_data, ref_db){
                                               pltproxy = refmet_dspedt_plot_proxy,
                                               newdat = rv$dspedt_user_reference_data)
 
-                   # # Line shape update
-                   # ROI_lines <- ROI_line_gen(data = rv$dspedt_user_reference_data)
-                   #
-                   # # Annotation update
-                   # ROI_annots <- ROI_annot_gen(data = rv$dspedt_user_reference_data)
-                   #
-                   # # Update plot
-                   # plotly::plotlyProxyInvoke(refmet_dspedt_plot_proxy, "relayout",
-                   #                           list(title = paste("Experimental Data:", input$sample_to_plot, "<br>", "<sup>",
-                   #                                              input$which_refmet_dspedt, "Peak Location(s) displayed", "</sup>"),
-                   #                                annotations = ROI_annots,
-                   #                                shapes = ROI_lines))
                  })
 
     # This datatable corresponds to the selected reference metabolite data to display/edit
     output$refmet_dspedt_table <- DT::renderDT({
 
       req(ref_data())
-      # req(input$which_refmet_dspedt)
-
 
       isolate({
         # Note: Remove quantification mode column, but allow users to specify quantification mode on a per-ROI basis on the
@@ -731,7 +718,6 @@ ref_data_editingServer <- function(id, xpmt_data, ref_data, ref_db){
                    req(input$which_refmet_dspedt)
                    req(input$revert_last_refmet_save_changes > 0)
 
-
                    rv <- refmet_revert_update(updated_refmet = input$which_refmet_dspedt,
                                               rvlist = rv)
 
@@ -783,7 +769,9 @@ ref_data_editingServer <- function(id, xpmt_data, ref_data, ref_db){
 
       req(ref_data())
       req(input$which_refmet_dspedt)
-      req(rv$change_counter[[input$which_refmet_dspedt]] > 1)
+      og_version <- rv$unedited_bestmatch_ref_data %>% dplyr::filter(.data$Metabolite %in% input$which_refmet_dspedt)
+      curr_version <- rv$user_reference_data %>% dplyr::filter(.data$Metabolite %in% input$which_refmet_dspedt)
+      req(!identical(og_version, curr_version))
 
       actionButton(NS(id, "revert_all_refmet_save_changes"),
                    label = "Revert All Saves")
