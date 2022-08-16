@@ -466,25 +466,29 @@ ref_data_editingServer <- function(id, xpmt_data, ref_data, ref_db){
                    # clear any unsaved changes
                    rv$unsaved_change <- list()
 
-                   # Line shape update
-                   ROI_lines <- ROI_line_gen(data = rv$dspedt_user_reference_data)
+                   ProxyUpdate_refmet_tabplot(tabproxy = refmet_dspedt_table_proxy,
+                                              pltproxy = refmet_dspedt_plot_proxy,
+                                              newdat = rv$dspedt_user_reference_data)
 
-                   # Annotation update
-                   ROI_annots <- ROI_annot_gen(data = rv$dspedt_user_reference_data)
-
-                   # Update plot
-                   plotly::plotlyProxyInvoke(refmet_dspedt_plot_proxy, "relayout",
-                                             list(title = paste("Experimental Data:", input$sample_to_plot, "<br>", "<sup>",
-                                                                input$which_refmet_dspedt, "Peak Location(s) displayed", "</sup>"),
-                                                  annotations = ROI_annots,
-                                                  shapes = ROI_lines))
+                   # # Line shape update
+                   # ROI_lines <- ROI_line_gen(data = rv$dspedt_user_reference_data)
+                   #
+                   # # Annotation update
+                   # ROI_annots <- ROI_annot_gen(data = rv$dspedt_user_reference_data)
+                   #
+                   # # Update plot
+                   # plotly::plotlyProxyInvoke(refmet_dspedt_plot_proxy, "relayout",
+                   #                           list(title = paste("Experimental Data:", input$sample_to_plot, "<br>", "<sup>",
+                   #                                              input$which_refmet_dspedt, "Peak Location(s) displayed", "</sup>"),
+                   #                                annotations = ROI_annots,
+                   #                                shapes = ROI_lines))
                  })
 
     # This datatable corresponds to the selected reference metabolite data to display/edit
     output$refmet_dspedt_table <- DT::renderDT({
 
       req(ref_data())
-      req(input$which_refmet_dspedt)
+      # req(input$which_refmet_dspedt)
 
 
       isolate({
