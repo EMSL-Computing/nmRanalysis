@@ -30,19 +30,44 @@
 #'
 #' @return A list containing the same elements as rvlist, but with values updated accordingly.
 #'
+#' @importFrom magrittr %>%
+#' @importFrom rlang .data
+#'
 refmet_save_update <- function(updated_refmet, rvlist){
+
   cmet <- updated_refmet
 
   rvlist$change_counter[[cmet]] <- sum(c(rvlist$change_counter[[cmet]], 1))
-  changed_rows <- rvlist$dspedt_user_reference_data$rowid
 
-  rvlist$refchanges[[cmet]][[rvlist$change_counter[[cmet]]]] <-
-    rvlist$user_reference_data[rvlist$user_reference_data$rowid %in% changed_rows,] # store values prior to change
+  if(rvlist$change_counter[[cmet]] > 1){
+    # rvlist$refchanges[[cmet]][[1]] <- rvlist$refchanges[[cmet]][[2]]
+    # rvlist$refchanges[[cmet]][[2]] <- rvlist$refchanges[[cmet]][[3]]
 
-  rvlist$user_reference_data[rvlist$user_reference_data$rowid %in% changed_rows,] <-
-    rvlist$dspedt_user_reference_data # Update values to change
+    current_version <- rvlist$user_reference_data %>% dplyr::filter(.data$Metabolite %in% updated_refmet)
+    suppressMessages(changed_rows <- dplyr::anti_join(current_version, rvlist$dspedt_user_reference_data)$rowid)
 
-  rvlist$unsaved_change[[cmet]] <- NULL
+    rvlist$refchanges[[cmet]][[1]] <-
+      rvlist$user_reference_data[rvlist$user_reference_data$rowid %in% changed_rows,] # store values prior to change
+
+    rvlist$user_reference_data[rvlist$user_reference_data$rowid %in% changed_rows,] <-
+      rvlist$dspedt_user_reference_data[rvlist$dspedt_user_reference_data$rowid %in% changed_rows,] # Update values to change
+
+    rvlist$unsaved_change[[cmet]] <- NULL
+
+    rvlist$change_counter[[cmet]] <- 1 # cap the change counter to 1
+
+  } else{
+    current_version <- rvlist$user_reference_data %>% dplyr::filter(.data$Metabolite %in% updated_refmet)
+    suppressMessages(changed_rows <- dplyr::anti_join(current_version, rvlist$dspedt_user_reference_data)$rowid)
+
+    rvlist$refchanges[[cmet]][[rvlist$change_counter[[cmet]]]] <-
+      rvlist$user_reference_data[rvlist$user_reference_data$rowid %in% changed_rows,] # store values prior to change
+
+    rvlist$user_reference_data[rvlist$user_reference_data$rowid %in% changed_rows,] <-
+      rvlist$dspedt_user_reference_data[rvlist$dspedt_user_reference_data$rowid %in% changed_rows,] # Update values to change
+
+    rvlist$unsaved_change[[cmet]] <- NULL
+  }
 
   return(rvlist)
 }

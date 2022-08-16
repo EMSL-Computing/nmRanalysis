@@ -197,6 +197,7 @@ ref_data_editingServer <- function(id, xpmt_data, ref_data, ref_db){
     observe(priority = 2, {
       req(ref_data())
 
+      rv$unedited_bestmatch_ref_data <- ref_data()$bestmatch_ref_data # Needed for 'revert all changes'
       rv$user_reference_data <- ref_data()$bestmatch_ref_data
       rv$full_reference_data <- ref_data()$full_ref_data
 
@@ -224,7 +225,6 @@ ref_data_editingServer <- function(id, xpmt_data, ref_data, ref_db){
                    req(ref_data())
                    req(xpmt_data())
 
-
                    # Check if any existing metabolites are being added
                    if(!is.null(input$refmet_toadd)){
 
@@ -239,9 +239,17 @@ ref_data_editingServer <- function(id, xpmt_data, ref_data, ref_db){
                                                             temperature         = attr(xpmt_data(), "exp_info")$temperature,
                                                             concentration       = attr(xpmt_data(), "exp_info")$concentration)
 
-                     shinyFeedback::feedbackDanger("refmet_toadd",
-                                                   nrow(added_reference_data) == 0,
-                                                   "No ROI data available.")
+                     if(is.null(added_reference_data)){
+                       shinyFeedback::feedbackDanger("refmet_toadd",
+                                                     is.null(added_reference_data),
+                                                     "No ROI data available.")
+                     } else{
+                       shinyFeedback::feedbackDanger("refmet_toadd",
+                                                     nrow(added_reference_data) == 0 | is.null(added_reference_data),
+                                                     "No ROI data available.")
+                     }
+
+                     req(added_reference_data)
                      req(nrow(added_reference_data) > 0)
 
                      # Filter to get exact or best match
@@ -324,10 +332,12 @@ ref_data_editingServer <- function(id, xpmt_data, ref_data, ref_db){
 
 
 
+
                      rv$user_reference_data <- dplyr::bind_rows(rv$user_reference_data, added_reference_data_bestmatch)
 
 
                      rv$full_reference_data <- dplyr::bind_rows(rv$full_reference_data, added_reference_data)
+                     rv$unedited_bestmatch_ref_data <- dplyr::bind_rows(rv$unedited_bestmatch_ref_data, added_reference_data_bestmatch)
                    }
 
                    # Check if any new metabolites are being added
@@ -357,6 +367,7 @@ ref_data_editingServer <- function(id, xpmt_data, ref_data, ref_db){
                      rv$user_reference_data <- dplyr::bind_rows(rv$user_reference_data, added_entry_data)
 
                      rv$full_reference_data <- dplyr::bind_rows(rv$full_reference_data, added_entry_data)
+                     rv$unedited_bestmatch_ref_data <- dplyr::bind_rows(rv$unedited_bestmatch_ref_data, added_entry_data)
                    }
 
 
@@ -393,6 +404,7 @@ ref_data_editingServer <- function(id, xpmt_data, ref_data, ref_db){
                    rv$user_reference_data <- temp
 
                    rv$full_reference_data <- rv$full_reference_data %>% dplyr::filter(.data$Metabolite %ni% input$refmet_toremove)
+                   rv$unedited_bestmatch_ref_data <- rv$unedited_bestmatch_ref_data %>% dplyr::filter(.data$Metabolite %ni% input$refmet_toremove)
 
                    # Also, remove stored changes and counter (from refchanges, change_counter) corresponding to removed metabolite
                    rv$refchanges <- rv$refchanges[names(rv$refchanges) %ni% input$refmet_toremove]
@@ -466,26 +478,16 @@ ref_data_editingServer <- function(id, xpmt_data, ref_data, ref_db){
                    # clear any unsaved changes
                    rv$unsaved_change <- list()
 
-                   # Line shape update
-                   ROI_lines <- ROI_line_gen(data = rv$dspedt_user_reference_data)
+                   ProxyUpdate_refmet_tabplot(tabproxy = refmet_dspedt_table_proxy,
+                                              pltproxy = refmet_dspedt_plot_proxy,
+                                              newdat = rv$dspedt_user_reference_data)
 
-                   # Annotation update
-                   ROI_annots <- ROI_annot_gen(data = rv$dspedt_user_reference_data)
-
-                   # Update plot
-                   plotly::plotlyProxyInvoke(refmet_dspedt_plot_proxy, "relayout",
-                                             list(title = paste("Experimental Data:", input$sample_to_plot, "<br>", "<sup>",
-                                                                input$which_refmet_dspedt, "Peak Location(s) displayed", "</sup>"),
-                                                  annotations = ROI_annots,
-                                                  shapes = ROI_lines))
                  })
 
     # This datatable corresponds to the selected reference metabolite data to display/edit
     output$refmet_dspedt_table <- DT::renderDT({
 
       req(ref_data())
-      req(input$which_refmet_dspedt)
-
 
       isolate({
         # Note: Remove quantification mode column, but allow users to specify quantification mode on a per-ROI basis on the
@@ -727,7 +729,6 @@ ref_data_editingServer <- function(id, xpmt_data, ref_data, ref_db){
                    req(input$which_refmet_dspedt)
                    req(input$revert_last_refmet_save_changes > 0)
 
-
                    rv <- refmet_revert_update(updated_refmet = input$which_refmet_dspedt,
                                               rvlist = rv)
 
@@ -742,6 +743,7 @@ ref_data_editingServer <- function(id, xpmt_data, ref_data, ref_db){
                    req(ref_data())
                    req(input$which_refmet_dspedt)
                    req(input$revert_all_refmet_save_changes > 0)
+
 
 
                    rv <- refmet_revert_update(updated_refmet = input$which_refmet_dspedt,
@@ -779,7 +781,15 @@ ref_data_editingServer <- function(id, xpmt_data, ref_data, ref_db){
 
       req(ref_data())
       req(input$which_refmet_dspedt)
-      req(rv$change_counter[[input$which_refmet_dspedt]] > 1)
+
+
+      og_version <- rv$unedited_bestmatch_ref_data %>%
+        dplyr::filter(.data$Metabolite %in% input$which_refmet_dspedt) %>%
+        dplyr::arrange(.data$`Quantification Signal`)
+      curr_version <- rv$user_reference_data %>%
+        dplyr::filter(.data$Metabolite %in% input$which_refmet_dspedt) %>%
+        dplyr::arrange(.data$`Quantification Signal`)
+      req(!identical(og_version, curr_version))
 
       actionButton(NS(id, "revert_all_refmet_save_changes"),
                    label = "Revert All Saves")
@@ -1791,8 +1801,11 @@ ref_data_editingServer <- function(id, xpmt_data, ref_data, ref_db){
     # Remove (Most Recent) Added Signal
     output$ui_remove_signal <- renderUI({
       req(rv$user_reference_data)
+
+      temp <- rv$full_reference_data %>%
+        dplyr::filter(.data$Metabolite %in% input$which_refmet_dspedt, !duplicated(.data$`Quantification Signal`))
       req(nrow(rv$user_reference_data %>% dplyr::filter(.data$Metabolite %in% input$which_refmet_dspedt)) >
-            nrow(ref_data()$bestmatch_ref_data %>% dplyr::filter(.data$Metabolite %in% input$which_refmet_dspedt)))
+            nrow(temp))
 
       actionButton(NS(id, "signal_remove"), "Remove Last Added Signal")
     })
@@ -1831,6 +1844,7 @@ ref_data_editingServer <- function(id, xpmt_data, ref_data, ref_db){
                                                   check.names = FALSE)
 
                    rv$user_reference_data <- dplyr::bind_rows(rv$user_reference_data, added_entry_data)
+                   rv$unedited_bestmatch_ref_data <- dplyr::bind_rows(rv$unedited_bestmatch_ref_data, added_entry_data)
 
                    # reference metabolite copy
                    rv$dspedt_user_reference_data <- rv$user_reference_data %>%
@@ -1860,6 +1874,8 @@ ref_data_editingServer <- function(id, xpmt_data, ref_data, ref_db){
 
                    rv$user_reference_data <- rv$user_reference_data %>% dplyr::filter(!(.data$Metabolite %in% input$which_refmet_dspedt &
                                                                                         .data$`Quantification Signal` == numSigs))
+                   rv$unedited_bestmatch_ref_data <- rv$unedited_bestmatch_ref_data %>% dplyr::filter(!(.data$Metabolite %in% input$which_refmet_dspedt &
+                                                                                                                .data$`Quantification Signal` == numSigs))
 
                    # reference metabolite copy
                    rv$dspedt_user_reference_data <- rv$user_reference_data %>%
@@ -1943,21 +1959,8 @@ ref_data_editingServer <- function(id, xpmt_data, ref_data, ref_db){
         allres <- vector("list", length = length(tempnames))
         names(allres) <- tempnames
         for(name in tempnames){
-          templength <- length(rv$refchanges[[name]])
-          tempres <- list(OriginalEntry = rv$refchanges[[name]][[1]])
-          if (templength > 1){
-            for(i in 2:templength){
-              # binary_diffmat <- !(rv$refchanges[[name]][[i]] == rv$refchanges[[name]][[1]]) # THIS IS THE PROBLEMATIC LINE FOR ADD SIGNAL EDITS. ERROR ONLY SHOWS UP AFTER YOU FIRST EDIT ONE OF ORIGINAL SIGNALS
-              # crows <- which(apply(binary_diffmat,1,any))
-              # ccols <- which(apply(binary_diffmat,2,any))
-              # Solution: Don't curate portion of data where change was made, just store each iteration of the data. (Even if unwieldly)
-              # tempres <- append(tempres, list(rv$refchanges[[name]][[i]][crows, ccols, drop = FALSE]))
-              tempres <- append(tempres, list(rv$refchanges[[name]][[i]]))
-            }
-            names(tempres) <- c("OriginalEntry", paste0("Edit_", 1:(templength-1)))
-          }
-          currdf <- rv$user_reference_data %>% dplyr::filter(.data$Metabolite == name)
-          allres[[name]] <- c(tempres, FinalEntry = list(currdf))
+          allres[[name]] <- list(OriginalEntry = orig_refdat %>% dplyr::filter(.data$Metabolite %in% name),
+                                 FinalEntry    = rv$user_reference_data %>% dplyr::filter(.data$Metabolite == name))
         }
         attr(rv$user_reference_data, "edit_history") <- allres
 
