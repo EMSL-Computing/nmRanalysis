@@ -54,7 +54,9 @@ Imports:
     rjson,
     dbscan,
     data.table,
-    tibble
+    tibble,
+    DBI,
+    RPostgres
 Suggests:
     knitr,
     rmarkdown,
