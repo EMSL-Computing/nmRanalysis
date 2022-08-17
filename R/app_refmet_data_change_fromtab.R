@@ -50,8 +50,6 @@ refmet_data_change_fromtab <- function(dspedt_refmet_data, changed_row, change, 
     new_tol   <- change
     chemshift <- dspedt_refmet_data$"Chemical shift(ppm)"[changed_row]
 
-    dspedt_refmet_data$"ROI left edge (ppm)"[changed_row]  <- chemshift + round(new_tol, round_num)
-    dspedt_refmet_data$"ROI right edge (ppm)"[changed_row] <- chemshift - round(new_tol, round_num)
     dspedt_refmet_data$"Chemical shift tolerance (ppm)"[changed_row] <- round(new_tol, round_num)
 
   } else if(edtd_colname == "Signal left edge (ppm)"){
@@ -66,7 +64,9 @@ refmet_data_change_fromtab <- function(dspedt_refmet_data, changed_row, change, 
 
     dspedt_refmet_data$"ROI left edge (ppm)"[changed_row]  <- chemshift + round(dist, round_num)
     dspedt_refmet_data$"ROI right edge (ppm)"[changed_row] <- chemshift - round(dist, round_num)
-    dspedt_refmet_data$"Chemical shift tolerance (ppm)"[changed_row] <- round(min(dist/2, 0.005), round_num)
+    dspedt_refmet_data$"Chemical shift tolerance (ppm)"[changed_row] <- round(min(dist/2,
+                                                                                  dspedt_refmet_data$"Chemical shift tolerance (ppm)"[changed_row]),
+                                                                              round_num)
 
   } else if(edtd_colname == "Signal right edge (ppm)"){
 
@@ -80,7 +80,9 @@ refmet_data_change_fromtab <- function(dspedt_refmet_data, changed_row, change, 
 
     dspedt_refmet_data$"ROI left edge (ppm)"[changed_row]  <- chemshift + round(dist, round_num)
     dspedt_refmet_data$"ROI right edge (ppm)"[changed_row] <- chemshift - round(dist, round_num)
-    dspedt_refmet_data$"Chemical shift tolerance (ppm)"[changed_row] <- round(min(dist/2, 0.005), round_num)
+    dspedt_refmet_data$"Chemical shift tolerance (ppm)"[changed_row] <- round(min(dist/2,
+                                                                                  dspedt_refmet_data$"Chemical shift tolerance (ppm)"[changed_row]),
+                                                                              round_num)
 
   }
 

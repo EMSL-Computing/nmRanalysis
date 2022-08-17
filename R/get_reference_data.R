@@ -615,22 +615,26 @@ export_roi_file <- function(spectra_df,
                              metab_name$Solvent)
   colnames(roi_df) <- header
 
-  # Average duplicate entries by experimental conditions
-  avg_roi_df <- roi_df %>%
-    dplyr::group_by(.data$`Quantification Mode`, .data$`Metabolite`, .data$`Quantification Signal`, .data$`Frequency (MHz)`,
-                    .data$`pH`, .data$`Concentration (mM)`, .data$`Temperature (K)`, .data$`Solvent`) %>%
-    dplyr::summarise(dplyr::across(dplyr::all_of(c('ROI left edge (ppm)', 'ROI right edge (ppm)', 'Chemical shift(ppm)',	'Chemical shift tolerance (ppm)',
-                                                   'Half bandwidth (Hz)', 'J coupling (Hz)',	'Roof effect', 'J coupling 2 (Hz)',
-                                                   'Roof effect 2')), mean, na.rm = TRUE),
-                     dplyr::across(dplyr::all_of(c('Multiplicity')), getmode, useNA = "no")) %>%
-    dplyr::select(.data$`ROI left edge (ppm)`, .data$`ROI right edge (ppm)`, .data$`Quantification Mode`,
-                  .data$`Metabolite`,	.data$`Quantification Signal`, .data$`Chemical shift(ppm)`,
-                  .data$`Chemical shift tolerance (ppm)`, .data$`Half bandwidth (Hz)`, .data$`Multiplicity`,
-                  .data$`J coupling (Hz)`,	.data$`Roof effect`, .data$`J coupling 2 (Hz)`, .data$`Roof effect 2`,
-                  .data$`Frequency (MHz)`, .data$`pH`, .data$`Concentration (mM)`, .data$`Temperature (K)`, .data$`Solvent`) %>%
-    dplyr::arrange(.data$`ROI left edge (ppm)`)
+  if(nrow(roi_df) == 0){
+    return(NULL)
+  } else{
+    # Average duplicate entries by experimental conditions
+    avg_roi_df <- roi_df %>%
+      dplyr::group_by(.data$`Quantification Mode`, .data$`Metabolite`, .data$`Quantification Signal`, .data$`Frequency (MHz)`,
+                      .data$`pH`, .data$`Concentration (mM)`, .data$`Temperature (K)`, .data$`Solvent`) %>%
+      dplyr::summarise(dplyr::across(dplyr::all_of(c('ROI left edge (ppm)', 'ROI right edge (ppm)', 'Chemical shift(ppm)',	'Chemical shift tolerance (ppm)',
+                                                     'Half bandwidth (Hz)', 'J coupling (Hz)',	'Roof effect', 'J coupling 2 (Hz)',
+                                                     'Roof effect 2')), mean, na.rm = TRUE),
+                       dplyr::across(dplyr::all_of(c('Multiplicity')), getmode, useNA = "no")) %>%
+      dplyr::select(.data$`ROI left edge (ppm)`, .data$`ROI right edge (ppm)`, .data$`Quantification Mode`,
+                    .data$`Metabolite`,	.data$`Quantification Signal`, .data$`Chemical shift(ppm)`,
+                    .data$`Chemical shift tolerance (ppm)`, .data$`Half bandwidth (Hz)`, .data$`Multiplicity`,
+                    .data$`J coupling (Hz)`,	.data$`Roof effect`, .data$`J coupling 2 (Hz)`, .data$`Roof effect 2`,
+                    .data$`Frequency (MHz)`, .data$`pH`, .data$`Concentration (mM)`, .data$`Temperature (K)`, .data$`Solvent`) %>%
+      dplyr::arrange(.data$`ROI left edge (ppm)`)
 
-  return(avg_roi_df)
+    return(avg_roi_df)
+  }
 }
 
 #' Wrap the generating and exporting functions into one
@@ -698,12 +702,16 @@ roi_ref_export <- function(name_list           = NULL,
   # get spectra data
   saveframe <- get_spectra_data(ID_list = id_list)
 
-  # return the ROI file formatted object and export CSV
-  roi_df <- export_roi_file(spectra_df          = saveframe,
-                            half_bandwidth      = half_bandwidth,
-                            roi_tol             = roi_tol)
+  if(nrow(saveframe) == 0){
+    return(NULL)
+  } else{
+    # return the ROI file formatted object and export CSV
+    roi_df <- export_roi_file(spectra_df          = saveframe,
+                              half_bandwidth      = half_bandwidth,
+                              roi_tol             = roi_tol)
 
-  return(roi_df)
+    return(roi_df)
+  }
 }
 
 #' Return nearest match metabolites, sorted by Euclidean distance

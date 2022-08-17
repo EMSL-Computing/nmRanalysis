@@ -53,6 +53,10 @@ ref_data_ROIeditingUI <- function(id){
       column(
         width = 2,
         uiOutput(ns("ui_refmet_dspedt_revert_all_savechanges"))
+      ),
+      column(
+        width = 4, offset = 3,
+        htmlOutput(ns("distance_text"))
       )
     ),
     h5(tags$b("Select a Signal:")),
@@ -193,6 +197,7 @@ ref_data_editingServer <- function(id, xpmt_data, ref_data, ref_db){
     observe(priority = 2, {
       req(ref_data())
 
+      rv$unedited_bestmatch_ref_data <- ref_data()$bestmatch_ref_data # Needed for 'revert all changes'
       rv$user_reference_data <- ref_data()$bestmatch_ref_data
       rv$full_reference_data <- ref_data()$full_ref_data
 
@@ -234,9 +239,17 @@ ref_data_editingServer <- function(id, xpmt_data, ref_data, ref_db){
                                                             temperature         = attr(xpmt_data(), "exp_info")$temperature,
                                                             concentration       = attr(xpmt_data(), "exp_info")$concentration)
 
-                     shinyFeedback::feedbackDanger("refmet_toadd",
-                                                   nrow(added_reference_data) == 0,
-                                                   "No ROI data available.")
+                     if(is.null(added_reference_data)){
+                       shinyFeedback::feedbackDanger("refmet_toadd",
+                                                     is.null(added_reference_data),
+                                                     "No ROI data available.")
+                     } else{
+                       shinyFeedback::feedbackDanger("refmet_toadd",
+                                                     nrow(added_reference_data) == 0 | is.null(added_reference_data),
+                                                     "No ROI data available.")
+                     }
+
+                     req(added_reference_data)
                      req(nrow(added_reference_data) > 0)
 
                      # Filter to get exact or best match
@@ -319,10 +332,12 @@ ref_data_editingServer <- function(id, xpmt_data, ref_data, ref_db){
 
 
 
+
                      rv$user_reference_data <- dplyr::bind_rows(rv$user_reference_data, added_reference_data_bestmatch)
 
 
                      rv$full_reference_data <- dplyr::bind_rows(rv$full_reference_data, added_reference_data)
+                     rv$unedited_bestmatch_ref_data <- dplyr::bind_rows(rv$unedited_bestmatch_ref_data, added_reference_data_bestmatch)
                    }
 
                    # Check if any new metabolites are being added
@@ -351,7 +366,8 @@ ref_data_editingServer <- function(id, xpmt_data, ref_data, ref_db){
 
                      rv$user_reference_data <- dplyr::bind_rows(rv$user_reference_data, added_entry_data)
 
-                     rv$full_reference_data <- dplyr::bind_rows(rv$full_reference_data, added_reference_data)
+                     rv$full_reference_data <- dplyr::bind_rows(rv$full_reference_data, added_entry_data)
+                     rv$unedited_bestmatch_ref_data <- dplyr::bind_rows(rv$unedited_bestmatch_ref_data, added_entry_data)
                    }
 
 
@@ -360,6 +376,16 @@ ref_data_editingServer <- function(id, xpmt_data, ref_data, ref_db){
                                         "which_refmet_dspedt",
                                         "Select Reference Metabolite(s) to Display/Edit:",
                                         choices = unique(rv$user_reference_data$Metabolite))
+
+                   updateSelectizeInput(session,
+                                        "refmet_toadd",
+                                        "Select from Existing:",
+                                        choices = setdiff(unique(ref_db$Solute), unique(rv$user_reference_data$Metabolite)))
+
+                   updateSelectizeInput(session,
+                                        "refmet_toremove",
+                                        "Select Metabolite(s) to Remove:",
+                                        choices = unique(rv$user_reference_data$Metabolite))
                  })
 
     # Observer to remove specified reference metabolite(s) from the set of reference metabolites already under consideration
@@ -367,6 +393,7 @@ ref_data_editingServer <- function(id, xpmt_data, ref_data, ref_db){
                  {
                    req(ref_data())
                    req(xpmt_data())
+
 
                    temp <- rv$user_reference_data %>% dplyr::filter(.data$Metabolite %ni% input$refmet_toremove)
                    shinyFeedback::feedbackDanger("refmet_toremove",
@@ -377,6 +404,7 @@ ref_data_editingServer <- function(id, xpmt_data, ref_data, ref_db){
                    rv$user_reference_data <- temp
 
                    rv$full_reference_data <- rv$full_reference_data %>% dplyr::filter(.data$Metabolite %ni% input$refmet_toremove)
+                   rv$unedited_bestmatch_ref_data <- rv$unedited_bestmatch_ref_data %>% dplyr::filter(.data$Metabolite %ni% input$refmet_toremove)
 
                    # Also, remove stored changes and counter (from refchanges, change_counter) corresponding to removed metabolite
                    rv$refchanges <- rv$refchanges[names(rv$refchanges) %ni% input$refmet_toremove]
@@ -386,6 +414,16 @@ ref_data_editingServer <- function(id, xpmt_data, ref_data, ref_db){
                                         "which_refmet_dspedt",
                                         "Select Reference Metabolite(s) to Display/Edit:",
                                         choices = unique(rv$user_reference_data$Metabolite))
+
+                   updateSelectizeInput(session,
+                                        "refmet_toadd",
+                                        "Select from Existing:",
+                                        choices = setdiff(unique(ref_db$Solute), unique(rv$user_reference_data$Metabolite)))
+
+                   updateSelectizeInput(session,
+                                        "refmet_toremove",
+                                        "Select Metabolite(s) to Remove:",
+                                        choices = unique(rv$user_reference_data$Metabolite))
                  })
 
     # UI element for the options of adding of reference metabolites
@@ -393,7 +431,7 @@ ref_data_editingServer <- function(id, xpmt_data, ref_data, ref_db){
 
       req(ref_data())
 
-      addchoices <- setdiff(unique(ref_db$Solute), unique(rv$user_reference_data$Metabolite))
+      addchoices <- setdiff(unique(ref_db$Solute), unique(ref_data()$bestmatch_ref_data$Metabolite))
       selectizeInput(NS(id, "refmet_toadd"),
                      label = "Select from Existing:",
                      choices = addchoices, multiple = TRUE)
@@ -418,7 +456,7 @@ ref_data_editingServer <- function(id, xpmt_data, ref_data, ref_db){
 
       selectizeInput(NS(id, "refmet_toremove"),
                      label = "Select Metabolite(s) to Remove:",
-                     choices = unique(rv$user_reference_data$Metabolite), multiple = TRUE)
+                     choices = unique(ref_data()$bestmatch_ref_data$Metabolite), multiple = TRUE)
     })
 
     #----------------------------------------------------------------------------------------------------------
@@ -429,7 +467,7 @@ ref_data_editingServer <- function(id, xpmt_data, ref_data, ref_db){
     # reference dataset filtered according to choice of reference metabolites to display/edit
     # Also resets rv$unsaved_change and updates annotations on main plot to reflect the selected
     # reference metabolite.
-    observeEvent(c(input$which_refmet_dspedt, input$signal_add), ignoreNULL = TRUE, ignoreInit = TRUE,
+    observeEvent(c(input$which_refmet_dspedt), ignoreNULL = TRUE, ignoreInit = TRUE,
                  {
                    req(ref_data())
 
@@ -440,27 +478,16 @@ ref_data_editingServer <- function(id, xpmt_data, ref_data, ref_db){
                    # clear any unsaved changes
                    rv$unsaved_change <- list()
 
-                   # Line shape update
-                   ROI_lines <- ROI_line_gen(data = rv$dspedt_user_reference_data)
+                   ProxyUpdate_refmet_tabplot(tabproxy = refmet_dspedt_table_proxy,
+                                              pltproxy = refmet_dspedt_plot_proxy,
+                                              newdat = rv$dspedt_user_reference_data)
 
-                   # Annotation update
-                   ROI_annots <- ROI_annot_gen(data = rv$dspedt_user_reference_data)
-
-                   # Update plot
-                   plotly::plotlyProxyInvoke(refmet_dspedt_plot_proxy, "relayout",
-                                             list(title = paste("Experimental Data:", input$sample_to_plot, "<br>", "<sup>",
-                                                                input$which_refmet_dspedt, "Peak Location(s) displayed", "</sup>"),
-                                                  annotations = ROI_annots,
-                                                  shapes = ROI_lines))
                  })
 
     # This datatable corresponds to the selected reference metabolite data to display/edit
     output$refmet_dspedt_table <- DT::renderDT({
 
       req(ref_data())
-      req(input$which_refmet_dspedt)
-      input$signal_add
-      input$signal_remove
 
       isolate({
         # Note: Remove quantification mode column, but allow users to specify quantification mode on a per-ROI basis on the
@@ -470,7 +497,8 @@ ref_data_editingServer <- function(id, xpmt_data, ref_data, ref_db){
           dplyr::mutate(Signal = paste0(.data$Metabolite, " [", .data$`Quantification Signal`, "]"),
                         `Signal left edge (ppm)` = .data$`ROI left edge (ppm)`,
                         `Signal right edge (ppm)` = .data$`ROI right edge (ppm)`) %>%
-          dplyr::select(.data$Signal, .data$Quantify, .data$`Chemical shift(ppm)`, .data$`Signal left edge (ppm)`,
+          dplyr::select(.data$Signal, .data$Quantify, .data$`Chemical shift(ppm)`, .data$`Chemical shift tolerance (ppm)`,
+                        .data$`Signal left edge (ppm)`,
                         .data$`Signal right edge (ppm)`, .data$`Half bandwidth (Hz)`, .data$Multiplicity, .data$`J coupling (Hz)`,
                         .data$`J coupling 2 (Hz)`, .data$`Roof effect`, .data$`Roof effect 2`,
                         .data$`Frequency (MHz)`, .data$`pH`, .data$`Concentration (mM)`, .data$`Temperature (K)`,
@@ -479,7 +507,8 @@ ref_data_editingServer <- function(id, xpmt_data, ref_data, ref_db){
                         editable   = TRUE,
                         selection = "none",
                         options = list(scrollX = TRUE)) %>%
-          DT::formatRound(columns = c("Chemical shift(ppm)", "Signal left edge (ppm)", "Signal right edge (ppm)",
+          DT::formatRound(columns = c("Chemical shift(ppm)", "Chemical shift tolerance (ppm)",
+                                      "Signal left edge (ppm)", "Signal right edge (ppm)",
                                       "Half bandwidth (Hz)", "J coupling (Hz)", "J coupling 2 (Hz)", "Roof effect",
                                       "Roof effect 2", "Frequency (MHz)", "pH", "Concentration (mM)", "Temperature (K)"),
                           digits = 3)
@@ -496,34 +525,34 @@ ref_data_editingServer <- function(id, xpmt_data, ref_data, ref_db){
       isolate({
         req(ref_data())
         req(xpmt_data())
-      })
 
-      # Code to resume the observer that was started in a suspended state. We also update the value of
-      # rv$obs_show_subplot_suspend so that $resume() is not called every time this plot is rendered,
-      # but only after the first rendering of the plot.
-      if(rv$obs_show_subplot_suspend){
-        obs_show_subplot$resume()
-        rv$obs_show_subplot_suspend <- FALSE
-      }
-      if(rv$obs_annot_update_suspend){
-        obs_annot_update$resume()
-        rv$obs_annot_update_suspend <- FALSE
-      }
-      plotly::plot_ly(source = "id_refmet_dspedt_selected_plot", type = "scatter", mode = "lines") %>%
-        plotly::event_register("plotly_relayout") %>%
-        plotly::config(displaylogo = FALSE,
-                       modeBarButtons = list(list("select2d"), list("zoom2d"), list("zoomIn2d"),
-                                             list("zoomOut2d"), list("pan2d"), list("autoScale2d"),
-                                             list("resetScale2d"), list("toImage"))) %>%
-        plotly::layout(title = paste("Experimental Data:"),
-                       xaxis = list(title     = "PPM",
-                                    autorange = "reversed"),
-                       yaxis = list(title     = "Intensity"),
-                       dragmode = "zoom2d") %>%
-        plotly::config(edits = list(annotationTail     = TRUE,
-                                    annotationText     = FALSE,
-                                    annotationPosition = FALSE,
-                                    shapePosition      = TRUE))
+        # Code to resume the observer that was started in a suspended state. We also update the value of
+        # rv$obs_show_subplot_suspend so that $resume() is not called every time this plot is rendered,
+        # but only after the first rendering of the plot.
+        if(rv$obs_show_subplot_suspend){
+          obs_show_subplot$resume()
+          rv$obs_show_subplot_suspend <- FALSE
+        }
+        if(rv$obs_annot_update_suspend){
+          obs_annot_update$resume()
+          rv$obs_annot_update_suspend <- FALSE
+        }
+        plotly::plot_ly(source = "id_refmet_dspedt_selected_plot", type = "scatter", mode = "lines") %>%
+          plotly::event_register("plotly_relayout") %>%
+          plotly::config(displaylogo = FALSE,
+                         modeBarButtons = list(list("select2d"), list("zoom2d"), list("zoomIn2d"),
+                                               list("zoomOut2d"), list("pan2d"), list("autoScale2d"),
+                                               list("resetScale2d"), list("toImage"))) %>%
+          plotly::layout(title = paste("Experimental Data:"),
+                         xaxis = list(title     = "PPM",
+                                      autorange = "reversed"),
+                         yaxis = list(title     = "Intensity"),
+                         dragmode = "zoom2d") %>%
+          plotly::config(edits = list(annotationTail     = TRUE,
+                                      annotationText     = FALSE,
+                                      annotationPosition = FALSE,
+                                      shapePosition      = TRUE))
+      })
 
     })
 
@@ -687,6 +716,7 @@ ref_data_editingServer <- function(id, xpmt_data, ref_data, ref_db){
                    req(input$which_refmet_dspedt)
                    req(input$save_refmet_plot_changes > 0)
 
+
                    rv <- refmet_save_update(updated_refmet = input$which_refmet_dspedt,
                                             rvlist = rv)
 
@@ -713,6 +743,8 @@ ref_data_editingServer <- function(id, xpmt_data, ref_data, ref_db){
                    req(ref_data())
                    req(input$which_refmet_dspedt)
                    req(input$revert_all_refmet_save_changes > 0)
+
+
 
                    rv <- refmet_revert_update(updated_refmet = input$which_refmet_dspedt,
                                               rvlist = rv,
@@ -749,7 +781,15 @@ ref_data_editingServer <- function(id, xpmt_data, ref_data, ref_db){
 
       req(ref_data())
       req(input$which_refmet_dspedt)
-      req(rv$change_counter[[input$which_refmet_dspedt]] > 1)
+
+
+      og_version <- rv$unedited_bestmatch_ref_data %>%
+        dplyr::filter(.data$Metabolite %in% input$which_refmet_dspedt) %>%
+        dplyr::arrange(.data$`Quantification Signal`)
+      curr_version <- rv$user_reference_data %>%
+        dplyr::filter(.data$Metabolite %in% input$which_refmet_dspedt) %>%
+        dplyr::arrange(.data$`Quantification Signal`)
+      req(!identical(og_version, curr_version))
 
       actionButton(NS(id, "revert_all_refmet_save_changes"),
                    label = "Revert All Saves")
@@ -856,7 +896,8 @@ ref_data_editingServer <- function(id, xpmt_data, ref_data, ref_db){
                      dplyr::mutate(Signal = paste0(.data$Metabolite, " [", .data$`Quantification Signal`, "]"),
                                    `Signal left edge (ppm)` = .data$`ROI left edge (ppm)`,
                                    `Signal right edge (ppm)` = .data$`ROI right edge (ppm)`) %>%
-                     dplyr::select(.data$Signal, .data$Quantify, .data$`Chemical shift(ppm)`, .data$`Signal left edge (ppm)`,
+                     dplyr::select(.data$Signal, .data$Quantify, .data$`Chemical shift(ppm)`, .data$`Chemical shift tolerance (ppm)`,
+                                   .data$`Signal left edge (ppm)`,
                                    .data$`Signal right edge (ppm)`, .data$`Half bandwidth (Hz)`, .data$Multiplicity, .data$`J coupling (Hz)`,
                                    .data$`J coupling 2 (Hz)`, .data$`Roof effect`, .data$`Roof effect 2`,
                                    .data$`Frequency (MHz)`, .data$`pH`, .data$`Concentration (mM)`, .data$`Temperature (K)`,
@@ -881,7 +922,7 @@ ref_data_editingServer <- function(id, xpmt_data, ref_data, ref_db){
                      # Store the unsaved changes
                      rv$unsaved_change[[input$which_refmet_dspedt]] <- rv$dspedt_user_reference_data
 
-                   } else if(edtd_colname %in% c("Half bandwidth (Hz)", "J coupling (Hz)",
+                   } else if(edtd_colname %in% c("Half bandwidth (Hz)", "J coupling (Hz)", "Chemical shift tolerance (ppm)",
                                                  "J coupling 2 (Hz)", "Roof effect", "Roof effect 2")) {
 
                      rv$dspedt_user_reference_data[[edtd_colname]][changed_row] <- as.numeric(v)
@@ -935,7 +976,6 @@ ref_data_editingServer <- function(id, xpmt_data, ref_data, ref_db){
     output$fitcheck <- renderUI({
 
       req(input$which_refmet_dspedt)
-      req(ref_data())
       req(rv$user_reference_data)
 
       temp <- rv$user_reference_data %>% dplyr::ungroup() %>%
@@ -961,7 +1001,6 @@ ref_data_editingServer <- function(id, xpmt_data, ref_data, ref_db){
     # Update selection options for quantification checks to be one of the signals for the selected metabolite
     observeEvent(c(input$which_refmet_dspedt), ignoreNULL = TRUE, ignoreInit = TRUE,
                  {
-                   req(ref_data())
                    req(rv$user_reference_data)
 
                    temp <- rv$user_reference_data %>% dplyr::ungroup() %>%
@@ -974,7 +1013,6 @@ ref_data_editingServer <- function(id, xpmt_data, ref_data, ref_db){
 
     # Defines new, "collapsed" or "merged" ROIs to be used for quantification.
     observe({
-      req(ref_data())
       req(rv$user_reference_data)
 
       # Retain only those signals that will be quantified.
@@ -1021,8 +1059,30 @@ ref_data_editingServer <- function(id, xpmt_data, ref_data, ref_db){
         .$`ROI right edge (ppm)`
       signalROIdat <- rv$quantdat %>% dplyr::filter(.data$`ROI right edge (ppm)` == signalROI_right)
 
+      temp_gpps <- list(BGdensity                          = input$gpp_BGdensity,
+                        widthtolerance                     = input$gpp_widthtolerance,
+                        gaussian                           = input$gpp_gaussian,
+                        j_coupling_variation               = input$gpp_j_coupling_variation,
+                        BG_gaussian_percentage             = input$gpp_BG_gaussian_percentage,
+                        BG_width                           = input$gpp_BG_width,
+                        BG_width_tolerance                 = input$gpp_BG_width_tolerance,
+                        errorprov                          = input$gpp_errorprov,
+                        fitting_maxiter                    = input$gpp_fitting_maxiter,
+                        nls_lm_maxiter                     = 200, # from rDolphin defaults
+                        ftol                               = 1e-06, # from rDolphin defaults
+                        ptol                               = 1e-06, # from rDolphin defaults
+                        factor                             = 0.01, # from rDolphin defaults
+                        additional_signal_ppm_distance     = 0.002, # from rDolphin defaults
+                        signals_to_add                     = 2, # from rDolphin defaults
+                        fitting_maxiterrep                 = 0, # from rDolphin defaults
+                        additional_signal_improvement      = 0.75, # from rDolphin defaults
+                        additional_signal_percentage_limit = 3, # from rDolphin defaults
+                        peakdet_minimum                    = 0.01) # from rDolphin defaults
+
       if(is.null(rv$dspedt_profiling_data[[input$sample_to_plot]][[input$signal_to_check]]) |
-         !identical(rv$curr_ROI_profile[[input$sample_to_plot]][[input$signal_to_check]], signalROIdat)){
+         !identical(rv$curr_ROI_profile[[input$sample_to_plot]][[input$signal_to_check]], signalROIdat) |
+         !identical(rv$fitcheck_gpps, temp_gpps)){
+
         shinyWidgets::progressSweetAlert(
           session = session,
           id = "metquant_profiling_progress",
@@ -1050,25 +1110,9 @@ ref_data_editingServer <- function(id, xpmt_data, ref_data, ref_db){
         # Formats the data object
         imported_data <- ppmData_to_rDolphin(ppmData = txpmt_data,
                                              metabs  = signalROIdat)
-        imported_data$program_parameters <- list(BGdensity                          = input$gpp_BGdensity,
-                                                 widthtolerance                     = input$gpp_widthtolerance,
-                                                 gaussian                           = input$gpp_gaussian,
-                                                 j_coupling_variation               = input$gpp_j_coupling_variation,
-                                                 BG_gaussian_percentage             = input$gpp_BG_gaussian_percentage,
-                                                 BG_width                           = input$gpp_BG_width,
-                                                 BG_width_tolerance                 = input$gpp_BG_width_tolerance,
-                                                 errorprov                          = input$gpp_errorprov,
-                                                 fitting_maxiter                    = input$gpp_fitting_maxiter,
-                                                 nls_lm_maxiter                     = 200, # from rDolphin defaults
-                                                 ftol                               = 1e-06, # from rDolphin defaults
-                                                 ptol                               = 1e-06, # from rDolphin defaults
-                                                 factor                             = 0.01, # from rDolphin defaults
-                                                 additional_signal_ppm_distance     = 0.002, # from rDolphin defaults
-                                                 signals_to_add                     = 2, # from rDolphin defaults
-                                                 fitting_maxiterrep                 = 0, # from rDolphin defaults
-                                                 additional_signal_improvement      = 0.75, # from rDolphin defaults
-                                                 additional_signal_percentage_limit = 3, # from rDolphin defaults
-                                                 peakdet_minimum                    = 0.01) # from rDolphin defaults
+        imported_data$program_parameters <- temp_gpps
+
+        rv$fitcheck_gpps <- imported_data$program_parameters
 
         ROI_data           <- imported_data$ROI_data
         spectra_to_profile <- which(rownames(imported_data$dataset) %in% input$sample_to_plot)
@@ -1183,12 +1227,49 @@ ref_data_editingServer <- function(id, xpmt_data, ref_data, ref_db){
 
         shinyWidgets::closeSweetAlert(session = session)
 
+
         rv$dspedt_profiling_data[[input$sample_to_plot]][[input$signal_to_check]] <-
           list(final_output = lapply(final_output,
                                      function(x) x[rownames(x) == input$sample_to_plot, , drop = FALSE]),
                reproducibility_data = reproducibility_data[[which(rownames(imported_data$dataset) %in% input$sample_to_plot)]])
 
         rv$curr_ROI_profile[[input$sample_to_plot]][[input$signal_to_check]] <- signalROIdat
+
+        temp <- rv$dspedt_user_reference_data %>%
+          dplyr::mutate(Signal = paste0(.data$Metabolite, " [", .data$`Quantification Signal`, "]"),
+                        Signal2 = make.names(paste(.data$Metabolite, .data$`Quantification Signal`, sep='_')))
+        whichrow <- which(temp$Signal == input$signal_to_check)
+        whichsig <- which(signals_names %in% make.names(gsub("\\]", "", gsub("\\ \\[", "_", input$signal_to_check))))
+
+        opt_signal_params <- reproducibility_data[[1]][[whichsig]]$signals_parameters[, whichsig, drop = FALSE]
+
+        dist <- (rv$dspedt_user_reference_data[["ROI left edge (ppm)"]][[whichrow]] -
+                   rv$dspedt_user_reference_data[["ROI right edge (ppm)"]][[whichrow]])/2
+
+        new_chemshift <- as.numeric(opt_signal_params[2,])
+
+        rv$dspedt_user_reference_data[["Chemical shift(ppm)"]][[whichrow]]  <- round(new_chemshift,3)
+        rv$dspedt_user_reference_data[["ROI left edge (ppm)"]][[whichrow]]  <- round(new_chemshift + dist,3)
+        rv$dspedt_user_reference_data[["ROI right edge (ppm)"]][[whichrow]] <- round(new_chemshift - dist,3)
+        rv$dspedt_user_reference_data[["Chemical shift tolerance (ppm)"]][[whichrow]] <- round(min(dist/2,
+                                                                                                   rv$dspedt_user_reference_data[["Chemical shift tolerance (ppm)"]][[whichrow]]),
+                                                                                               3)
+
+
+        rv$dspedt_user_reference_data[["Half bandwidth (Hz)"]][[whichrow]] <- as.numeric(opt_signal_params[3,])
+        rv$dspedt_user_reference_data[["J coupling (Hz)"]][[whichrow]]     <- as.numeric(opt_signal_params[5,])
+
+        if(rv$dspedt_user_reference_data[["Multiplicity"]][[whichrow]] == "dd"){
+          rv$dspedt_user_reference_data[["J coupling 2 (Hz)"]][[whichrow]] <- as.numeric(opt_signal_params[6,])
+        }
+
+        ProxyUpdate_refmet_tabplot(tabproxy = refmet_dspedt_table_proxy,
+                                   pltproxy = refmet_dspedt_plot_proxy,
+                                   newdat = rv$dspedt_user_reference_data)
+
+        # Store the unsaved changes
+        rv$unsaved_change[[input$which_refmet_dspedt]] <- rv$dspedt_user_reference_data
+
       }
 
     })
@@ -1197,15 +1278,56 @@ ref_data_editingServer <- function(id, xpmt_data, ref_data, ref_db){
       req(input$show_metquant)
       req(rv$dspedt_profiling_data[[input$sample_to_plot]][[input$signal_to_check]])
 
+
       profiling_data <- rv$dspedt_profiling_data[[input$sample_to_plot]][[input$signal_to_check]]
 
       fmtted_signal_to_check <- rv$quantdat %>%
         dplyr::filter(paste0(.data$Metabolite, " [", .data$`Quantification Signal`, "]") == input$signal_to_check) %>%
         dplyr::mutate(SigName = paste0(.data$Metabolite, "_", .data$`Quantification Signal`)) %>% .$SigName
-      roidat <- rv$quantdat %>%
+
+      # This recomputes a version of quantdat based on the (not yet saved) optimized tweaks to the signal parameters that
+      # resulted from the fit check.
+      # Retain only those signals that will be quantified.
+      tempdf <- rv$user_reference_data %>%
+        dplyr::filter(.data$Quantify == 1)
+      tempdf[tempdf$rowid %in% rv$dspedt_user_reference_data$rowid,] <-
+        rv$dspedt_user_reference_data[rv$dspedt_user_reference_data$rowid %in% tempdf$rowid,]
+
+      # Merge metabolite signals whose bounds overlap into single ROIs
+      tempdf <- tempdf %>% dplyr::arrange(.data$`Chemical shift(ppm)`)
+      if(nrow(tempdf) > 1){
+        for(i in 1:(nrow(tempdf) - 1)){
+          if(tempdf$`ROI left edge (ppm)`[i] - tempdf$`ROI right edge (ppm)`[i+1] >= 0){
+            # If there is an overlap, update the right end (lower value) of the subsequent, overlapped ROI to that of
+            # the minimum between the two.
+            tempdf$`ROI right edge (ppm)`[i+1] <- min(tempdf$`ROI right edge (ppm)`[i], tempdf$`ROI right edge (ppm)`[i+1])
+            # Also update the ith right end and all others that share the same right end value to the same minimum.
+            tempdf$`ROI right edge (ppm)`[which(tempdf$`ROI right edge (ppm)` == tempdf$`ROI right edge (ppm)`[i])] <-
+              tempdf$`ROI right edge (ppm)`[i+1]
+            # Last, update the left end (higher value) of any other ROIs with the maximum right end value among all that share the
+            # updated ROI right edge
+            tempdf$`ROI left edge (ppm)`[which(tempdf$`ROI right edge (ppm)` == tempdf$`ROI right edge (ppm)`[i])] <-
+              max(tempdf$`ROI left edge (ppm)`[which(tempdf$`ROI right edge (ppm)` == tempdf$`ROI right edge (ppm)`[i])])
+          }
+        }
+      }
+
+      # Change experimental conditions of final quantification data to reflect that of the current experimental sample
+      tempdf$`Frequency (MHz)`    <- attr(xpmt_data(), "exp_info")$instrument_strength
+      tempdf$pH                   <- attr(xpmt_data(), "exp_info")$ph
+      tempdf$`Concentration (mM)` <- attr(xpmt_data(), "exp_info")$concentration
+      tempdf$`Temperature (K)`    <- attr(xpmt_data(), "exp_info")$temperature
+      tempdf$Solvent              <- attr(xpmt_data(), "exp_info")$solvent
+
+      # End recompute version of quantdat
+
+
+
+
+      roidat <- tempdf %>%
         dplyr::mutate(Signal = paste0(.data$Metabolite, " [", .data$`Quantification Signal`, "]")) %>%
         dplyr::filter(Signal == input$signal_to_check)
-      signames <- rv$quantdat %>%
+      signames <- tempdf %>%
         dplyr::mutate(Signal = paste0(.data$Metabolite, " [", .data$`Quantification Signal`, "]")) %>%
         dplyr::filter(.data$`ROI left edge (ppm)` == roidat$`ROI left edge (ppm)`) %>% .$Signal
 
@@ -1236,7 +1358,10 @@ ref_data_editingServer <- function(id, xpmt_data, ref_data, ref_db){
       ROI_data <- profiling_data$reproducibility_data[[1]]$ROI_profile
 
 
+
       tempdat <- rv$user_reference_data
+      tempdat[tempdat$rowid %in% rv$dspedt_user_reference_data$rowid,] <-
+        rv$dspedt_user_reference_data[rv$dspedt_user_reference_data$rowid %in% tempdat$rowid,]
       sigidx <- which(paste0(tempdat$Metabolite, " [", tempdat$`Quantification Signal`, "]") == input$signal_to_check)
 
       ROI_annots <- list(
@@ -1562,6 +1687,22 @@ ref_data_editingServer <- function(id, xpmt_data, ref_data, ref_db){
 
     # Misc ----------------------------------------------------------------------------------------------------
 
+    # Observer to measure distances with box select
+    output$distance_text <- renderUI({
+
+      brushedData <- plotly::event_data("plotly_brushed", source = "id_refmet_dspedt_selected_plot")
+      if(is.null(brushedData)){
+        return(NULL)
+      } else{
+        distppm <- abs(diff(brushedData$x))
+        disthz  <- distppm*attr(xpmt_data(), "exp_info")$instrument_strength
+        intensity_diff <- abs(diff(brushedData$y))
+        htmltools::HTML(paste0("<strong>Difference (ppm):</strong> ", round(distppm, 3), "<br/>",
+                               "<strong>Difference (Hz):</strong> ", round(disthz, 3), "<br/>",
+                               "<strong>Intensity Difference:</strong> ", round(intensity_diff, 3)))
+      }
+    })
+
     # Creates a datatable that displays reference database
     output$refmet_database <- DT::renderDataTable({
 
@@ -1582,10 +1723,24 @@ ref_data_editingServer <- function(id, xpmt_data, ref_data, ref_db){
                           shinyBS::bsCollapsePanel(title = "Metabolite Signal Options",
 
                                                    fluidRow(
-                                                     column(width = 4,
+                                                     column(width = 2,
                                                             actionButton(NS(id, "signal_add"), "Add New Signal")),
-                                                     column(width = 4,
+                                                     column(width = 3,
                                                             uiOutput(NS(id, "ui_remove_signal"))),
+                                                     column(width = 3,
+                                                            shinyWidgets::materialSwitch(
+                                                              inputId = NS(id, "set_metbwidth"),
+                                                              label = "Set Signal-Wide Half Bandwidth",
+                                                              status = "primary",
+                                                              value = FALSE,
+                                                              inline = TRUE,
+                                                              right = TRUE
+                                                            )),
+                                                     column(width = 3,
+                                                            uiOutput(NS(id, "ui_set_metbwidth")))
+                                                   ),
+                                                   h4(""),
+                                                   fluidRow({
                                                      column(width = 4,
                                                             shinyWidgets::materialSwitch(
                                                               inputId = NS(id, "display_fulldat"),
@@ -1595,13 +1750,14 @@ ref_data_editingServer <- function(id, xpmt_data, ref_data, ref_db){
                                                               inline = TRUE,
                                                               right = TRUE
                                                             ))
-                                                   ),
+                                                   }),
                                                    h4(""),
                                                    uiOutput(NS(id, "ui_fulldat_table")),
                                                    style = "primary"
                           ))
     })
 
+    # Dynamically displaying table containing all entries for a given reference metabolite
     output$ui_fulldat_table <- renderUI({
       req(input$display_fulldat)
       req(rv$full_reference_data)
@@ -1614,7 +1770,8 @@ ref_data_editingServer <- function(id, xpmt_data, ref_data, ref_db){
                       `Signal right edge (ppm)` = .data$`ROI right edge (ppm)`) %>%
         dplyr::arrange(dplyr::desc(.data$`Quantification Signal`)) %>%
         dplyr::select(.data$`Frequency (MHz)`, .data$`pH`, .data$`Concentration (mM)`, .data$`Temperature (K)`,
-                      .data$`Solvent`, .data$Signal, .data$`Chemical shift(ppm)`, .data$`Signal left edge (ppm)`,
+                      .data$`Solvent`, .data$Signal, .data$`Chemical shift(ppm)`, .data$`Chemical shift tolerance (ppm)`,
+                      .data$`Signal left edge (ppm)`,
                       .data$`Signal right edge (ppm)`, .data$`Half bandwidth (Hz)`, .data$Multiplicity, .data$`J coupling (Hz)`,
                       .data$`J coupling 2 (Hz)`, .data$`Roof effect`, .data$`Roof effect 2`) %>%
         DT::datatable(rownames   = FALSE,
@@ -1623,7 +1780,7 @@ ref_data_editingServer <- function(id, xpmt_data, ref_data, ref_db){
                       options = list(scrollX = TRUE,
                                      paging = TRUE,
                                      pageLength = 5)) %>%
-        DT::formatRound(columns = c("Chemical shift(ppm)", "Signal left edge (ppm)", "Signal right edge (ppm)",
+        DT::formatRound(columns = c("Chemical shift(ppm)", "Chemical shift tolerance (ppm)", "Signal left edge (ppm)", "Signal right edge (ppm)",
                                     "Half bandwidth (Hz)", "J coupling (Hz)", "J coupling 2 (Hz)", "Roof effect",
                                     "Roof effect 2", "Frequency (MHz)", "pH", "Concentration (mM)", "Temperature (K)"),
                         digits = 3)
@@ -1631,12 +1788,24 @@ ref_data_editingServer <- function(id, xpmt_data, ref_data, ref_db){
 
     })
 
+    # Dynamically displaying text box for signal-wide halfbandwidth
+    output$ui_set_metbwidth <- renderUI({
+      req(input$set_metbwidth)
+
+      textInput(inputId  = NS(id, "sigwide_bwidth"),
+                label    = "Half Bandwidth (Hz):",
+                value    = "")
+
+    })
+
     # Remove (Most Recent) Added Signal
     output$ui_remove_signal <- renderUI({
-      req(ref_data())
       req(rv$user_reference_data)
+
+      temp <- rv$full_reference_data %>%
+        dplyr::filter(.data$Metabolite %in% input$which_refmet_dspedt, !duplicated(.data$`Quantification Signal`))
       req(nrow(rv$user_reference_data %>% dplyr::filter(.data$Metabolite %in% input$which_refmet_dspedt)) >
-            nrow(ref_data()$bestmatch_ref_data %>% dplyr::filter(.data$Metabolite %in% input$which_refmet_dspedt)))
+            nrow(temp))
 
       actionButton(NS(id, "signal_remove"), "Remove Last Added Signal")
     })
@@ -1675,6 +1844,19 @@ ref_data_editingServer <- function(id, xpmt_data, ref_data, ref_db){
                                                   check.names = FALSE)
 
                    rv$user_reference_data <- dplyr::bind_rows(rv$user_reference_data, added_entry_data)
+                   rv$unedited_bestmatch_ref_data <- dplyr::bind_rows(rv$unedited_bestmatch_ref_data, added_entry_data)
+
+                   # reference metabolite copy
+                   rv$dspedt_user_reference_data <- rv$user_reference_data %>%
+                     dplyr::filter(.data$Metabolite %in% input$which_refmet_dspedt)
+
+                   # clear any unsaved changes
+                   rv$unsaved_change <- list()
+
+                   ProxyUpdate_refmet_tabplot(tabproxy = refmet_dspedt_table_proxy,
+                                              pltproxy = refmet_dspedt_plot_proxy,
+                                              newdat = rv$dspedt_user_reference_data)
+
 
                  })
 
@@ -1692,7 +1874,47 @@ ref_data_editingServer <- function(id, xpmt_data, ref_data, ref_db){
 
                    rv$user_reference_data <- rv$user_reference_data %>% dplyr::filter(!(.data$Metabolite %in% input$which_refmet_dspedt &
                                                                                         .data$`Quantification Signal` == numSigs))
+                   rv$unedited_bestmatch_ref_data <- rv$unedited_bestmatch_ref_data %>% dplyr::filter(!(.data$Metabolite %in% input$which_refmet_dspedt &
+                                                                                                                .data$`Quantification Signal` == numSigs))
+
+                   # reference metabolite copy
+                   rv$dspedt_user_reference_data <- rv$user_reference_data %>%
+                     dplyr::filter(.data$Metabolite %in% input$which_refmet_dspedt)
+
+                   # clear any unsaved changes
+                   rv$unsaved_change <- list()
+
+                   ProxyUpdate_refmet_tabplot(tabproxy = refmet_dspedt_table_proxy,
+                                              pltproxy = refmet_dspedt_plot_proxy,
+                                              newdat = rv$dspedt_user_reference_data)
                  })
+
+    # Set the specified halfbandwidth for all signals of the metabolite
+    observeEvent(c(input$sigwide_bwidth),{
+      req(input$set_metbwidth)
+      req(input$sigwide_bwidth)
+
+      newbw <- as.numeric(input$sigwide_bwidth)
+
+      if(!is.na(newbw)){
+        rv$dspedt_user_reference_data[["Half bandwidth (Hz)"]] <- newbw
+
+        ProxyUpdate_refmet_tabplot(tabproxy = refmet_dspedt_table_proxy,
+                                   pltproxy = refmet_dspedt_plot_proxy,
+                                   newdat = rv$dspedt_user_reference_data)
+
+        # Store the unsaved changes
+        rv$unsaved_change[[input$which_refmet_dspedt]] <- rv$dspedt_user_reference_data
+      } else{
+        shinyWidgets::show_alert(
+          title = "Invalid Entry.",
+          text = "The supplied value must be numeric.",
+          type = "error"
+        )
+      }
+
+
+    })
 
     #----------------------------------------------------------------------------------------------------------
 
@@ -1737,21 +1959,8 @@ ref_data_editingServer <- function(id, xpmt_data, ref_data, ref_db){
         allres <- vector("list", length = length(tempnames))
         names(allres) <- tempnames
         for(name in tempnames){
-          templength <- length(rv$refchanges[[name]])
-          tempres <- list(OriginalEntry = rv$refchanges[[name]][[1]])
-          if (templength > 1){
-            for(i in 2:templength){
-              # binary_diffmat <- !(rv$refchanges[[name]][[i]] == rv$refchanges[[name]][[1]]) # THIS IS THE PROBLEMATIC LINE FOR ADD SIGNAL EDITS. ERROR ONLY SHOWS UP AFTER YOU FIRST EDIT ONE OF ORIGINAL SIGNALS
-              # crows <- which(apply(binary_diffmat,1,any))
-              # ccols <- which(apply(binary_diffmat,2,any))
-              # Solution: Don't curate portion of data where change was made, just store each iteration of the data. (Even if unwieldly)
-              # tempres <- append(tempres, list(rv$refchanges[[name]][[i]][crows, ccols, drop = FALSE]))
-              tempres <- append(tempres, list(rv$refchanges[[name]][[i]]))
-            }
-            names(tempres) <- c("OriginalEntry", paste0("Edit_", 1:(templength-1)))
-          }
-          currdf <- rv$user_reference_data %>% dplyr::filter(.data$Metabolite == name)
-          allres[[name]] <- c(tempres, FinalEntry = list(currdf))
+          allres[[name]] <- list(OriginalEntry = orig_refdat %>% dplyr::filter(.data$Metabolite %in% name),
+                                 FinalEntry    = rv$user_reference_data %>% dplyr::filter(.data$Metabolite == name))
         }
         attr(rv$user_reference_data, "edit_history") <- allres
 
