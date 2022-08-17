@@ -1,81 +1,159 @@
-## Requirements
+#' Connect the Reference Database to the app session.
+#'
+#' @description Copyright (C) 2022 Battelle Memorial Institute
+#'
+#'  This program is free software; you can redistribute it and/or modify
+#'  it under the terms of the GNU General Public License as published by
+#'  the Free Software Foundation; either version 2 of the License, or
+#'  (at your option) any later version.
+#'
+#'  This program is distributed in the hope that it will be useful,
+#'  but WITHOUT ANY WARRANTY; without even the implied warranty of
+#'  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+#'  GNU General Public License for more details.
+#'
+#'  You should have received a copy of the GNU General Public License along
+#'  with this program; if not, write to the Free Software Foundation, Inc.,
+#'  51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
+#'
+#'
+#' @details This main function establishes a connection to a PostgreSQL database containing reference an user defined data
+#' upon application launch. The connection must be established before any referencing can take place.
+#'
+#' @import shiny
+#' @import RPostgres
+#'
+connect_db <- function(){
+  # Set environmental variables
+  dsn_database = "nmRanalysis"
+  dsn_hostname = "localhost"
+  dsn_port = "5432"
+  dsn_uid = "developer"
+  dsn_pwd = "developer"
 
-if (!require('devtools')) install.packages('devtools')
-if (!require('remotes')) install.packages('remotes')
-if (!require("DBI")) install.packages("DBI")
-remotes::install_github("r-dbi/RPostgres")
+  # Connect to Database
+  tryCatch({
+    #drv <- RPostgres::Postgres()
+    print("Connecting to Database…")
+    connec <- dbConnect(RPostgres::Postgres(),
+                        dbname = dsn_database,
+                        host=dsn_hostname,
+                        port=dsn_port,
+                        user=dsn_uid,
+                        password=dsn_pwd)
+    print("Database Connected!")
+  },
+  error=function(cond) {
+    print("Unable to connect to Database.")
+  })
+}
 
-library(RPostgres)
 
-# Set environmental variables
-dsn_database = "nmRanalysis"
-dsn_hostname = "localhost"
-dsn_port = "5432"
-dsn_uid = "developer"
-dsn_pwd = "developer"
+#' Create a table in the Reference Database.
+#'
+#' @description Copyright (C) 2022 Battelle Memorial Institute
+#'
+#'  This program is free software; you can redistribute it and/or modify
+#'  it under the terms of the GNU General Public License as published by
+#'  the Free Software Foundation; either version 2 of the License, or
+#'  (at your option) any later version.
+#'
+#'  This program is distributed in the hope that it will be useful,
+#'  but WITHOUT ANY WARRANTY; without even the implied warranty of
+#'  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+#'  GNU General Public License for more details.
+#'
+#'  You should have received a copy of the GNU General Public License along
+#'  with this program; if not, write to the Free Software Foundation, Inc.,
+#'  51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
+#'
+#' @param db_connection The established connection from connect_db()
+#' @param table_name The name of a table you wish to create.
+#' @param df_object The data frame object you wish to structure the table as
+#'
+#' @details This function creates a table in the database based on an existing data frame. The columns of
+#' the data frame will become the fields in the table created on the database.
+#'
+#' @import shiny
+#' @import RPostgres
+#'
+create_new_table <- function(db_connection, table_name, df_object){
+  dbCreateTable(db_connection, toString(table_name), df_object)
+}
 
+
+#' Update a table in the Reference Database
+#'
+#' @description Copyright (C) 2022 Battelle Memorial Institute
+#'
+#'  This program is free software; you can redistribute it and/or modify
+#'  it under the terms of the GNU General Public License as published by
+#'  the Free Software Foundation; either version 2 of the License, or
+#'  (at your option) any later version.
+#'
+#'  This program is distributed in the hope that it will be useful,
+#'  but WITHOUT ANY WARRANTY; without even the implied warranty of
+#'  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+#'  GNU General Public License for more details.
+#'
+#'  You should have received a copy of the GNU General Public License along
+#'  with this program; if not, write to the Free Software Foundation, Inc.,
+#'  51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
+#'
+#' @param db_connection The established connection from connect_db()
+#' @param table_name The name of a table you wish to append to.
+#' @param df_object The data frame object to append to an existing table. Must contain the same columns as
+#' the table being appended to.
+#'
+#' @details This function appends to a table in the database a specified existing data frame. The columns of
+#' the data frame must be sure to match the fields in the table on the database.
+#'
+#' @import shiny
+#' @import RPostgres
+#'
+append_table <- function(db_connection, table_name, df_object){
+  dbAppendTable(conn = db_connection,
+                name = SQL(toString(table_name)),
+                value = df_object,
+                copy = NULL,
+                row.names = NULL)
+}
+
+#' Query a table in the Reference Database
+#'
+#' @description Copyright (C) 2022 Battelle Memorial Institute
+#'
+#'  This program is free software; you can redistribute it and/or modify
+#'  it under the terms of the GNU General Public License as published by
+#'  the Free Software Foundation; either version 2 of the License, or
+#'  (at your option) any later version.
+#'
+#'  This program is distributed in the hope that it will be useful,
+#'  but WITHOUT ANY WARRANTY; without even the implied warranty of
+#'  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+#'  GNU General Public License for more details.
+#'
+#'  You should have received a copy of the GNU General Public License along
+#'  with this program; if not, write to the Free Software Foundation, Inc.,
+#'  51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
+#'
+#' @param db_connection The established connection from connect_db()
+#' @param table_name The name of a table you wish to query to.
+#'
+#' @details This function a table in the database and returns a data frame object
+#'
+#' @import shiny
+#' @import RPostgres
+#'
+query_table <- function(db_connection, table_name){
+  SQLstring <- paste("SELECT * FROM ", table_name)
+  df <- dbGetQuery(db_connection, SQLstring)
+  return(df)
+}
+
+## Requirements DBI and RPostgres
+# Test variables
 load(file = 'data/bmse_associations.rda')
 test <- subset(bmse_associations[1,])
 test <- cbind(id=1,test)
 test <- as.data.frame(test)
-
-# Connect to Database
-tryCatch({
-  #drv <- RPostgres::Postgres()
-  print("Connecting to Database…")
-  connec <- dbConnect(RPostgres::Postgres(),
-                      dbname = dsn_database,
-                      host=dsn_hostname,
-                      port=dsn_port,
-                      user=dsn_uid,
-                      password=dsn_pwd)
-  print("Database Connected!")
-},
-error=function(cond) {
-  print("Unable to connect to Database.")
-})
-
-
-# Query a TABLE
-df <- dbGetQuery(connec, "SELECT * FROM bmse_associations")
-
-# Create a new table
-dbCreateTable(connec, "bmse_associations", bmse_associations)
-
-#Append to a existing table
-dbAppendTable(conn = connec,
-              name = SQL("bmse_associations"),
-              value = bmse_associations,
-              copy = NULL,
-              row.names = NULL)
-
-
-#Insert row by row
-##### NOT NECESSARY #####
-for(i in seq(nrow(bmse_associations))) {
-  UPDATE_LINE <- sprintf("INSERT INTO bmse_associations (id, entryID, CASno, Field_strength, Solute, Solvent, Reference, pH, Temperature, Concentration) VALUES ('%i','%s','%s','%i','%s','%s','%s','%s','%i','%s');",
-                         i, bmse_associations$Entry_ID[i], bmse_associations$CASno[i], bmse_associations$Field_strength[i],
-                         bmse_associations$Solute[i], bmse_associations$Solvent[i], bmse_associations$Reference[i],
-                         bmse_associations$pH[i], bmse_associations$Temperature[i], bmse_associations$Concentration[i])
-  print(UPDATE_LINE)
-  #D_MASTER_UPDATE <- dbGetQuery(conn = connec, statement = UPDATE_LINE)
-}
-
-dbGetQuery(conn = connec, statement = "INSERT INTO bmse_associations (id, entryID, CASno, Field_strength, Solute, Solvent, Reference, pH, Temperature, Concentration) VALUES ('10','bmse000005','53624-78-5','500','AMP','D2O','DSS','7.4','298','100mM');")
-
-
-
-#############################################################################
-
-
-# function for updating from user specified table in app UI
-
-#dbCreateTable(connec, "profiling_parameters", User_defined_params)
-
-dbAppendTable(conn = connec,
-              name = SQL("profiling_parameters"),
-              value = User_defined_params,
-              copy = NULL,
-              row.names = NULL)
-
-dbDisconnect(connec)
