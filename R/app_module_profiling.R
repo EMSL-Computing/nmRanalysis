@@ -69,7 +69,8 @@ profiling_prequantUI <- function(id){
     uiOutput(ns("vizoptions_quantdata_ui")),
     shinycssloaders::withSpinner(plotly::plotlyOutput(ns('quantdata_plot'))),
     DT::dataTableOutput(ns("refmet_quant_table")),
-    uiOutput(ns("tempsoln"))
+    uiOutput(ns("tempsoln")),
+    uiOutput(ns("ui_upload_ref_data_db"))
   )
 }
 
@@ -155,6 +156,8 @@ profiling_detailedviewUI <- function(id){
     shinycssloaders::withSpinner(plotly::plotlyOutput(ns('prof_refmet_view_plot')))
   )
 }
+
+
 
 #' Module: Server functions specific to metabolite profiling and profiling result generation
 #'
@@ -420,6 +423,20 @@ profilingServer <- function(id, xpmt_data, ref_data){
       # clickable button
       shinyWidgets::actionBttn(inputId = NS(id, "auto_profile"),
                                label = "Profile",
+                               style = "unite",
+                               color = "primary",
+                               size = "sm")
+    })
+
+    # Dynamic action button to automatically append to the profiling parameters
+    # database table containing user modified metabolite entries
+
+    output$ui_upload_ref_data_db <- renderUI({
+      req(ref_data())
+
+      # clickable button
+      shinyWidgets::actionBttn(inputId = NS(id, "upload_ref_data_db"),
+                               label = "Upload Profiling Parameters ",
                                style = "unite",
                                color = "primary",
                                size = "sm")
@@ -1437,6 +1454,20 @@ profilingServer <- function(id, xpmt_data, ref_data){
 
       })
 
+    })
+
+
+    # Respond to the upload button being pressed and append the user defined
+    # reference data to the db
+
+    observeEvent(input$upload_ref_data_db, {
+      req(input$upload_ref_data_db>0)
+
+      df <- ref_data()$user_edited_refdata
+
+      # connect to db table
+      connec <- connect_db()
+      append_table(connec, "profiling_parameters", df)
     })
 
     # Observer to control pop-up (i.e. modal) containing the subplot of spectral data at a selected region.
