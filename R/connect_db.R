@@ -24,28 +24,29 @@
 #' @import RPostgres
 #'
 connect_db <- function(){
-  # Set environmental variables
-  dsn_database = "nmRanalysis"
-  dsn_hostname = "localhost"
-  dsn_port = "5432"
-  dsn_uid = "developer"
-  dsn_pwd = "developer"
+    # Set environmental variables
+    dsn_database = "nmRanalysis"
+    dsn_hostname = "localhost"
+    dsn_port = "5432"
+    dsn_uid = "developer"
+    dsn_pwd = "developer"
 
-  # Connect to Database
-  tryCatch({
-    #drv <- RPostgres::Postgres()
-    print("Connecting to Database…")
-    connec <- dbConnect(RPostgres::Postgres(),
-                        dbname = dsn_database,
-                        host=dsn_hostname,
-                        port=dsn_port,
-                        user=dsn_uid,
-                        password=dsn_pwd)
-    print("Database Connected!")
-  },
-  error=function(cond) {
-    print("Unable to connect to Database.")
-  })
+    # Connect to Database
+    tryCatch({
+      #drv <- RPostgres::Postgres()
+      print("Connecting to Database…")
+      connec <- DBI::dbConnect(RPostgres::Postgres(),
+                          dbname = dsn_database,
+                          host=dsn_hostname,
+                          port=dsn_port,
+                          user=dsn_uid,
+                          password=dsn_pwd)
+      print("Database Connected!")
+    },
+    error=function(cond) {
+      print("Unable to connect to Database.")
+    })
+    return(connec)
 }
 
 
@@ -78,7 +79,7 @@ connect_db <- function(){
 #' @import RPostgres
 #'
 create_new_table <- function(db_connection, table_name, df_object){
-  dbCreateTable(db_connection, toString(table_name), df_object)
+  DBI::dbCreateTable(db_connection, toString(table_name), df_object)
 }
 
 
@@ -112,7 +113,7 @@ create_new_table <- function(db_connection, table_name, df_object){
 #' @import RPostgres
 #'
 append_table <- function(db_connection, table_name, df_object){
-  dbAppendTable(conn = db_connection,
+  DBI::dbAppendTable(conn = db_connection,
                 name = SQL(toString(table_name)),
                 value = df_object,
                 copy = NULL,
@@ -146,8 +147,9 @@ append_table <- function(db_connection, table_name, df_object){
 #' @import RPostgres
 #'
 query_table <- function(db_connection, table_name){
-  SQLstring <- paste("SELECT * FROM ", table_name)
-  df <- dbGetQuery(db_connection, SQLstring)
+  name <- deparse(substitute(table_name))
+  SQLstring <- paste("SELECT * FROM ", name)
+  df <- DBI::dbGetQuery(db_connection, SQLstring)
   return(df)
 }
 

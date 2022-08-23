@@ -58,9 +58,12 @@ as.bmseList <- function(casno_list,
   #   stop('Solvent type and ph must be specified if return_metabs = "nearest_match"')
   # }
 
+  # connect to db table
+  connec <- connect_db()
+  bmseassociations <- query_table(connec, bmse_associations)
   # warn if one casno isn't in the db
   for (item in casno_list){
-    if (!(item %in% bmse_associations$CASno)){
+    if (!(item %in% bmseassociations$CASno)){
       warning(sprintf("%s is not a recognized CAS registry number", item))
     }
   }
@@ -70,7 +73,7 @@ as.bmseList <- function(casno_list,
     #create list without filtering by exp conditions
     bmse_list <- list()
     for (i in 1:length(casno_list)){
-      subset    <- bmse_associations[bmse_associations$CASno == casno_list[[i]], ]
+      subset    <- bmseassociations[bmseassociations$CASno == casno_list[[i]], ]
       bmse_val  <- subset$Entry_ID
       bmse_list <- append(bmse_list, bmse_val)
       misscheck[i] <- ifelse(length(bmse_val) > 0, 0, 1)
@@ -86,7 +89,7 @@ as.bmseList <- function(casno_list,
     #create list filtered by solvent type and pH
     bmse_list <- list()
     for (i in 1:length(casno_list)){
-      subset <- bmse_associations %>% dplyr::filter(.data$CASno == casno_list[[i]],
+      subset <- bmseassociations %>% dplyr::filter(.data$CASno == casno_list[[i]],
                                                     .data$Solvent == solvent_type,
                                                     .data$pH == ph)
 
@@ -155,6 +158,9 @@ as.bmseListFromName <- function(name_list,
                                 temperature         = NULL,
                                 concentration       = NULL){
 
+  # connect to db table
+  connec <- connect_db()
+  bmseassociations <- query_table(connec, bmse_associations)
   # Initial Checks
   if(!inherits(name_list, "list")){
     stop("List of metabolite names must be of the class 'list'.")
@@ -170,7 +176,7 @@ as.bmseListFromName <- function(name_list,
 
   # fail check if one metabolite name is not in the db
   for (item in name_list){
-    if (!(item %in% bmse_associations$Solute)){
+    if (!(item %in% bmseassociations$Solute)){
       warning(sprintf("%s is not a recognized metabolite name", item))
     }
   }
@@ -181,7 +187,7 @@ as.bmseListFromName <- function(name_list,
     bmse_list <- list()
 
     for (i in 1:length(name_list)){
-      subset    <- bmse_associations[bmse_associations$Solute == name_list[[i]], ]
+      subset    <- bmseassociations[bmseassociations$Solute == name_list[[i]], ]
       bmse_val  <- subset$Entry_ID
       bmse_list <- append(bmse_list, bmse_val)
       misscheck[i] <- ifelse(length(bmse_val) > 0, 0, 1)
@@ -196,7 +202,7 @@ as.bmseListFromName <- function(name_list,
     #create list
     bmse_list <- list()
     for (i in 1:length(name_list)){
-      subset <- bmse_associations %>% dplyr::filter(.data$Solute == name_list[[i]],
+      subset <- bmseassociations %>% dplyr::filter(.data$Solute == name_list[[i]],
                                                     .data$Solvent == solvent_type,
                                                     .data$pH == ph)
       if(!is.na(temperature)){
@@ -570,9 +576,12 @@ export_roi_file <- function(spectra_df,
               'Half bandwidth (Hz)', 'Multiplicity', 'J coupling (Hz)',	'Roof effect', 'J coupling 2 (Hz)',
               'Roof effect 2', 'Frequency (MHz)', 'pH', 'Concentration (mM)', 'Temperature (K)', 'Solvent')
 
+  # connect to db table
+  connec <- connect_db()
+  bmseassociations <- query_table(connec, bmse_associations)
 
   # reference the entry ID to the bmse metadata
-  metab_name <- unique(merge(x = spectra_df, y = bmse_associations[, c("Entry_ID", "Solute", "Solvent", "pH", "Temperature", "Concentration")], by="Entry_ID", all.x=TRUE))
+  metab_name <- unique(merge(x = spectra_df, y = bmseassociations[, c("Entry_ID", "Solute", "Solvent", "pH", "Temperature", "Concentration")], by="Entry_ID", all.x=TRUE))
 
   #set default constants for columns (quantification mode, roof effect, and tolerance)
   q_mode       <- rep("Baseline Fitting", nrow(metab_name))
@@ -738,6 +747,7 @@ roi_ref_export <- function(name_list           = NULL,
 #' @return data.frame
 #' @export
 nearest_match_metabs <- function(roi_df, pH, instrument_strength) {
+
 
   # use HMDB code as unique ID for specific solute/pH/field strength combination
   metab_id <- roi_df$HMDB_code
