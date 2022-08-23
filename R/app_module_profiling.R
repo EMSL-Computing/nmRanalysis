@@ -1503,7 +1503,6 @@ profilingServer <- function(id, xpmt_data, ref_data, connec){
     # reference data to the db
 
     observeEvent(input$upload_ref_data_db, {
-
       req(input$upload_ref_data_db>0)
 
       df <- ref_data()$user_edited_refdata
