@@ -60,7 +60,11 @@ as.bmseList <- function(casno_list,
   # }
 
   # connect to db table
+<<<<<<< HEAD
   #connec <- connect_db()
+=======
+  connec <- connect_db()
+>>>>>>> 0e67940 (apply functions to startup db connection and query from bmse_associations)
   bmseassociations <- query_table(connec, bmse_associations)
   # warn if one casno isn't in the db
   for (item in casno_list){
@@ -161,7 +165,11 @@ as.bmseListFromName <- function(name_list,
                                 connec){
 
   # connect to db table
+<<<<<<< HEAD
   #connec <- connect_db()
+=======
+  connec <- connect_db()
+>>>>>>> 0e67940 (apply functions to startup db connection and query from bmse_associations)
   bmseassociations <- query_table(connec, bmse_associations)
   # Initial Checks
   if(!inherits(name_list, "list")){
@@ -581,7 +589,11 @@ export_roi_file <- function(spectra_df,
               'Roof effect 2', 'Frequency (MHz)', 'pH', 'Concentration (mM)', 'Temperature (K)', 'Solvent')
 
   # connect to db table
+<<<<<<< HEAD
   #connec <- connect_db()
+=======
+  connec <- connect_db()
+>>>>>>> 0e67940 (apply functions to startup db connection and query from bmse_associations)
   bmseassociations <- query_table(connec, bmse_associations)
 
   # reference the entry ID to the bmse metadata
@@ -755,6 +767,7 @@ roi_ref_export <- function(name_list           = NULL,
 #' @return data.frame
 #' @export
 nearest_match_metabs <- function(roi_df, temperature, instrument_strength) {
+
 
 
   # use HMDB code as unique ID for specific solute/pH/field strength combination
