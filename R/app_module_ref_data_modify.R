@@ -906,7 +906,42 @@ ref_data_editingServer <- function(id, xpmt_data, ref_data, ref_db){
 
                    edtd_colname <- names(temp)[changed_col]
 
+
                    if(edtd_colname %in% c("Chemical shift(ppm)", "Signal left edge (ppm)", "Signal right edge (ppm)")) {
+
+                     if(edtd_colname %in% c("Signal left edge (ppm)")){
+                       if(as.numeric(v) < rv$dspedt_user_reference_data$"ROI right edge (ppm)"[changed_row]){
+
+                         ProxyUpdate_refmet_tabplot(tabproxy = refmet_dspedt_table_proxy,
+                                                    pltproxy = refmet_dspedt_plot_proxy,
+                                                    newdat = rv$dspedt_user_reference_data)
+
+                         shinyWidgets::show_alert(
+                           title = "Invalid entry.",
+                           text = "The signal left edge should be larger than the signal right edge.",
+                           type = "error"
+                         )
+
+                         req(as.numeric(v) > rv$dspedt_user_reference_data$"ROI right edge (ppm)"[changed_row])
+                       }
+                     }
+
+                     if(edtd_colname %in% c("Signal right edge (ppm)")){
+                       if(as.numeric(v) > rv$dspedt_user_reference_data$"ROI left edge (ppm)"[changed_row]){
+
+                         ProxyUpdate_refmet_tabplot(tabproxy = refmet_dspedt_table_proxy,
+                                                    pltproxy = refmet_dspedt_plot_proxy,
+                                                    newdat = rv$dspedt_user_reference_data)
+
+                         shinyWidgets::show_alert(
+                           title = "Invalid entry.",
+                           text = "The signal right edge should be less than the signal left edge.",
+                           type = "error"
+                         )
+
+                         req(as.numeric(v) < rv$dspedt_user_reference_data$"ROI left edge (ppm)"[changed_row])
+                       }
+                     }
 
                      rv$dspedt_user_reference_data <-
                        refmet_data_change_fromtab(dspedt_refmet_data = rv$dspedt_user_reference_data,
@@ -925,12 +960,167 @@ ref_data_editingServer <- function(id, xpmt_data, ref_data, ref_db){
                    } else if(edtd_colname %in% c("Half bandwidth (Hz)", "J coupling (Hz)", "Chemical shift tolerance (ppm)",
                                                  "J coupling 2 (Hz)", "Roof effect", "Roof effect 2")) {
 
+                     if(edtd_colname %in% c("Half bandwidth (Hz)")){
+
+                       if(as.numeric(v) <= 0){
+
+                         ProxyUpdate_refmet_tabplot(tabproxy = refmet_dspedt_table_proxy,
+                                                    pltproxy = refmet_dspedt_plot_proxy,
+                                                    newdat = rv$dspedt_user_reference_data)
+
+                         shinyWidgets::show_alert(
+                           title = "Invalid entry.",
+                           text = "The specified value must be larger than 0.",
+                           type = "error"
+                         )
+                       }
+
+                       req(as.numeric(v) > 0)
+
+                       if(as.numeric(v) - input$gpp_widthtolerance <= 0){
+                         ProxyUpdate_refmet_tabplot(tabproxy = refmet_dspedt_table_proxy,
+                                                    pltproxy = refmet_dspedt_plot_proxy,
+                                                    newdat = rv$dspedt_user_reference_data)
+
+                         shinyWidgets::show_alert(
+                           title = "Invalid entry.",
+                           text = "The lower bandwidth bound based on the specified bandwidth and tolerance is less than or equal to 0.",
+                           type = "error"
+                         )
+                       }
+
+                       req(as.numeric(v) - input$gpp_widthtolerance > 0)
+                     }
+
+                     if(edtd_colname %in% c("Chemical shift tolerance (ppm)")){
+
+                       if(as.numeric(v) < 0){
+
+                         ProxyUpdate_refmet_tabplot(tabproxy = refmet_dspedt_table_proxy,
+                                                    pltproxy = refmet_dspedt_plot_proxy,
+                                                    newdat = rv$dspedt_user_reference_data)
+
+                         shinyWidgets::show_alert(
+                           title = "Invalid entry.",
+                           text = "The specified value must be larger than or equal to 0.",
+                           type = "error"
+                         )
+                       }
+
+                       req(as.numeric(v) >= 0)
+
+                       dist <- (rv$dspedt_user_reference_data$"ROI left edge (ppm)"[changed_row] -
+                                  rv$dspedt_user_reference_data$"ROI right edge (ppm)"[changed_row])/2
+
+                       if(as.numeric(v) >= dist){
+                         ProxyUpdate_refmet_tabplot(tabproxy = refmet_dspedt_table_proxy,
+                                                    pltproxy = refmet_dspedt_plot_proxy,
+                                                    newdat = rv$dspedt_user_reference_data)
+
+                         shinyWidgets::show_alert(
+                           title = "Invalid entry.",
+                           text = "The specified value must be less than half the signal interval width",
+                           type = "error"
+                         )
+                       }
+
+                       req(as.numeric(v) < dist)
+                     }
+
+
+                     if(edtd_colname %in% c("J coupling (Hz)", "J coupling 2 (Hz)")){
+
+                       if(as.numeric(v) < 0){
+
+                         ProxyUpdate_refmet_tabplot(tabproxy = refmet_dspedt_table_proxy,
+                                                    pltproxy = refmet_dspedt_plot_proxy,
+                                                    newdat = rv$dspedt_user_reference_data)
+
+                         shinyWidgets::show_alert(
+                           title = "Invalid entry.",
+                           text = "The specified value must be larger than or equal to 0.",
+                           type = "error"
+                         )
+                       }
+
+                       req(as.numeric(v) >= 0)
+
+                       if(as.numeric(v) - input$gpp_j_coupling_variation < 0){
+                         ProxyUpdate_refmet_tabplot(tabproxy = refmet_dspedt_table_proxy,
+                                                    pltproxy = refmet_dspedt_plot_proxy,
+                                                    newdat = rv$dspedt_user_reference_data)
+
+                         shinyWidgets::show_alert(
+                           title = "Invalid entry.",
+                           text = "The lower J-coupling bound based on the specified J-coupling and tolerance is less than 0.",
+                           type = "error"
+                         )
+                       }
+
+                       req(as.numeric(v) - input$gpp_j_coupling_variation >= 0)
+                     }
+
+
+                     if(edtd_colname %in% c("Roof effect", "Roof effect 2")){
+
+                       if(rv$dspedt_user_reference_data$"Multiplicity"[changed_row] %in% c("2", "d", "dd")){
+                         if(as.numeric(v) <= -1 | as.numeric(v) >= 1){
+
+                           ProxyUpdate_refmet_tabplot(tabproxy = refmet_dspedt_table_proxy,
+                                                      pltproxy = refmet_dspedt_plot_proxy,
+                                                      newdat = rv$dspedt_user_reference_data)
+
+                           shinyWidgets::show_alert(
+                             title = "Invalid entry.",
+                             text = "For d or dd multiplicities, allowable values range from -1 to 1, non-inclusive.",
+                             type = "error"
+                           )
+                         }
+
+                         req(as.numeric(v) > -1 & as.numeric(v) < 1)
+                       }
+                     }
+
                      rv$dspedt_user_reference_data[[edtd_colname]][changed_row] <- as.numeric(v)
 
                      # Store the unsaved changes
                      rv$unsaved_change[[input$which_refmet_dspedt]] <- rv$dspedt_user_reference_data
 
                    } else if(edtd_colname %in% c("Multiplicity")){
+
+                     if(!is.na(suppressWarnings(as.numeric(v)))){
+                       if(as.numeric(v) <= 0){
+                         ProxyUpdate_refmet_tabplot(tabproxy = refmet_dspedt_table_proxy,
+                                                    pltproxy = refmet_dspedt_plot_proxy,
+                                                    newdat = rv$dspedt_user_reference_data)
+
+                         shinyWidgets::show_alert(
+                           title = "Invalid entry.",
+                           text = "Numeric multiplicity values must be larger than 0.",
+                           type = "error"
+                         )
+                       }
+
+                       req(as.numeric(v) > 0)
+                     }
+
+                     if(rv$dspedt_user_reference_data$"Roof effect"[changed_row] %in% c(-1, 1) |
+                        rv$dspedt_user_reference_data$"Roof effect 2"[changed_row] %in% c(-1, 1)){
+                       if(v %in% c("2", "d", "dd")){
+                         ProxyUpdate_refmet_tabplot(tabproxy = refmet_dspedt_table_proxy,
+                                                    pltproxy = refmet_dspedt_plot_proxy,
+                                                    newdat = rv$dspedt_user_reference_data)
+
+                         shinyWidgets::show_alert(
+                           title = "Invalid entry.",
+                           text = "For d or dd multiplicities, allowable roof effect values range from -1 to 1, non-inclusive.",
+                           type = "error"
+                         )
+                       }
+
+                       req(v %ni% c("2", "d", "dd"))
+                     }
+
 
                      # multiplicity should remain character-valued so as to allow for specifications like "dd", "s", and so forth.
                      rv$dspedt_user_reference_data[[edtd_colname]][changed_row] <- v
@@ -941,6 +1131,11 @@ ref_data_editingServer <- function(id, xpmt_data, ref_data, ref_db){
                    } else if(edtd_colname == "Quantify"){
 
                      if(v %ni% c("0", "1")){
+
+                       ProxyUpdate_refmet_tabplot(tabproxy = refmet_dspedt_table_proxy,
+                                                  pltproxy = refmet_dspedt_plot_proxy,
+                                                  newdat = rv$dspedt_user_reference_data)
+
                        shinyWidgets::show_alert(
                          title = "Invalid entry.",
                          text = "Specify 0 to exclude the corresponding peak from quantification; 1 otherwise.",
@@ -960,9 +1155,13 @@ ref_data_editingServer <- function(id, xpmt_data, ref_data, ref_db){
                      rv$unsaved_change[[input$which_refmet_dspedt]] <- rv$dspedt_user_reference_data
 
                    } else {
+
+                     ProxyUpdate_refmet_tabplot(tabproxy = refmet_dspedt_table_proxy,
+                                                pltproxy = refmet_dspedt_plot_proxy,
+                                                newdat = rv$dspedt_user_reference_data)
+
                      shinyWidgets::show_alert(
                        title = "Non-editable Field.",
-                       text = "Changes made to this field are not saved.",
                        type = "error"
                      )
                    }
@@ -1235,6 +1434,8 @@ ref_data_editingServer <- function(id, xpmt_data, ref_data, ref_db){
 
         rv$curr_ROI_profile[[input$sample_to_plot]][[input$signal_to_check]] <- signalROIdat
 
+
+
         temp <- rv$dspedt_user_reference_data %>%
           dplyr::mutate(Signal = paste0(.data$Metabolite, " [", .data$`Quantification Signal`, "]"),
                         Signal2 = make.names(paste(.data$Metabolite, .data$`Quantification Signal`, sep='_')))
@@ -1272,11 +1473,13 @@ ref_data_editingServer <- function(id, xpmt_data, ref_data, ref_db){
 
       }
 
+
     })
 
     observeEvent(c(rv$dspedt_profiling_data, input$show_metquant),{
       req(input$show_metquant)
       req(rv$dspedt_profiling_data[[input$sample_to_plot]][[input$signal_to_check]])
+
 
 
       profiling_data <- rv$dspedt_profiling_data[[input$sample_to_plot]][[input$signal_to_check]]
