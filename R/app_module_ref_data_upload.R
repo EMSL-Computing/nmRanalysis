@@ -103,9 +103,11 @@ ref_data_uploadUI <- function(id, ref_db){
 #' @importFrom magrittr %>%
 #' @importFrom rlang .data
 #'
-ref_data_uploadServer <- function(id, xpmt_data, ref_db){
+ref_data_uploadServer <- function(id, xpmt_data, ref_db, connec){
   stopifnot(!is.reactive(ref_db))
   stopifnot(is.reactive(xpmt_data))
+  stopifnot(is.reactive(connec))
+
   moduleServer(id, function(input, output, session){
 
     # Initialize reactiveValues needed by this module
@@ -189,6 +191,7 @@ ref_data_uploadServer <- function(id, xpmt_data, ref_db){
     # eventReactive() to fully process the uploading of reference metabolite data, whether via file upload
     # or manual specification
     uploaded_ref_data <- eventReactive(c(input$process_ref_inputs),
+
                                        {
                                          req(xpmt_data())
 
@@ -249,7 +252,8 @@ ref_data_uploadServer <- function(id, xpmt_data, ref_db){
                                                                                  ph                  = attr(xpmt_data(), "exp_info")$ph,
                                                                                  instrument_strength = attr(xpmt_data(), "exp_info")$instrument_strength,
                                                                                  temperature         = attr(xpmt_data(), "exp_info")$temperature,
-                                                                                 concentration       = attr(xpmt_data(), "exp_info")$concentration)
+                                                                                 concentration       = attr(xpmt_data(), "exp_info")$concentration,
+                                                                                 connec = connec())
 
                                            shinyFeedback::feedbackDanger("uploaded_refmet_file",
                                                                          nrow(user_reference_data) == 0,
@@ -360,7 +364,8 @@ ref_data_uploadServer <- function(id, xpmt_data, ref_db){
                                                                                  ph                  = attr(xpmt_data(), "exp_info")$ph,
                                                                                  instrument_strength = attr(xpmt_data(), "exp_info")$instrument_strength,
                                                                                  temperature         = attr(xpmt_data(), "exp_info")$temperature,
-                                                                                 concentration       = attr(xpmt_data(), "exp_info")$concentration)
+                                                                                 concentration       = attr(xpmt_data(), "exp_info")$concentration,
+                                                                                 connec = connec())
 
                                            shinyFeedback::feedbackDanger("user_refmets",
                                                                          nrow(user_reference_data) == 0,
