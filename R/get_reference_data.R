@@ -61,10 +61,14 @@ as.bmseList <- function(casno_list,
 
   # connect to db table
 <<<<<<< HEAD
+<<<<<<< HEAD
   #connec <- connect_db()
 =======
   connec <- connect_db()
 >>>>>>> 0e67940 (apply functions to startup db connection and query from bmse_associations)
+=======
+  #connec <- connect_db()
+>>>>>>> e432c17 (move db connection to reactive variable)
   bmseassociations <- query_table(connec, bmse_associations)
   # warn if one casno isn't in the db
   for (item in casno_list){
@@ -166,10 +170,14 @@ as.bmseListFromName <- function(name_list,
 
   # connect to db table
 <<<<<<< HEAD
+<<<<<<< HEAD
   #connec <- connect_db()
 =======
   connec <- connect_db()
 >>>>>>> 0e67940 (apply functions to startup db connection and query from bmse_associations)
+=======
+  #connec <- connect_db()
+>>>>>>> e432c17 (move db connection to reactive variable)
   bmseassociations <- query_table(connec, bmse_associations)
   # Initial Checks
   if(!inherits(name_list, "list")){
@@ -590,10 +598,14 @@ export_roi_file <- function(spectra_df,
 
   # connect to db table
 <<<<<<< HEAD
+<<<<<<< HEAD
   #connec <- connect_db()
 =======
   connec <- connect_db()
 >>>>>>> 0e67940 (apply functions to startup db connection and query from bmse_associations)
+=======
+  #connec <- connect_db()
+>>>>>>> e432c17 (move db connection to reactive variable)
   bmseassociations <- query_table(connec, bmse_associations)
 
   # reference the entry ID to the bmse metadata
