@@ -203,9 +203,10 @@ profiling_detailedviewUI <- function(id){
 #' @importFrom rlang .data
 #' @importFrom plyr .
 #'
-profilingServer <- function(id, xpmt_data, ref_data){
+profilingServer <- function(id, xpmt_data, ref_data, connec){
   stopifnot(is.reactive(xpmt_data))
   stopifnot(is.reactive(ref_data))
+  stopifnot(is.reactive(connec))
   moduleServer(id, function(input, output, session){
 
     rv <- reactiveValues(subplot_dat = NULL)
@@ -1502,13 +1503,16 @@ profilingServer <- function(id, xpmt_data, ref_data){
     # reference data to the db
 
     observeEvent(input$upload_ref_data_db, {
+
       req(input$upload_ref_data_db>0)
+
+      browser()
 
       df <- ref_data()$user_edited_refdata
 
       # connect to db table
-      connec <- connect_db()
-      append_table(connec, "profiling_parameters", df)
+      #connec <- connect_db()
+      append_table(db_connection= connec(), table_name="profiling_parameters", df_object=df)
     })
 
     # Observer to control pop-up (i.e. modal) containing the subplot of spectral data at a selected region.
