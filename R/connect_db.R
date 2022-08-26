@@ -114,7 +114,7 @@ create_new_table <- function(db_connection, table_name, df_object){
 #'
 append_table <- function(db_connection, table_name, df_object){
   DBI::dbAppendTable(conn = db_connection,
-                name = SQL(toString(table_name)),
+                name = DBI::SQL(toString(table_name)),
                 value = df_object,
                 copy = NULL,
                 row.names = NULL)

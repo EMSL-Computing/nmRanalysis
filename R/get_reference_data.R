@@ -39,7 +39,8 @@ as.bmseList <- function(casno_list,
                         ph = NULL,
                         instrument_strength = NULL,
                         temperature         = NULL,
-                        concentration       = NULL){
+                        concentration       = NULL,
+                        connec){
 
   # Initial Checks
   if(!inherits(casno_list, "list")){
@@ -59,7 +60,7 @@ as.bmseList <- function(casno_list,
   # }
 
   # connect to db table
-  connec <- connect_db()
+  #connec <- connect_db()
   bmseassociations <- query_table(connec, bmse_associations)
   # warn if one casno isn't in the db
   for (item in casno_list){
@@ -156,10 +157,11 @@ as.bmseListFromName <- function(name_list,
                                 ph = NULL,
                                 instrument_strength,
                                 temperature         = NULL,
-                                concentration       = NULL){
+                                concentration       = NULL,
+                                connec){
 
   # connect to db table
-  connec <- connect_db()
+  #connec <- connect_db()
   bmseassociations <- query_table(connec, bmse_associations)
   # Initial Checks
   if(!inherits(name_list, "list")){
@@ -566,7 +568,8 @@ get_spectra_data <- function(ID_list){
 #' @export export_roi_file
 export_roi_file <- function(spectra_df,
                             half_bandwidth = 1.4,
-                            roi_tol        = 0.005){
+                            roi_tol        = 0.005,
+                            connec){
 
   # (Note that HMDB_code is removed and NOT returned)
 
@@ -577,7 +580,7 @@ export_roi_file <- function(spectra_df,
               'Roof effect 2', 'Frequency (MHz)', 'pH', 'Concentration (mM)', 'Temperature (K)', 'Solvent')
 
   # connect to db table
-  connec <- connect_db()
+  #connec <- connect_db()
   bmseassociations <- query_table(connec, bmse_associations)
 
   # reference the entry ID to the bmse metadata
@@ -686,7 +689,8 @@ roi_ref_export <- function(name_list           = NULL,
                            roi_tol             = 0.005,
                            instrument_strength = NULL,
                            temperature         = NULL,
-                           concentration       = NULL){
+                           concentration       = NULL,
+                           connec){
 
   # set ID list object
   id_list <- NULL
@@ -697,7 +701,8 @@ roi_ref_export <- function(name_list           = NULL,
                                    ph                  = ph,
                                    instrument_strength = instrument_strength,
                                    temperature         = temperature,
-                                   concentration       = concentration)
+                                   concentration       = concentration,
+                                   connec = connec)
   } else{
     id_list <- as.bmseList(casno_list          = cas_list,
                            return_metabs       = return_metabs,
@@ -705,7 +710,8 @@ roi_ref_export <- function(name_list           = NULL,
                            ph                  = ph,
                            instrument_strength = instrument_strength,
                            temperature         = temperature,
-                           concentration       = concentration)
+                           concentration       = concentration,
+                           connec = connec)
   }
 
   # get spectra data
@@ -717,7 +723,8 @@ roi_ref_export <- function(name_list           = NULL,
     # return the ROI file formatted object and export CSV
     roi_df <- export_roi_file(spectra_df          = saveframe,
                               half_bandwidth      = half_bandwidth,
-                              roi_tol             = roi_tol)
+                              roi_tol             = roi_tol,
+                              connec = connec)
 
     return(roi_df)
   }

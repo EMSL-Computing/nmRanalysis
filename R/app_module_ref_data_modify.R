@@ -177,10 +177,11 @@ ref_data_add_delUI <- function(id){
 #' @importFrom magrittr %>%
 #' @importFrom rlang .data
 #'
-ref_data_editingServer <- function(id, xpmt_data, ref_data, ref_db){
+ref_data_editingServer <- function(id, xpmt_data, ref_data, ref_db, connec){
   stopifnot(is.reactive(xpmt_data))
   stopifnot(is.reactive(ref_data))
   stopifnot(!is.reactive(ref_db))
+  stopifnot(is.reactive(connec))
   moduleServer(id, function(input, output, session){
 
     # Initialize reactiveValues needed by this module:
@@ -237,7 +238,8 @@ ref_data_editingServer <- function(id, xpmt_data, ref_data, ref_db){
                                                             ph                  = attr(xpmt_data(), "exp_info")$ph,
                                                             instrument_strength = attr(xpmt_data(), "exp_info")$instrument_strength,
                                                             temperature         = attr(xpmt_data(), "exp_info")$temperature,
-                                                            concentration       = attr(xpmt_data(), "exp_info")$concentration)
+                                                            concentration       = attr(xpmt_data(), "exp_info")$concentration,
+                                                            connec = connec())
 
                      if(is.null(added_reference_data)){
                        shinyFeedback::feedbackDanger("refmet_toadd",
