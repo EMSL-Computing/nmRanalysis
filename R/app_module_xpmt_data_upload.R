@@ -60,10 +60,10 @@ xpmt_data_uploadUI <- function(id, ref_db){
 
                                                  fluidRow(
                                                    column(width = 6,
-                                                          textInput(inputId     = ns("pH"),
-                                                                    label       = "pH:",
+                                                          textInput(inputId     = ns("temperature"),
+                                                                    label       = "Temperature (K)",
                                                                     value       = "",
-                                                                    placeholder = "e.g. 7.4")),
+                                                                    placeholder = "e.g. 298")),
 
                                                    column(width = 6,
                                                           textInput(inputId     = ns("instrument_strength"),
@@ -79,10 +79,10 @@ xpmt_data_uploadUI <- function(id, ref_db){
                                                                       c('H2O' = "h2o",
                                                                         "D2O" = "d2o"))),
                                                    column(width = 6,
-                                                          textInput(inputId     = ns("temperature"),
-                                                                    label       = "(Optional) Temperature (K)",
+                                                          textInput(inputId     = ns("pH"),
+                                                                    label       = "(Optional) pH:",
                                                                     value       = "",
-                                                                    placeholder = "e.g. 298"))
+                                                                    placeholder = "e.g. 7.4"))
 
 
                                                  ),
@@ -160,8 +160,8 @@ xpmt_data_uploadServer <- function(id){
                                                                         is.null(input$uploaded_nmR_edata$datapath),
                                                                         text = "Please provide a datafile.")
 
-                                          shinyFeedback::feedbackDanger("pH",
-                                                                        input$pH == "" | is.na(as.numeric(input$pH)),
+                                          shinyFeedback::feedbackDanger("temperature",
+                                                                        input$temperature == "" | is.na(as.numeric(input$temperature)),
                                                                         text = "Numeric value required.")
 
                                           shinyFeedback::feedbackDanger("instrument_strength",
@@ -172,20 +172,20 @@ xpmt_data_uploadServer <- function(id){
                                           # as well as field strength, ph, and solvent
                                           req(input$uploaded_nmR_edata)
                                           req(input$instrument_strength)
-                                          req(input$pH)
+                                          req(input$temperature)
                                           req(input$solvent)
 
                                           # Read in experimental data file
                                           xpmt.e_data <- load_file(path    = input$uploaded_nmR_edata$datapath,
                                                                    dataset = "experiment")
 
-                                          xpmt_ph <- as.numeric(input$pH)
+                                          xpmt_temp <- as.numeric(input$temperature)
                                           xpmt_freq <- as.numeric(input$instrument_strength)
-                                          xpmt_temp <- NA
+                                          xpmt_ph   <- NA
                                           xpmt_conc <- NA
 
-                                          if(input$temperature != ""){
-                                            xpmt_temp <- as.numeric(input$temperature)
+                                          if(input$pH != ""){
+                                            xpmt_ph <- as.numeric(input$pH)
                                           }
 
                                           if(input$concentration != ""){
