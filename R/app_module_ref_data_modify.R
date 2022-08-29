@@ -1044,19 +1044,19 @@ ref_data_editingServer <- function(id, xpmt_data, ref_data, ref_db){
                        dist <- (rv$dspedt_user_reference_data$"ROI left edge (ppm)"[changed_row] -
                                   rv$dspedt_user_reference_data$"ROI right edge (ppm)"[changed_row])/2
 
-                       if(as.numeric(v) >= dist){
+                       if(as.numeric(v) > dist){
                          ProxyUpdate_refmet_tabplot(tabproxy = refmet_dspedt_table_proxy,
                                                     pltproxy = refmet_dspedt_plot_proxy,
                                                     newdat = rv$dspedt_user_reference_data)
 
                          shinyWidgets::show_alert(
                            title = "Invalid entry.",
-                           text = "The specified value must be less than half the signal interval width",
+                           text = "The specified value must be less than or equal to half the signal interval width",
                            type = "error"
                          )
                        }
 
-                       req(as.numeric(v) < dist)
+                       req(as.numeric(v) <= dist)
                      }
 
 
