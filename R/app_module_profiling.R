@@ -985,16 +985,31 @@ profilingServer <- function(id, xpmt_data, ref_data){
 
       quant_refdata <- ref_data()$user_edited_refdata %>% dplyr::filter(.data$Quantify == 1)
       qmetnames <- unique(quant_refdata$Metabolite)
+      qmet_signums <- sub(".*_", "", tempdat$Metabolite)
+
       for(name in qmetnames){
-        tempdat$Metabolite[which(grepl(make.names(name), tempdat$Metabolite))] <- name
+        signums <- qmet_signums[which(grepl(make.names(name), tempdat$Metabolite))]
+        tempdat$Metabolite[which(grepl(make.names(name), tempdat$Metabolite))] <- paste0(name, " [", signums, "]")
       }
+
+      refdat_info <- ref_data()$user_edited_refdata %>% dplyr::ungroup() %>%
+        dplyr::mutate(SigName = paste0(.data$Metabolite, " [", .data$`Quantification Signal`, "]")) %>%
+        dplyr::select(.data$`SigName`, .data$`ROI left edge (ppm)`, .data$`ROI right edge (ppm)`, .data$`Chemical shift(ppm)`,
+                      .data$`Chemical shift tolerance (ppm)`, .data$`Half bandwidth (Hz)`, .data$`Multiplicity`,
+                      .data$`J coupling (Hz)`, .data$`J coupling 2 (Hz)`, .data$`Roof effect`, .data$`Roof effect 2`) %>%
+        dplyr::rename(Metabolite = SigName)
+
+      tempdat <- dplyr::left_join(tempdat, refdat_info)
 
       tempdat %>% dplyr::select(.data$Sample, .data$Metabolite, .data$`Fitted Chemical Shift (ppm)`, .data$`Fitted Intensity`,
                                 .data$`Fitted Half Bandwidth (Hz)`, .data$`Quantity`, .data$`Fitting Error`,
-                                .data$`Signal to Area Ratio`) %>%
+                                .data$`Signal to Area Ratio`,
+                                .data$`ROI left edge (ppm)`, .data$`ROI right edge (ppm)`, .data$`Chemical shift(ppm)`,
+                                .data$`Chemical shift tolerance (ppm)`, .data$`Half bandwidth (Hz)`, .data$`Multiplicity`,
+                                .data$`J coupling (Hz)`, .data$`J coupling 2 (Hz)`, .data$`Roof effect`, .data$`Roof effect 2`) %>%
         DT::datatable(rownames   = FALSE,
                       filter = "top",
-                      extensions = c("Responsive", "Buttons", "Scroller"),
+                      extensions = c("Buttons", "Scroller"),
                       options = exprToFunction(
                         list(dom = 'Bfrtip',
                              buttons = list(
@@ -1030,11 +1045,15 @@ profilingServer <- function(id, xpmt_data, ref_data){
                                #      exportOptions = list(
                                #        modifier = list(page = "all")
                                #      ))
-                             ))
+                             ),
+                             scrollX = TRUE)
                       ),
                       class = "display") %>%
         DT::formatRound(columns = c("Fitted Chemical Shift (ppm)", "Fitted Intensity", "Fitted Half Bandwidth (Hz)",
-                                    "Quantity", "Fitting Error", "Signal to Area Ratio"),
+                                    "Quantity", "Fitting Error", "Signal to Area Ratio",
+                                    "ROI left edge (ppm)", "ROI right edge (ppm)", "Chemical shift(ppm)",
+                                    "Chemical shift tolerance (ppm)", "Half bandwidth (Hz)",
+                                    "J coupling (Hz)", "J coupling 2 (Hz)", "Roof effect", "Roof effect 2"),
                         digits = 3)
 
     })
