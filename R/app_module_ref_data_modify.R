@@ -192,7 +192,8 @@ ref_data_editingServer <- function(id, xpmt_data, ref_data, ref_db){
                          unsaved_change = list(),
                          obs_show_subplot_suspend = TRUE,
                          obs_annot_update_suspend = TRUE,
-                         obs_annot_update_subplot_suspend = TRUE)
+                         obs_annot_update_subplot_suspend = TRUE,
+                         subplot_dat = NULL)
 
     observe(priority = 2, {
       req(ref_data())
@@ -692,7 +693,10 @@ ref_data_editingServer <- function(id, xpmt_data, ref_data, ref_db){
     obs_show_subplot <- observeEvent(plotly::event_data("plotly_brushed", source = "id_refmet_dspedt_selected_plot"), suspended = TRUE, {
       req(input$show_subplot)
 
+
       brushedData <- plotly::event_data("plotly_brushed", source = "id_refmet_dspedt_selected_plot")
+
+      req(!identical(brushedData, rv$subplot_dat))
 
       removeModal()
       showModal(
@@ -703,6 +707,7 @@ ref_data_editingServer <- function(id, xpmt_data, ref_data, ref_db){
           easyClose = TRUE,
           fade = FALSE
         ))
+      rv$subplot_dat <- brushedData
     })
 
     #----------------------------------------------------------------------------------------------------------
@@ -1044,19 +1049,19 @@ ref_data_editingServer <- function(id, xpmt_data, ref_data, ref_db){
                        dist <- (rv$dspedt_user_reference_data$"ROI left edge (ppm)"[changed_row] -
                                   rv$dspedt_user_reference_data$"ROI right edge (ppm)"[changed_row])/2
 
-                       if(as.numeric(v) >= dist){
+                       if(as.numeric(v) > dist){
                          ProxyUpdate_refmet_tabplot(tabproxy = refmet_dspedt_table_proxy,
                                                     pltproxy = refmet_dspedt_plot_proxy,
                                                     newdat = rv$dspedt_user_reference_data)
 
                          shinyWidgets::show_alert(
                            title = "Invalid entry.",
-                           text = "The specified value must be less than half the signal interval width",
+                           text = "The specified value must be less than or equal to half the signal interval width",
                            type = "error"
                          )
                        }
 
-                       req(as.numeric(v) < dist)
+                       req(as.numeric(v) <= dist)
                      }
 
 

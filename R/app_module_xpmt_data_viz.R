@@ -126,7 +126,8 @@ xpmt_data_vizServer <- function(id, xpmt_data){
     # Initialize reactiveValues object that will be used to store version of uploaded experimental data (xpmt_data())
     # that may be modified/updated at various points. Cannot call xpmt_data() directly in the initialization because
     # reactiveValues() is not a reactive environment. Therefore, we use the observer seen immediately below.
-    rv <- reactiveValues(obs_show_subplot_suspend = TRUE)
+    rv <- reactiveValues(obs_show_subplot_suspend = TRUE,
+                         subplot_dat = NULL)
 
     observe({
       req(xpmt_data())
@@ -260,7 +261,10 @@ xpmt_data_vizServer <- function(id, xpmt_data){
       req(input$show_subplot)
       req(xpmt_data())
 
+
       brushedData <- plotly::event_data("plotly_brushed", source = "e_data_plot")
+
+      req(!identical(brushedData, rv$subplot_dat))
 
       removeModal()
       showModal(
@@ -271,6 +275,8 @@ xpmt_data_vizServer <- function(id, xpmt_data){
           easyClose = TRUE,
           fade = FALSE
         ))
+
+      rv$subplot_dat <- brushedData
     })
 
 
