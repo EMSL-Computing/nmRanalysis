@@ -205,6 +205,8 @@ profilingServer <- function(id, xpmt_data, ref_data){
   stopifnot(is.reactive(ref_data))
   moduleServer(id, function(input, output, session){
 
+    rv <- reactiveValues(subplot_dat = NULL)
+
     # Observer that prompts confirmation of profiling anytime the button is clicked.
     observeEvent(c(input$auto_profile),
                  {
@@ -1273,6 +1275,7 @@ profilingServer <- function(id, xpmt_data, ref_data){
       }
 
       isolate({
+        # browser()
 
         profiling_data <- user_profiling()
 
@@ -1448,7 +1451,10 @@ profilingServer <- function(id, xpmt_data, ref_data){
     obs_show_subplot <- observeEvent(plotly::event_data("plotly_brushed", source = "id_prof_refmet_view_plot"), suspended = TRUE, {
       req(input$show_subplot)
 
+
       brushedData <- plotly::event_data("plotly_brushed", source = "id_prof_refmet_view_plot")
+
+      req(!identical(brushedData, rv$subplot_dat))
 
       removeModal()
       showModal(
@@ -1459,6 +1465,7 @@ profilingServer <- function(id, xpmt_data, ref_data){
           easyClose = TRUE,
           fade = FALSE
         ))
+      rv$subplot_dat <- brushedData
     })
 
     user_profiling <- eventReactive(input$profile_confirm,{

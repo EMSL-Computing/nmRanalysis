@@ -192,7 +192,8 @@ ref_data_editingServer <- function(id, xpmt_data, ref_data, ref_db){
                          unsaved_change = list(),
                          obs_show_subplot_suspend = TRUE,
                          obs_annot_update_suspend = TRUE,
-                         obs_annot_update_subplot_suspend = TRUE)
+                         obs_annot_update_subplot_suspend = TRUE,
+                         subplot_dat = NULL)
 
     observe(priority = 2, {
       req(ref_data())
@@ -692,7 +693,10 @@ ref_data_editingServer <- function(id, xpmt_data, ref_data, ref_db){
     obs_show_subplot <- observeEvent(plotly::event_data("plotly_brushed", source = "id_refmet_dspedt_selected_plot"), suspended = TRUE, {
       req(input$show_subplot)
 
+
       brushedData <- plotly::event_data("plotly_brushed", source = "id_refmet_dspedt_selected_plot")
+
+      req(!identical(brushedData, rv$subplot_dat))
 
       removeModal()
       showModal(
@@ -703,6 +707,7 @@ ref_data_editingServer <- function(id, xpmt_data, ref_data, ref_db){
           easyClose = TRUE,
           fade = FALSE
         ))
+      rv$subplot_dat <- brushedData
     })
 
     #----------------------------------------------------------------------------------------------------------
