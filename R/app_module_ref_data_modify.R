@@ -1100,21 +1100,22 @@ ref_data_editingServer <- function(id, xpmt_data, ref_data, ref_db){
 
                      if(edtd_colname %in% c("Roof effect", "Roof effect 2")){
 
-                       if(rv$dspedt_user_reference_data$"Multiplicity"[changed_row] %in% c("2", "d", "dd")){
-                         if(as.numeric(v) <= -1 | as.numeric(v) >= 1){
+                       if(rv$dspedt_user_reference_data$"Multiplicity"[changed_row] %ni%
+                          c("1", "s", "2", "d", "3", "t", "dd")){
+                         if(as.numeric(v) != 0){
 
                            ProxyUpdate_refmet_tabplot(tabproxy = refmet_dspedt_table_proxy,
                                                       pltproxy = refmet_dspedt_plot_proxy,
                                                       newdat = rv$dspedt_user_reference_data)
 
                            shinyWidgets::show_alert(
-                             title = "Invalid entry.",
-                             text = "For d or dd multiplicities, allowable values range from -1 to 1, non-inclusive.",
+                             title = "Not currently supported.",
+                             text = "Profiling is currently only supported for s, d, t, and dd splitting patterns (multiplicities), when non-zero roof effect(s) are specified.",
                              type = "error"
                            )
                          }
 
-                         req(as.numeric(v) > -1 & as.numeric(v) < 1)
+                         req(as.numeric(v) == 0)
                        }
                      }
 
@@ -1141,21 +1142,36 @@ ref_data_editingServer <- function(id, xpmt_data, ref_data, ref_db){
                        req(as.numeric(v) > 0)
                      }
 
-                     if(rv$dspedt_user_reference_data$"Roof effect"[changed_row] %in% c(-1, 1) |
-                        rv$dspedt_user_reference_data$"Roof effect 2"[changed_row] %in% c(-1, 1)){
-                       if(v %in% c("2", "d", "dd")){
+                     if(v %ni% c("1", "s", "2", "d", "3", "t", "4", "q", "dd")){
+                       ProxyUpdate_refmet_tabplot(tabproxy = refmet_dspedt_table_proxy,
+                                                  pltproxy = refmet_dspedt_plot_proxy,
+                                                  newdat = rv$dspedt_user_reference_data)
+
+                       shinyWidgets::show_alert(
+                         title = "Not currently supported.",
+                         text = "Profiling is currently only supported for s, d, t, q, and dd multiplets.",
+                         type = "error"
+                       )
+                     }
+
+                     req(v %in% c("1", "s", "2", "d", "3", "t", "4", "q", "dd"))
+
+
+                     if(rv$dspedt_user_reference_data$"Roof effect"[changed_row] != 0 |
+                        rv$dspedt_user_reference_data$"Roof effect 2"[changed_row] != 0){
+                       if(v %ni% c("1", "s", "2", "d", "3", "t", "dd")){
                          ProxyUpdate_refmet_tabplot(tabproxy = refmet_dspedt_table_proxy,
                                                     pltproxy = refmet_dspedt_plot_proxy,
                                                     newdat = rv$dspedt_user_reference_data)
 
                          shinyWidgets::show_alert(
-                           title = "Invalid entry.",
-                           text = "For d or dd multiplicities, allowable roof effect values range from -1 to 1, non-inclusive.",
+                           title = "Not currently supported.",
+                           text = "Profiling is currently only supported for s, d, t, and dd splitting patterns (multiplicities), when non-zero roof effect(s) are specified.",
                            type = "error"
                          )
                        }
 
-                       req(v %ni% c("2", "d", "dd"))
+                       req(v %in% c("1", "s", "2", "d", "3", "t", "dd"))
                      }
 
 
@@ -1181,6 +1197,24 @@ ref_data_editingServer <- function(id, xpmt_data, ref_data, ref_db){
                      }
 
                      req(v %in% c("0", "1"))
+
+                     if(rv$dspedt_user_reference_data$"Multiplicity"[changed_row] %ni%
+                        c("1", "s", "2", "d", "3", "t", "4", "q", "dd")){
+
+                       ProxyUpdate_refmet_tabplot(tabproxy = refmet_dspedt_table_proxy,
+                                                  pltproxy = refmet_dspedt_plot_proxy,
+                                                  newdat = rv$dspedt_user_reference_data)
+
+                       shinyWidgets::show_alert(
+                         title = "Not currently supported.",
+                         text = "Profiling is currently only supported for s, d, t, q, and dd splitting patterns (multiplicities)",
+                         type = "error"
+                       )
+
+                     }
+
+                     req(rv$dspedt_user_reference_data$"Multiplicity"[changed_row] %in%
+                           c("1", "s", "2", "d", "3", "t", "4", "q", "dd"))
 
                      rv$dspedt_user_reference_data[[edtd_colname]][changed_row] <- as.numeric(v)
 
