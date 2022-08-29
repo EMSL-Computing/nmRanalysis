@@ -819,6 +819,21 @@ ref_data_editingServer <- function(id, xpmt_data, ref_data, ref_db){
                                        req(!all(is.na(c(x0_fields, x1_fields))))
 
 
+                                       if(!is.na(x0_fields)){
+                                         changed_row <-
+                                           as.numeric(gsub("[^0-9.-]", "",
+                                                           regmatches(x0_fields,
+                                                                      gregexpr("\\[.*?\\]", x0_fields))[[1]])) + 1
+                                       } else if(!is.na(x1_fields)){
+                                         changed_row <-
+                                           as.numeric(gsub("[^0-9.-]", "",
+                                                           regmatches(x1_fields,
+                                                                      gregexpr("\\[.*?\\]", x1_fields))[[1]])) + 1
+                                       }
+
+                                       req(changed_row <= nrow(rv$dspedt_user_reference_data))
+
+
                                        rv$dspedt_user_reference_data <-
                                          refmet_data_change_fromplot(dspedt_refmet_data = rv$dspedt_user_reference_data,
                                                                      event_data = dat_allchanges,
@@ -851,6 +866,22 @@ ref_data_editingServer <- function(id, xpmt_data, ref_data, ref_db){
                                                                    NA, grep("*.\\.x1", names(dat_allchanges), value = TRUE))
 
                                                req(!all(is.na(c(x0_fields, x1_fields))))
+
+
+                                               if(!is.na(x0_fields)){
+                                                 changed_row <-
+                                                   as.numeric(gsub("[^0-9.-]", "",
+                                                                   regmatches(x0_fields,
+                                                                              gregexpr("\\[.*?\\]", x0_fields))[[1]])) + min(which(rv$subplot_idx))
+                                               } else if(!is.na(x1_fields)){
+                                                 changed_row <-
+                                                   as.numeric(gsub("[^0-9.-]", "",
+                                                                   regmatches(x1_fields,
+                                                                              gregexpr("\\[.*?\\]", x1_fields))[[1]])) + min(which(rv$subplot_idx))
+                                               }
+
+                                               req(changed_row <= nrow(rv$dspedt_user_reference_data))
+
 
 
                                                rv$dspedt_user_reference_data <-
@@ -906,6 +937,7 @@ ref_data_editingServer <- function(id, xpmt_data, ref_data, ref_db){
 
                    edtd_colname <- names(temp)[changed_col]
 
+                   req(changed_row <= nrow(rv$dspedt_user_reference_data))
 
                    if(edtd_colname %in% c("Chemical shift(ppm)", "Signal left edge (ppm)", "Signal right edge (ppm)")) {
 
