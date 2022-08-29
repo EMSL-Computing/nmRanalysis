@@ -205,6 +205,8 @@ profilingServer <- function(id, xpmt_data, ref_data){
   stopifnot(is.reactive(ref_data))
   moduleServer(id, function(input, output, session){
 
+    rv <- reactiveValues(subplot_dat = NULL)
+
     # Observer that prompts confirmation of profiling anytime the button is clicked.
     observeEvent(c(input$auto_profile),
                  {
@@ -1279,6 +1281,7 @@ profilingServer <- function(id, xpmt_data, ref_data){
         # Extract indices of reproducibility data that correspond to selected sample and metabolite
         selsamp_ind <- which(rownames(profiling_data$final_output$quantification) == input$sample_to_plot)
         selmet_inds <- which(grepl(make.names(input$refmet_to_plot), colnames(profiling_data$final_output$quantification)))
+        selmet_names <- colnames(profiling_data$final_output$quantification)[selmet_inds]
 
         ROI_plots <- vector("list", length = length(selmet_inds))
         for(i in 1:length(selmet_inds)){
@@ -1299,7 +1302,7 @@ profilingServer <- function(id, xpmt_data, ref_data){
 
           # Update intensities accordingly
           plotdata$Intensity[plotdata$Intensity_Type == "Signal"] <-
-            colSums(tempdat$plot_data[which(grepl(make.names(input$refmet_to_plot), rownames(tempdat$plot_data))),,drop = FALSE])
+            colSums(tempdat$plot_data[which(grepl(selmet_names[i], rownames(tempdat$plot_data))),,drop = FALSE])
           plotdata$Intensity[plotdata$Intensity_Type == "Background"] <-
             tempdat$plot_data[rownames(tempdat$plot_data) == "baseline_sum", ]
           plotdata$Intensity[plotdata$Intensity_Type == "Generated"] <-
@@ -1322,117 +1325,136 @@ profilingServer <- function(id, xpmt_data, ref_data){
                         .data$`Chemical shift(ppm)` <= max(brushedData$x)) %>%
           dplyr::filter(!duplicated(.data$`ROI left edge (ppm)`))
 
-        # Line shape update
-        # Create default line object to add as shape to plot
-        ROI_line <- list(
-          type = "line",
-          line = list(color = "red"),
-          xref = "x",
-          yref = "y"
-        )
+        if(nrow(ROI_collapsed_data) !=0){
 
-        # Create list containing all line objects. For each line object in this list, populate with the
-        # ROI information corresponding to the given reference metabolite peak.
-        ROI_lines <- list()
-        for(i in 1:nrow(ROI_collapsed_data)){
+          # Line shape update
+          # Create default line object to add as shape to plot
+          ROI_line <- list(
+            type = "line",
+            line = list(color = "red"),
+            xref = "x",
+            yref = "y"
+          )
 
-          ROI_line[["x0"]]        <- ROI_collapsed_data[i,,drop = FALSE]$"ROI left edge (ppm)"
-          ROI_line[["x1"]]        <- ROI_collapsed_data[i,,drop = FALSE]$"ROI right edge (ppm)"
-          ROI_line[c("y0", "y1")] <- 0
-          ROI_lines               <- c(ROI_lines, list(ROI_line))
+          # Create list containing all line objects. For each line object in this list, populate with the
+          # ROI information corresponding to the given reference metabolite peak.
+          ROI_lines <- list()
+          for(i in 1:nrow(ROI_collapsed_data)){
+
+            ROI_line[["x0"]]        <- ROI_collapsed_data[i,,drop = FALSE]$"ROI left edge (ppm)"
+            ROI_line[["x1"]]        <- ROI_collapsed_data[i,,drop = FALSE]$"ROI right edge (ppm)"
+            ROI_line[c("y0", "y1")] <- 0
+            ROI_lines               <- c(ROI_lines, list(ROI_line))
+          }
+
+          # Annotation update
+          # Create default annot object to add as annotation to plot
+          ROI_annot <- list(
+            y         = 0,
+            xref      = "x",
+            yref      = "y",
+            arrowhead = 4,
+            ay        = 40
+          )
+
+          ROI_annots <- list()
+          for(i in 1:nrow(ROI_data)){
+            ROI_annot[["x"]]         <- ROI_data[i,,drop = FALSE]$"Chemical shift(ppm)"
+            ROI_annot[["text"]]      <- paste0(sprintf("<b>%s</b>", paste0(ROI_data[i,,drop = FALSE]$Metabolite,
+                                                                           " [", ROI_data[i,,drop = FALSE]$`Quantification Signal`,
+                                                                           "]: ")),
+                                               ROI_data[i,,drop = FALSE]$"Chemical shift(ppm)", " (",
+                                               ROI_data[i,,drop = FALSE]$"ROI left edge (ppm)", ", ",
+                                               ROI_data[i,,drop = FALSE]$"ROI right edge (ppm)", ")", " <br> ",
+                                               sprintf("<b>%s</b>", "Quantification: "), round(profiling_data$final_output$quantification[selsamp_ind, selmet_inds[i]],3), " <br> ",
+                                               sprintf("<b>%s</b>", "Signal to Area Ratio: "), round(profiling_data$final_output$signal_area_ratio[selsamp_ind, selmet_inds[i]],3), " <br> ",
+                                               sprintf("<b>%s</b>", "Fitting Error: "), round(profiling_data$final_output$fitting_error[selsamp_ind, selmet_inds[i]],3))
+            ROI_annot[["arrowsize"]] <- ROI_data[i,,drop = FALSE]$"Chemical shift tolerance (ppm)"
+            ROI_annot[["showarrow"]] <- TRUE
+            ROI_annots               <- c(ROI_annots, list(ROI_annot))
+          }
+
+          # xpmt_data_sample <- xpmt_data()$e_data %>% dplyr::select(.data$PPM, .data[[input$sample_to_plot]])
+          df_long <- xpmt_data()$e_data %>%
+            tidyr::pivot_longer(!.data$PPM, names_to = "Sample", values_to = "Intensity")
+          df_long <- df_long %>% dplyr::filter(.data$PPM >= min(brushedData$x), .data$PPM <= max(brushedData$x))
+          df_long_selsamp <- df_long %>% dplyr::filter(.data$Sample == input$sample_to_plot)
+          df_long_nonselsamp <- df_long %>% dplyr::filter(.data$Sample != input$sample_to_plot)
+
+          # Include only the signals within the selected range.
+          tempdat <- ref_data()$user_edited_refdata %>%
+            dplyr::mutate(SigName = make.names(paste0(.data$Metabolite, "_", .data$`Quantification Signal`)),
+                          Signal = paste0(.data$Metabolite, " [", .data$`Quantification Signal`, "]")) %>%
+            dplyr::filter(.data$`Chemical shift(ppm)` >= min(brushedData$x) & .data$`Chemical shift(ppm)` <= max(brushedData$x)) %>%
+            dplyr::filter(grepl(make.names(input$refmet_to_plot), .data$Metabolite))
+
+          if(nrow(tempdat) != 0){
+
+            selmet_inds2 <- which(selmet_names %in% tempdat$SigName)
+
+            ROI_plots2 <- ROI_plots %>% dplyr::filter(ROI %in% selmet_inds2)
+
+
+            ROI_plots2 %>% dplyr::group_by(.data$ROI) %>%
+              plotly::plot_ly(source = "id_prof_refmet_view_subplot", type = "scatter", mode = "lines") %>%
+              plotly::config(displaylogo = FALSE,
+                             modeBarButtons = list(list("select2d"), list("zoom2d"), list("zoomIn2d"),
+                                                   list("zoomOut2d"), list("pan2d"), list("autoScale2d"),
+                                                   list("resetScale2d"), list("toImage"))) %>%
+              plotly::layout(title = paste("Experimental Data:", input$sample_to_plot, "<br>", "<sup>",
+                                           input$refmet_to_plot, "Region(s) of Interest (ROI) displayed", "</sup>"),
+                             xaxis = list(title     = "PPM",
+                                          autorange = "reversed"),
+                             yaxis = list(title     = "Intensity"),
+                             showlegend = TRUE,
+                             dragmode = "zoom2d",
+                             annotations = ROI_annots,
+                             shapes = ROI_lines) %>%
+              plotly::config(edits = list(annotationTail     = TRUE,
+                                          annotationText     = FALSE,
+                                          annotationPosition = FALSE,
+                                          shapePosition      = FALSE)) %>%
+              plotly::add_trace(x    = df_long_selsamp$PPM,
+                                y    = df_long_selsamp$Intensity,
+                                name = input$sample_to_plot,
+                                type = 'scatter',
+                                mode = 'lines',
+                                line = list(width = 1.3),
+                                hoverinfo = "text",
+                                hovertext = paste0("Sample: ", input$sample_to_plot,
+                                                   "\nPPM: ", round(df_long_selsamp$PPM, 4),
+                                                   "\nIntensity: ", round(df_long_selsamp$Intensity, 4))) %>%
+              plotly::add_trace(x    = df_long_nonselsamp$PPM,
+                                y    = df_long_nonselsamp$Intensity,
+                                name = ~df_long_nonselsamp$Sample,
+                                type = 'scatter',
+                                opacity = 0.3, mode = "lines", line = list(color = "#000000", width = 0.75),
+                                hoverinfo = "text", hovertext = paste0("Sample: ", df_long_nonselsamp$Sample,
+                                                                       "\nPPM: ", round(df_long_nonselsamp$PPM, 4),
+                                                                       "\nIntensity: ", round(df_long_nonselsamp$Intensity, 4)),
+                                showlegend = FALSE) %>%
+              plotly::add_trace(x = ROI_plots2$PPM,
+                                y = ROI_plots2$Intensity,
+                                name = ~ROI_plots2$Intensity_Type,
+                                type = "scatter",
+                                mode = "lines",
+                                line = list(color = ~ROI_plots2$Intensity_Type,
+                                            width = 1))
+          } else{
+
+            plot_xpmt_data(xpmt_data      = xpmt_data()$e_data,
+                           sourceid       = "id_prof_refmet_view_subplot",
+                           sample_to_plot = input$sample_to_plot,
+                           brushed_data   = brushedData)
+          }
+
+
+        } else{
+          plot_xpmt_data(xpmt_data      = xpmt_data()$e_data,
+                         sourceid       = "id_prof_refmet_view_subplot",
+                         sample_to_plot = input$sample_to_plot,
+                         brushed_data   = brushedData)
         }
-
-        # Annotation update
-        # Create default annot object to add as annotation to plot
-        ROI_annot <- list(
-          y         = 0,
-          xref      = "x",
-          yref      = "y",
-          arrowhead = 4,
-          ay        = 40
-        )
-
-        ROI_annots <- list()
-        for(i in 1:nrow(ROI_data)){
-          ROI_annot[["x"]]         <- ROI_data[i,,drop = FALSE]$"Chemical shift(ppm)"
-          ROI_annot[["text"]]      <- paste0(sprintf("<b>%s</b>", paste0(ROI_data[i,,drop = FALSE]$Metabolite,
-                                                                         " [", ROI_data[i,,drop = FALSE]$`Quantification Signal`,
-                                                                         "]: ")),
-                                             ROI_data[i,,drop = FALSE]$"Chemical shift(ppm)", " (",
-                                             ROI_data[i,,drop = FALSE]$"ROI left edge (ppm)", ", ",
-                                             ROI_data[i,,drop = FALSE]$"ROI right edge (ppm)", ")", " <br> ",
-                                             sprintf("<b>%s</b>", "Quantification: "), round(profiling_data$final_output$quantification[selsamp_ind, selmet_inds[i]],3), " <br> ",
-                                             sprintf("<b>%s</b>", "Signal to Area Ratio: "), round(profiling_data$final_output$signal_area_ratio[selsamp_ind, selmet_inds[i]],3), " <br> ",
-                                             sprintf("<b>%s</b>", "Fitting Error: "), round(profiling_data$final_output$fitting_error[selsamp_ind, selmet_inds[i]],3))
-          ROI_annot[["arrowsize"]] <- ROI_data[i,,drop = FALSE]$"Chemical shift tolerance (ppm)"
-          ROI_annot[["showarrow"]] <- TRUE
-          ROI_annots               <- c(ROI_annots, list(ROI_annot))
-        }
-
-
-        # xpmt_data_sample <- xpmt_data()$e_data %>% dplyr::select(.data$PPM, .data[[input$sample_to_plot]])
-        df_long <- xpmt_data()$e_data %>%
-          tidyr::pivot_longer(!.data$PPM, names_to = "Sample", values_to = "Intensity")
-        df_long <- df_long %>% dplyr::filter(.data$PPM >= min(brushedData$x), .data$PPM <= max(brushedData$x))
-        df_long_selsamp <- df_long %>% dplyr::filter(.data$Sample == input$sample_to_plot)
-        df_long_nonselsamp <- df_long %>% dplyr::filter(.data$Sample != input$sample_to_plot)
-
-        # Include only the signals within the selected range.
-        tempdat <- ref_data()$user_edited_refdata %>%
-          dplyr::mutate(SigName = make.names(paste0(.data$Metabolite, "_", .data$`Quantification Signal`)),
-                        Signal = paste0(.data$Metabolite, " [", .data$`Quantification Signal`, "]")) %>%
-          dplyr::filter(.data$`Chemical shift(ppm)` >= min(brushedData$x) & .data$`Chemical shift(ppm)` <= max(brushedData$x)) %>%
-          dplyr::filter(grepl(make.names(input$refmet_to_plot), .data$Metabolite))
-        selmet_inds2 <- which(which(colnames(profiling_data$final_output$quantification) %in% tempdat$SigName) %in% selmet_inds)
-
-        ROI_plots2 <- ROI_plots %>% dplyr::filter(ROI %in% selmet_inds2)
-
-
-        ROI_plots2 %>% dplyr::group_by(.data$ROI) %>%
-          plotly::plot_ly(source = "id_prof_refmet_view_subplot", type = "scatter", mode = "lines") %>%
-          plotly::config(displaylogo = FALSE,
-                         modeBarButtons = list(list("select2d"), list("zoom2d"), list("zoomIn2d"),
-                                               list("zoomOut2d"), list("pan2d"), list("autoScale2d"),
-                                               list("resetScale2d"), list("toImage"))) %>%
-          plotly::layout(title = paste("Experimental Data:", input$sample_to_plot, "<br>", "<sup>",
-                                       input$refmet_to_plot, "Region(s) of Interest (ROI) displayed", "</sup>"),
-                         xaxis = list(title     = "PPM",
-                                      autorange = "reversed"),
-                         yaxis = list(title     = "Intensity"),
-                         showlegend = TRUE,
-                         dragmode = "zoom2d",
-                         annotations = ROI_annots,
-                         shapes = ROI_lines) %>%
-          plotly::config(edits = list(annotationTail     = TRUE,
-                                      annotationText     = FALSE,
-                                      annotationPosition = FALSE,
-                                      shapePosition      = FALSE)) %>%
-          plotly::add_trace(x    = df_long_selsamp$PPM,
-                            y    = df_long_selsamp$Intensity,
-                            name = input$sample_to_plot,
-                            type = 'scatter',
-                            mode = 'lines',
-                            line = list(width = 1.3),
-                            hoverinfo = "text",
-                            hovertext = paste0("Sample: ", input$sample_to_plot,
-                                               "\nPPM: ", round(df_long_selsamp$PPM, 4),
-                                               "\nIntensity: ", round(df_long_selsamp$Intensity, 4))) %>%
-          plotly::add_trace(x    = df_long_nonselsamp$PPM,
-                            y    = df_long_nonselsamp$Intensity,
-                            name = ~df_long_nonselsamp$Sample,
-                            type = 'scatter',
-                            opacity = 0.3, mode = "lines", line = list(color = "#000000", width = 0.75),
-                            hoverinfo = "text", hovertext = paste0("Sample: ", df_long_nonselsamp$Sample,
-                                                                   "\nPPM: ", round(df_long_nonselsamp$PPM, 4),
-                                                                   "\nIntensity: ", round(df_long_nonselsamp$Intensity, 4)),
-                            showlegend = FALSE) %>%
-          plotly::add_trace(x = ROI_plots2$PPM,
-                            y = ROI_plots2$Intensity,
-                            name = ~ROI_plots2$Intensity_Type,
-                            type = "scatter",
-                            mode = "lines",
-                            line = list(color = ~ROI_plots2$Intensity_Type,
-                                        width = 1))
 
 
       })
@@ -1448,7 +1470,10 @@ profilingServer <- function(id, xpmt_data, ref_data){
     obs_show_subplot <- observeEvent(plotly::event_data("plotly_brushed", source = "id_prof_refmet_view_plot"), suspended = TRUE, {
       req(input$show_subplot)
 
+
       brushedData <- plotly::event_data("plotly_brushed", source = "id_prof_refmet_view_plot")
+
+      req(!identical(brushedData, rv$subplot_dat))
 
       removeModal()
       showModal(
@@ -1459,6 +1484,7 @@ profilingServer <- function(id, xpmt_data, ref_data){
           easyClose = TRUE,
           fade = FALSE
         ))
+      rv$subplot_dat <- brushedData
     })
 
     user_profiling <- eventReactive(input$profile_confirm,{
