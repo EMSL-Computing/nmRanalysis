@@ -49,13 +49,13 @@
 #' @author Allison Thompson
 #'
 #' @export
-as.ppmData <- function(e_data, f_data, edata_cname, fdata_cname, align = FALSE, instrument_strength, ph, solvent, temperature = NA, concentration = NA, ...){
-  .as.ppmData(e_data, f_data, edata_cname, fdata_cname, align, instrument_strength, ph, solvent, temperature = temperature, concentration = concentration, ...)
+as.ppmData <- function(e_data, f_data, edata_cname, fdata_cname, align = FALSE, instrument_strength, ph = NA, solvent, temperature, concentration = NA, ...){
+  .as.ppmData(e_data, f_data, edata_cname, fdata_cname, align, instrument_strength, ph = ph, solvent, temperature, concentration = concentration, ...)
 }
 
 ## ppm data ##
 .as.ppmData <- function(e_data, f_data, edata_cname, fdata_cname, align,
-                        instrument_strength, ph, solvent, temperature = NA, concentration = NA,
+                        instrument_strength, ph = NA, solvent, temperature, concentration = NA,
                         check.names = TRUE){
 
   # initial checks #
@@ -119,15 +119,15 @@ as.ppmData <- function(e_data, f_data, edata_cname, fdata_cname, align = FALSE, 
     stop("instrument_strength must be a numeric value of the MHz strength of the instrument")
   }
 
-  # check that pH is numeric #
-  if(class(ph) != "numeric"){
-    stop("ph must be a numeric value indicating the pH of the sample")
+  # check that temperature is numeric #
+  if(class(temperature) != "numeric"){
+    stop("temperature must be a numeric value indicating the temperature of the sample")
   }
 
-  if(!is.na(temperature)){
-    # check that temperature is numeric #
-    if(class(temperature) != "numeric"){
-      stop("temperature must be a numeric value indicating the temperature of the sample")
+  if(!is.na(ph)){
+    # check that ph is numeric #
+    if(class(ph) != "numeric"){
+      stop("ph must be a numeric value indicating the pH of the sample")
     }
   }
 
