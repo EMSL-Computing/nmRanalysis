@@ -1465,14 +1465,23 @@ profilingServer <- function(id, xpmt_data, ref_data, connec){
 
       req(input$upload_ref_data_db>0)
 
-      browser()
-
       df <- ref_data()$user_edited_refdata
 
       # connect to db table
-      #connec <- connect_db()
       append_table(db_connection= connec(), table_name="profiling_parameters", df_object=df)
+
+      # add pop up to let the user know the entry has been added to the database
+      removeModal()
+      showModal(
+        modalDialog(
+          title = "Profiling parameters have been added to the database server.",
+          size = "xl",
+          easyClose = TRUE,
+          fade = FALSE
+        ))
     })
+
+
 
     # Observer to control pop-up (i.e. modal) containing the subplot of spectral data at a selected region.
     # Note: This works fine, but the only thing that I would like to change is
