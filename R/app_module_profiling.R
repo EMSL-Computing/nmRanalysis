@@ -1509,6 +1509,7 @@ profilingServer <- function(id, xpmt_data, ref_data){
     user_profiling <- eventReactive(input$profile_confirm,{
       req(xpmt_data())
       req(ref_data())
+      req(input$profile_confirm)
 
       shinyWidgets::progressSweetAlert(
         session = shiny::getDefaultReactiveDomain(),
