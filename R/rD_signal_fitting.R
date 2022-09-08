@@ -47,7 +47,7 @@ signal_fitting <- function(parS, Xdata, multiplicities, roof_effect, roof_effect
         # 6/6/22 modification by Javier E. Flores to adapt to character-valued multiplicities
       } else if (multiplicities[s] %in% c("2", "d")) {
         fitted_signals[s, ] = peakpvoigt(c(
-          signals_parameters[1, s]*(1 + abs(roof_effect[s])),
+          signals_parameters[1, s]*(1 - abs(roof_effect[s]))/(1 + abs(roof_effect[s])),
           (signals_parameters[2, s] - signals_parameters[5, s]/2),
           signals_parameters[3, s],
           signals_parameters[4, s]
@@ -126,13 +126,13 @@ signal_fitting <- function(parS, Xdata, multiplicities, roof_effect, roof_effect
         if(roof_effect2[s] > 0){
 
           fitted_signals[s, ] = peakpvoigt(c(
-            signals_parameters[1, s]*(1 + abs(roof_effect[s]))*(1 + abs(roof_effect2[s])),
+            signals_parameters[1, s]*(1 - abs(roof_effect[s]))/(1 + abs(roof_effect[s]))*(1 + abs(roof_effect2[s])),
             (signals_parameters[2, s] - (signals_parameters[5, s] - signals_parameters[6, s])/2 - signals_parameters[6, s]),
             signals_parameters[3, s],
             signals_parameters[4, s]
           ),
           Xdata) + peakpvoigt(c(
-            signals_parameters[1, s]*(1 + abs(roof_effect[s])),
+            signals_parameters[1, s]*(1 - abs(roof_effect[s]))/(1 + abs(roof_effect[s])),
             (signals_parameters[2, s] - (signals_parameters[5, s] - signals_parameters[6, s])/2),
             signals_parameters[3, s],
             signals_parameters[4, s]
@@ -157,13 +157,13 @@ signal_fitting <- function(parS, Xdata, multiplicities, roof_effect, roof_effect
         } else if(roof_effect2[s] < 0){
 
           fitted_signals[s, ] = peakpvoigt(c(
-            signals_parameters[1, s]*(1 + abs(roof_effect[s])),
+            signals_parameters[1, s]*(1 - abs(roof_effect[s]))/(1 + abs(roof_effect[s])),
             (signals_parameters[2, s] - (signals_parameters[5, s] - signals_parameters[6, s])/2 - signals_parameters[6, s]),
             signals_parameters[3, s],
             signals_parameters[4, s]
           ),
           Xdata) + peakpvoigt(c(
-            signals_parameters[1, s]*(1 + abs(roof_effect[s])) * (1 + abs(roof_effect2[s])),
+            signals_parameters[1, s]*(1 - abs(roof_effect[s]))/(1 + abs(roof_effect[s])) * (1 + abs(roof_effect2[s])),
             (signals_parameters[2, s] - (signals_parameters[5, s] - signals_parameters[6, s])/2),
             signals_parameters[3, s],
             signals_parameters[4, s]
@@ -188,13 +188,13 @@ signal_fitting <- function(parS, Xdata, multiplicities, roof_effect, roof_effect
 
         } else if(roof_effect2[s] == 0){
           fitted_signals[s, ] = peakpvoigt(c(
-            signals_parameters[1, s]*(1 + abs(roof_effect[s])),
+            signals_parameters[1, s]*(1 - abs(roof_effect[s]))/(1 + abs(roof_effect[s])),
             (signals_parameters[2, s] - (signals_parameters[5, s] - signals_parameters[6, s])/2 - signals_parameters[6, s]),
             signals_parameters[3, s],
             signals_parameters[4, s]
           ),
           Xdata) + peakpvoigt(c(
-            signals_parameters[1, s]*(1 + abs(roof_effect[s])),
+            signals_parameters[1, s]*(1 - abs(roof_effect[s]))/(1 + abs(roof_effect[s])),
             (signals_parameters[2, s] - (signals_parameters[5, s] - signals_parameters[6, s])/2),
             signals_parameters[3, s],
             signals_parameters[4, s]
@@ -434,7 +434,7 @@ signal_fitting <- function(parS, Xdata, multiplicities, roof_effect, roof_effect
           Xdata
         ) + peakpvoigt(c(
           signals_parameters[1, s] *
-            (1 + abs(roof_effect[s])) ,
+            (1 - abs(roof_effect[s]))/(1 + abs(roof_effect[s])) ,
           (signals_parameters[2, s] + signals_parameters[5, s]/2),
           signals_parameters[3, s],
           signals_parameters[4, s]
@@ -521,14 +521,14 @@ signal_fitting <- function(parS, Xdata, multiplicities, roof_effect, roof_effect
             Xdata
           ) + peakpvoigt(c(
             signals_parameters[1, s] *
-              (1 + abs(roof_effect[s]))*(1 + abs(roof_effect2[s])) ,
+              (1 - abs(roof_effect[s]))/(1 + abs(roof_effect[s]))*(1 + abs(roof_effect2[s])) ,
             (signals_parameters[2, s] + (signals_parameters[5, s] - signals_parameters[6, s])/2),
             signals_parameters[3, s],
             signals_parameters[4, s]
           ),
           Xdata) + peakpvoigt(c(
             signals_parameters[1, s] *
-              (1 + abs(roof_effect[s])) ,
+              (1 - abs(roof_effect[s]))/(1 + abs(roof_effect[s])) ,
             (signals_parameters[2, s] + (signals_parameters[5, s] - signals_parameters[6, s])/2 + signals_parameters[6, s]),
             signals_parameters[3, s],
             signals_parameters[4, s]
@@ -553,14 +553,14 @@ signal_fitting <- function(parS, Xdata, multiplicities, roof_effect, roof_effect
             Xdata
           ) + peakpvoigt(c(
             signals_parameters[1, s] *
-              (1 + abs(roof_effect[s])) ,
+              (1 - abs(roof_effect[s]))/(1 + abs(roof_effect[s])) ,
             (signals_parameters[2, s] + (signals_parameters[5, s] - signals_parameters[6, s])/2),
             signals_parameters[3, s],
             signals_parameters[4, s]
           ),
           Xdata) + peakpvoigt(c(
             signals_parameters[1, s] *
-              (1 + abs(roof_effect[s])) * (1 + abs(roof_effect2[s])) ,
+              (1 - abs(roof_effect[s]))/(1 + abs(roof_effect[s])) * (1 + abs(roof_effect2[s])) ,
             (signals_parameters[2, s] + (signals_parameters[5, s] - signals_parameters[6, s])/2 + signals_parameters[6, s]),
             signals_parameters[3, s],
             signals_parameters[4, s]
@@ -585,14 +585,14 @@ signal_fitting <- function(parS, Xdata, multiplicities, roof_effect, roof_effect
             Xdata
           ) + peakpvoigt(c(
             signals_parameters[1, s] *
-              (1 + abs(roof_effect[s])) ,
+              (1 - abs(roof_effect[s]))/(1 + abs(roof_effect[s])) ,
             (signals_parameters[2, s] + (signals_parameters[5, s] - signals_parameters[6, s])/2),
             signals_parameters[3, s],
             signals_parameters[4, s]
           ),
           Xdata) + peakpvoigt(c(
             signals_parameters[1, s] *
-              (1 + abs(roof_effect[s])) ,
+              (1 - abs(roof_effect[s]))/(1 + abs(roof_effect[s])) ,
             (signals_parameters[2, s] + (signals_parameters[5, s] - signals_parameters[6, s])/2 + signals_parameters[6, s]),
             signals_parameters[3, s],
             signals_parameters[4, s]
