@@ -1082,19 +1082,26 @@ ref_data_editingServer <- function(id, xpmt_data, ref_data, ref_db){
 
                        req(as.numeric(v) >= 0)
 
-                       if(as.numeric(v) - input$gpp_j_coupling_variation < 0){
-                         ProxyUpdate_refmet_tabplot(tabproxy = refmet_dspedt_table_proxy,
-                                                    pltproxy = refmet_dspedt_plot_proxy,
-                                                    newdat = rv$dspedt_user_reference_data)
+                       if(rv$dspedt_user_reference_data$"Multiplicity"[changed_row] %ni% c("1", "s")){
 
-                         shinyWidgets::show_alert(
-                           title = "Invalid entry.",
-                           text = "The lower J-coupling bound based on the specified J-coupling and tolerance is less than 0.",
-                           type = "error"
-                         )
+                         if(edtd_colname %in% c("J coupling (Hz)")){
+                           if(as.numeric(v) - input$gpp_j_coupling_variation < 0){
+                             ProxyUpdate_refmet_tabplot(tabproxy = refmet_dspedt_table_proxy,
+                                                        pltproxy = refmet_dspedt_plot_proxy,
+                                                        newdat = rv$dspedt_user_reference_data)
+
+                             shinyWidgets::show_alert(
+                               title = "Invalid entry.",
+                               text = "The lower J-coupling bound based on the specified J-coupling and tolerance is less than 0.",
+                               type = "error"
+                             )
+                           }
+
+                           req(as.numeric(v) - input$gpp_j_coupling_variation >= 0)
+                         }
+
                        }
 
-                       req(as.numeric(v) - input$gpp_j_coupling_variation >= 0)
                      }
 
 
