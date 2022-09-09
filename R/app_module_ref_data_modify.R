@@ -343,26 +343,46 @@ ref_data_editingServer <- function(id, xpmt_data, ref_data, ref_db){
 
                    # Check if any new metabolites are being added
                    if(!is.null(input$newentry_toadd)){
-                     added_entry_data <- data.frame(`ROI left edge (ppm)` = rep(0.02, length(input$newentry_toadd)),
-                                                    `ROI right edge (ppm)` = rep(-0.02, length(input$newentry_toadd)),
-                                                    `Quantification Mode` = rep("Baseline Fitting", length(input$newentry_toadd)),
-                                                    `Metabolite` = input$newentry_toadd,
-                                                    `Quantification Signal` = rep(1, length(input$newentry_toadd)),
-                                                    `Chemical shift(ppm)` = rep(0, length(input$newentry_toadd)),
-                                                    `Chemical shift tolerance (ppm)` = rep(0.02, length(input$newentry_toadd)),
-                                                    `Half bandwidth (Hz)` = rep(1, length(input$newentry_toadd)),
-                                                    `Multiplicity` = rep("1", length(input$newentry_toadd)),
-                                                    `J coupling (Hz)` = rep(0, length(input$newentry_toadd)),
-                                                    `Roof effect` = rep(0, length(input$newentry_toadd)),
-                                                    `J coupling 2 (Hz)` = rep(0, length(input$newentry_toadd)),
-                                                    `Roof effect 2` = rep(0, length(input$newentry_toadd)),
-                                                    `Quantify` = rep(1, length(input$newentry_toadd)),
-                                                    `Frequency (MHz)` = rep(attr(xpmt_data(), "exp_info")$instrument_strength, length(input$newentry_toadd)),
-                                                    `pH` = rep(attr(xpmt_data(), "exp_info")$ph, length(input$newentry_toadd)),
-                                                    `Concentration (mM)` = rep(attr(xpmt_data(), "exp_info")$concentration, length(input$newentry_toadd)),
-                                                    `Temperature (K)` = rep(attr(xpmt_data(), "exp_info")$temperature, length(input$newentry_toadd)),
-                                                    `Solvent` = rep(attr(xpmt_data(), "exp_info")$solvent, length(input$newentry_toadd)),
-                                                    `rowid` = paste0(input$newentry_toadd, "1"),
+
+                     check1 <- grepl("\\[", input$newentry_toadd) | grepl("\\]", input$newentry_toadd)
+                     valid_newentries <- input$newentry_toadd[!check1]
+                     if(length(valid_newentries) == 0){
+                       shinyWidgets::show_alert(
+                         title = "Metabolite Naming error.",
+                         text = "The name of the profiled metabolite should not contain the following characters: '[', ']'",
+                         type = "error"
+                       )
+                     }
+                     req(length(valid_newentries) > 0)
+
+                     if(length(valid_newentries) != length(input$newentry_toadd)){
+                       shinyWidgets::show_alert(
+                         title = "Some metabolites were not added.",
+                         text = "One or more specified metabolite names contained invalid characters and were therefore not added.",
+                         type = "warning"
+                       )
+                     }
+
+                     added_entry_data <- data.frame(`ROI left edge (ppm)` = rep(0.02, length(valid_newentries)),
+                                                    `ROI right edge (ppm)` = rep(-0.02, length(valid_newentries)),
+                                                    `Quantification Mode` = rep("Baseline Fitting", length(valid_newentries)),
+                                                    `Metabolite` = valid_newentries,
+                                                    `Quantification Signal` = rep(1, length(valid_newentries)),
+                                                    `Chemical shift(ppm)` = rep(0, length(valid_newentries)),
+                                                    `Chemical shift tolerance (ppm)` = rep(0.02, length(valid_newentries)),
+                                                    `Half bandwidth (Hz)` = rep(1, length(valid_newentries)),
+                                                    `Multiplicity` = rep("1", length(valid_newentries)),
+                                                    `J coupling (Hz)` = rep(0, length(valid_newentries)),
+                                                    `Roof effect` = rep(0, length(valid_newentries)),
+                                                    `J coupling 2 (Hz)` = rep(0, length(valid_newentries)),
+                                                    `Roof effect 2` = rep(0, length(valid_newentries)),
+                                                    `Quantify` = rep(1, length(valid_newentries)),
+                                                    `Frequency (MHz)` = rep(attr(xpmt_data(), "exp_info")$instrument_strength, length(valid_newentries)),
+                                                    `pH` = rep(attr(xpmt_data(), "exp_info")$ph, length(valid_newentries)),
+                                                    `Concentration (mM)` = rep(attr(xpmt_data(), "exp_info")$concentration, length(valid_newentries)),
+                                                    `Temperature (K)` = rep(attr(xpmt_data(), "exp_info")$temperature, length(valid_newentries)),
+                                                    `Solvent` = rep(attr(xpmt_data(), "exp_info")$solvent, length(valid_newentries)),
+                                                    `rowid` = paste0(valid_newentries, "1"),
                                                     check.names = FALSE)
 
                      rv$user_reference_data <- dplyr::bind_rows(rv$user_reference_data, added_entry_data)
@@ -1331,8 +1351,89 @@ ref_data_editingServer <- function(id, xpmt_data, ref_data, ref_db){
       req(input$show_metquant > 0)
       req(rv$dspedt_user_reference_data)
 
-      signalROI_right <- rv$quantdat %>%
-        dplyr::filter(paste0(.data$Metabolite, " [", .data$`Quantification Signal`, "]") == input$signal_to_check) %>%
+      if(!is.null(rv$unsaved_change[[input$which_refmet_dspedt]])){
+        shinyWidgets::show_alert(
+          title = "Unsaved changes present.",
+          text = "Save changes prior to checking the signal fit.",
+          type = "error"
+        )
+      }
+      req(is.null(rv$unsaved_change[[input$which_refmet_dspedt]]))
+
+
+      temp <- rv$quantdat %>%
+        dplyr::filter(paste0(.data$Metabolite, " [", .data$`Quantification Signal`, "]") == input$signal_to_check)
+
+      if(temp$`ROI left edge (ppm)` < temp$`ROI right edge (ppm)`){
+        shinyWidgets::show_alert(
+          title = "Fitting parameter error.",
+          text = "The signal left edge should be larger than the signal right edge.",
+          type = "error"
+        )
+      }
+      req(temp$`ROI left edge (ppm)` > temp$`ROI right edge (ppm)`)
+
+      if(temp$`Chemical shift tolerance (ppm)` > abs(temp$`ROI right edge (ppm)` - temp$`Chemical shift(ppm)`) |
+         temp$`Chemical shift tolerance (ppm)` > abs(temp$`ROI left edge (ppm)` - temp$`Chemical shift(ppm)`)){
+        shinyWidgets::show_alert(
+          title = "Fitting parameter error.",
+          text = "The chemical shift tolerance is larger than half the specified width of the signal region.",
+          type = "error"
+        )
+      }
+      req(temp$`Chemical shift tolerance (ppm)` <= abs(temp$`ROI right edge (ppm)` - temp$`Chemical shift(ppm)`) &
+            temp$`Chemical shift tolerance (ppm)` <= abs(temp$`ROI left edge (ppm)` - temp$`Chemical shift(ppm)`))
+
+      if((temp$`Half bandwidth (Hz)` - input$gpp_widthtolerance) <= 0){
+        shinyWidgets::show_alert(
+          title = "Fitting parameter error.",
+          text = "The lower bandwidth bound based on the specified bandwidth and tolerance is less than or equal to 0.",
+          type = "error"
+        )
+      }
+      req((temp$`Half bandwidth (Hz)` - input$gpp_widthtolerance > 0))
+
+      if(temp$`Multiplicity` %ni% c("1", "2", "3", "4", "s", "d", "t", "q", "dd")){
+        shinyWidgets::show_alert(
+          title = "Fitting parameter error.",
+          text = "The specified multiplicity is not supported.",
+          type = "error"
+        )
+      }
+      req(temp$`Multiplicity` %in% c("1", "2", "3", "4", "s", "d", "t", "q", "dd"))
+
+      if(temp$`Multiplicity` %ni% c("1", "s")){
+        if((temp$`J coupling (Hz)` - input$gpp_j_coupling_variation) <= 0){
+          shinyWidgets::show_alert(
+            title = "Fitting parameter error.",
+            text = "The lower J-coupling bound based on the specified J-coupling and tolerance must be greater than 0 for non-singlet multiplicities.",
+            type = "error"
+          )
+        }
+        req((temp$`J coupling (Hz)` - input$gpp_j_coupling_variation) > 0)
+
+        if(temp$`J coupling 2 (Hz)` != 0){
+          if((temp$`J coupling 2 (Hz)` - input$gpp_j_coupling_variation) <= 0){
+            shinyWidgets::show_alert(
+              title = "Fitting parameter error.",
+              text = "The lower J-coupling bound based on the specified J-coupling 2 and tolerance must be greater than 0 for non-singlet multiplicities.",
+              type = "error"
+            )
+          }
+          req((temp$`J coupling 2 (Hz)` - input$gpp_j_coupling_variation) > 0)
+        }
+      } else if(temp$`Multiplicity` %in% c("1", "s")){
+        if(temp$`J coupling (Hz)` != 0 | temp$`J coupling 2 (Hz)` != 0){
+          shinyWidgets::show_alert(
+            title = "Fitting parameter error.",
+            text = "J-coupling values should be set to 0 for singlets.",
+            type = "error"
+          )
+        }
+        req(temp$`J coupling (Hz)` == 0 & temp$`J coupling 2 (Hz)` == 0)
+      }
+
+      signalROI_right <- temp %>%
         .$`ROI right edge (ppm)`
       signalROIdat <- rv$quantdat %>% dplyr::filter(.data$`ROI right edge (ppm)` == signalROI_right)
 
@@ -1520,6 +1621,15 @@ ref_data_editingServer <- function(id, xpmt_data, ref_data, ref_db){
         whichrow <- which(temp$Signal == input$signal_to_check)
         whichsig <- which(signals_names %in% make.names(gsub("\\]", "", gsub("\\ \\[", "_", input$signal_to_check))))
 
+        if(length(whichsig) == 0){
+          shinyWidgets::show_alert(
+            title = "Metabolite Naming error.",
+            text = "The name of the profiled metabolite should not contain the following characters: '[', ']'",
+            type = "error"
+          )
+        }
+        req(length(whichsig) > 0)
+
         opt_signal_params <- reproducibility_data[[1]][[whichsig]]$signals_parameters[, whichsig, drop = FALSE]
 
         dist <- (rv$dspedt_user_reference_data[["ROI left edge (ppm)"]][[whichrow]] -
@@ -1559,6 +1669,30 @@ ref_data_editingServer <- function(id, xpmt_data, ref_data, ref_db){
       req(rv$dspedt_profiling_data[[input$sample_to_plot]][[input$signal_to_check]])
 
 
+      isolate({
+        temp <- rv$quantdat %>%
+          dplyr::filter(paste0(.data$Metabolite, " [", .data$`Quantification Signal`, "]") == input$signal_to_check)
+
+        req(temp$`ROI left edge (ppm)` > temp$`ROI right edge (ppm)`)
+
+        req(temp$`Chemical shift tolerance (ppm)` <= abs(temp$`ROI right edge (ppm)` - temp$`Chemical shift(ppm)`) &
+              temp$`Chemical shift tolerance (ppm)` <= abs(temp$`ROI left edge (ppm)` - temp$`Chemical shift(ppm)`))
+
+        req((temp$`Half bandwidth (Hz)` - input$gpp_widthtolerance > 0))
+
+        req(temp$`Multiplicity` %in% c("1", "2", "3", "4", "s", "d", "t", "q", "dd"))
+
+        if(temp$`Multiplicity` %ni% c("1", "s")){
+          req((temp$`J coupling (Hz)` - input$gpp_j_coupling_variation) > 0)
+
+          if(temp$`J coupling 2 (Hz)` != 0){
+            req((temp$`J coupling 2 (Hz)` - input$gpp_j_coupling_variation) > 0)
+          }
+        } else if(temp$`Multiplicity` %in% c("1", "s")){
+          req(temp$`J coupling (Hz)` == 0 & temp$`J coupling 2 (Hz)` == 0)
+        }
+        rm(temp)
+      })
 
       profiling_data <- rv$dspedt_profiling_data[[input$sample_to_plot]][[input$signal_to_check]]
 
@@ -1571,8 +1705,9 @@ ref_data_editingServer <- function(id, xpmt_data, ref_data, ref_db){
       # Retain only those signals that will be quantified.
       tempdf <- rv$user_reference_data %>%
         dplyr::filter(.data$Quantify == 1)
-      tempdf[tempdf$rowid %in% rv$dspedt_user_reference_data$rowid,] <-
-        rv$dspedt_user_reference_data[rv$dspedt_user_reference_data$rowid %in% tempdf$rowid,]
+      tempdf[paste0(tempdf$Metabolite, "_", tempdf$`Quantification Signal`) %in% fmtted_signal_to_check,] <-
+        rv$dspedt_user_reference_data[paste0(rv$dspedt_user_reference_data$Metabolite, "_", rv$dspedt_user_reference_data$`Quantification Signal`) %in% fmtted_signal_to_check,]
+
 
       # Merge metabolite signals whose bounds overlap into single ROIs
       tempdf <- tempdf %>% dplyr::arrange(.data$`Chemical shift(ppm)`)
@@ -1722,6 +1857,33 @@ ref_data_editingServer <- function(id, xpmt_data, ref_data, ref_db){
     observeEvent(c(rv$dspedt_profiling_data_plot, input$show_metquant),{
       req(input$show_metquant > 0)
       req(rv$dspedt_profiling_data_plot[[input$sample_to_plot]][[input$signal_to_check]])
+
+
+      isolate({
+        temp <- rv$quantdat %>%
+          dplyr::filter(paste0(.data$Metabolite, " [", .data$`Quantification Signal`, "]") == input$signal_to_check)
+
+        req(temp$`ROI left edge (ppm)` > temp$`ROI right edge (ppm)`)
+
+        req(temp$`Chemical shift tolerance (ppm)` <= abs(temp$`ROI right edge (ppm)` - temp$`Chemical shift(ppm)`) &
+              temp$`Chemical shift tolerance (ppm)` <= abs(temp$`ROI left edge (ppm)` - temp$`Chemical shift(ppm)`))
+
+        req((temp$`Half bandwidth (Hz)` - input$gpp_widthtolerance > 0))
+
+        req(temp$`Multiplicity` %in% c("1", "2", "3", "4", "s", "d", "t", "q", "dd"))
+
+        if(temp$`Multiplicity` %ni% c("1", "s")){
+          req((temp$`J coupling (Hz)` - input$gpp_j_coupling_variation) > 0)
+
+          if(temp$`J coupling 2 (Hz)` != 0){
+            req((temp$`J coupling 2 (Hz)` - input$gpp_j_coupling_variation) > 0)
+          }
+        } else if(temp$`Multiplicity` %in% c("1", "s")){
+          req(temp$`J coupling (Hz)` == 0 & temp$`J coupling 2 (Hz)` == 0)
+        }
+        rm(temp)
+      })
+
 
       removeModal()
       showModal(
