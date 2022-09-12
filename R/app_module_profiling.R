@@ -1509,6 +1509,7 @@ profilingServer <- function(id, xpmt_data, ref_data, connec){
       df <- ref_data()$user_edited_refdata
 
       # connect to db table
+      #create_new_table(connec(), "profiling_parameters", df)
       append_table(db_connection= connec(), table_name="profiling_parameters", df_object=df)
 
       # add pop up to let the user know the entry has been added to the database
