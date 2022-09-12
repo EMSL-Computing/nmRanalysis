@@ -1,5 +1,13 @@
 version: '3.7' 
 services:
+    postgresdb:
+        restart: always
+        image: postgres:latest
+        ports:
+        - 5432:5432
+        env_file:
+        - ./db-prod.env
+
     web: 
         build: .
         image: nmrshinyapp
