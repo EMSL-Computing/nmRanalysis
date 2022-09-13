@@ -1,0 +1,33 @@
+#Include our standard library
+include:
+  - remote: 'https://raw.githubusercontent.com/pnnl-miscscripts/gitlab-lib/v1/gitlab-lib.yaml'
+
+variables:
+  CONTAINER_TAG: 0.0.1
+
+#Check to see if the image already exists and blocks overwriting an existing image. (New image = new tag, never overwrite, is a best practice.)
+verify-new-image:
+  extends: .pnnllib-gitlab-verify-new-image
+  stage: check
+  tags:
+    - k8s
+    - rzr
+    - codebuilds
+
+#Build and push the container.
+build-image:
+  extends: .pnnllib-gitlab-build-container-image
+  stage: build
+  tags:
+    - k8s
+    - rzr
+    - codebuilds
+
+#Load a secret into the Kubernetes cluster.
+deply-token-to-cluster:
+  extends: .pnnllib-gitlab-load-deploy-token
+  stage: build
+  tags:
+    - k8s
+    - rzr
+    - nmranalysis
