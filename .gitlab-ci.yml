@@ -2,6 +2,10 @@
 include:
   - remote: 'https://raw.githubusercontent.com/pnnl-miscscripts/gitlab-lib/v1/gitlab-lib.yaml'
 
+stages:
+- check
+- build
+
 variables:
   CONTAINER_TAG: 0.0.1
 
