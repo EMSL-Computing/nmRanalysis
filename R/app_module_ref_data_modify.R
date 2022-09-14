@@ -61,6 +61,19 @@ ref_data_ROIeditingUI <- function(id){
     ),
     h5(tags$b("Select a Signal:")),
     uiOutput(ns("fitcheck")),
+    fluidRow(
+      column(
+        width = 2,
+        shinyWidgets::switchInput(
+          inputId = ns("auto_optim"),
+          label = "Auto-Optimize",
+          size = "small")
+        ),
+      column(width = 9,
+             htmlOutput(ns("autoptim_note"))
+             )
+    ),
+    h5(""),
     uiOutput(ns("ui_global_profiling_parameters")),
     uiOutput(ns("ui_metabolite_signal_options")),
     DT::dataTableOutput(ns("refmet_dspedt_table"))
@@ -1288,7 +1301,7 @@ ref_data_editingServer <- function(id, xpmt_data, ref_data, ref_db){
                       choices = temp$Signal)
         ),
         column(
-          width = 1,
+          width = 2,
           actionButton(NS(id, "show_metquant"), label = "Check Signal Fit")
         )
       )
@@ -1459,7 +1472,8 @@ ref_data_editingServer <- function(id, xpmt_data, ref_data, ref_db){
 
       if(is.null(rv$dspedt_profiling_data[[input$sample_to_plot]][[input$signal_to_check]]) |
          !identical(rv$curr_ROI_profile[[input$sample_to_plot]][[input$signal_to_check]], signalROIdat) |
-         !identical(rv$fitcheck_gpps, temp_gpps)){
+         !identical(rv$fitcheck_gpps, temp_gpps) |
+         !identical(rv$fitcheck_autoptim, input$auto_optim)){
 
         shinyWidgets::progressSweetAlert(
           session = session,
@@ -1490,7 +1504,8 @@ ref_data_editingServer <- function(id, xpmt_data, ref_data, ref_db){
                                              metabs  = signalROIdat)
         imported_data$program_parameters <- temp_gpps
 
-        rv$fitcheck_gpps <- imported_data$program_parameters
+        rv$fitcheck_gpps     <- imported_data$program_parameters
+        rv$fitcheck_autoptim <- input$auto_optim
 
         ROI_data           <- imported_data$ROI_data
         spectra_to_profile <- which(rownames(imported_data$dataset) %in% input$sample_to_plot)
@@ -1614,51 +1629,51 @@ ref_data_editingServer <- function(id, xpmt_data, ref_data, ref_db){
         rv$curr_ROI_profile[[input$sample_to_plot]][[input$signal_to_check]] <- signalROIdat
 
 
+        if(input$auto_optim){
+          temp <- rv$dspedt_user_reference_data %>%
+            dplyr::mutate(Signal = paste0(.data$Metabolite, " [", .data$`Quantification Signal`, "]"),
+                          Signal2 = make.names(paste(.data$Metabolite, .data$`Quantification Signal`, sep='_')))
+          whichrow <- which(temp$Signal == input$signal_to_check)
+          whichsig <- which(signals_names %in% make.names(gsub("\\]", "", gsub("\\ \\[", "_", input$signal_to_check))))
 
-        temp <- rv$dspedt_user_reference_data %>%
-          dplyr::mutate(Signal = paste0(.data$Metabolite, " [", .data$`Quantification Signal`, "]"),
-                        Signal2 = make.names(paste(.data$Metabolite, .data$`Quantification Signal`, sep='_')))
-        whichrow <- which(temp$Signal == input$signal_to_check)
-        whichsig <- which(signals_names %in% make.names(gsub("\\]", "", gsub("\\ \\[", "_", input$signal_to_check))))
+          if(length(whichsig) == 0){
+            shinyWidgets::show_alert(
+              title = "Metabolite Naming error.",
+              text = "The name of the profiled metabolite should not contain the following characters: '[', ']'",
+              type = "error"
+            )
+          }
+          req(length(whichsig) > 0)
 
-        if(length(whichsig) == 0){
-          shinyWidgets::show_alert(
-            title = "Metabolite Naming error.",
-            text = "The name of the profiled metabolite should not contain the following characters: '[', ']'",
-            type = "error"
-          )
+          opt_signal_params <- reproducibility_data[[1]][[whichsig]]$signals_parameters[, whichsig, drop = FALSE]
+
+          dist <- (rv$dspedt_user_reference_data[["ROI left edge (ppm)"]][[whichrow]] -
+                     rv$dspedt_user_reference_data[["ROI right edge (ppm)"]][[whichrow]])/2
+
+          new_chemshift <- as.numeric(opt_signal_params[2,])
+
+          rv$dspedt_user_reference_data[["Chemical shift(ppm)"]][[whichrow]]  <- round(new_chemshift,3)
+          rv$dspedt_user_reference_data[["ROI left edge (ppm)"]][[whichrow]]  <- round(new_chemshift + dist,3)
+          rv$dspedt_user_reference_data[["ROI right edge (ppm)"]][[whichrow]] <- round(new_chemshift - dist,3)
+          rv$dspedt_user_reference_data[["Chemical shift tolerance (ppm)"]][[whichrow]] <- round(min(dist/2,
+                                                                                                     rv$dspedt_user_reference_data[["Chemical shift tolerance (ppm)"]][[whichrow]]),
+                                                                                                 3)
+
+
+          rv$dspedt_user_reference_data[["Half bandwidth (Hz)"]][[whichrow]] <- as.numeric(opt_signal_params[3,])
+          rv$dspedt_user_reference_data[["J coupling (Hz)"]][[whichrow]]     <- as.numeric(opt_signal_params[5,])
+
+          if(rv$dspedt_user_reference_data[["Multiplicity"]][[whichrow]] == "dd"){
+            rv$dspedt_user_reference_data[["J coupling 2 (Hz)"]][[whichrow]] <- as.numeric(opt_signal_params[6,])
+          }
+
+          ProxyUpdate_refmet_tabplot(tabproxy = refmet_dspedt_table_proxy,
+                                     pltproxy = refmet_dspedt_plot_proxy,
+                                     newdat = rv$dspedt_user_reference_data)
+
+          # Store the unsaved changes
+          rv$unsaved_change[[input$which_refmet_dspedt]] <- rv$dspedt_user_reference_data
         }
-        req(length(whichsig) > 0)
-
-        opt_signal_params <- reproducibility_data[[1]][[whichsig]]$signals_parameters[, whichsig, drop = FALSE]
-
-        dist <- (rv$dspedt_user_reference_data[["ROI left edge (ppm)"]][[whichrow]] -
-                   rv$dspedt_user_reference_data[["ROI right edge (ppm)"]][[whichrow]])/2
-
-        new_chemshift <- as.numeric(opt_signal_params[2,])
-
-        rv$dspedt_user_reference_data[["Chemical shift(ppm)"]][[whichrow]]  <- round(new_chemshift,3)
-        rv$dspedt_user_reference_data[["ROI left edge (ppm)"]][[whichrow]]  <- round(new_chemshift + dist,3)
-        rv$dspedt_user_reference_data[["ROI right edge (ppm)"]][[whichrow]] <- round(new_chemshift - dist,3)
-        rv$dspedt_user_reference_data[["Chemical shift tolerance (ppm)"]][[whichrow]] <- round(min(dist/2,
-                                                                                                   rv$dspedt_user_reference_data[["Chemical shift tolerance (ppm)"]][[whichrow]]),
-                                                                                               3)
-
-
-        rv$dspedt_user_reference_data[["Half bandwidth (Hz)"]][[whichrow]] <- as.numeric(opt_signal_params[3,])
-        rv$dspedt_user_reference_data[["J coupling (Hz)"]][[whichrow]]     <- as.numeric(opt_signal_params[5,])
-
-        if(rv$dspedt_user_reference_data[["Multiplicity"]][[whichrow]] == "dd"){
-          rv$dspedt_user_reference_data[["J coupling 2 (Hz)"]][[whichrow]] <- as.numeric(opt_signal_params[6,])
-        }
-
-        ProxyUpdate_refmet_tabplot(tabproxy = refmet_dspedt_table_proxy,
-                                   pltproxy = refmet_dspedt_plot_proxy,
-                                   newdat = rv$dspedt_user_reference_data)
-
-        # Store the unsaved changes
-        rv$unsaved_change[[input$which_refmet_dspedt]] <- rv$dspedt_user_reference_data
-
       }
 
 
@@ -2129,6 +2144,14 @@ ref_data_editingServer <- function(id, xpmt_data, ref_data, ref_db){
     #----------------------------------------------------------------------------------------------------------
 
     # Misc ----------------------------------------------------------------------------------------------------
+
+    # Note for Auto-optimization
+    output$autoptim_note <- renderUI({
+
+      req(input$auto_optim)
+
+      htmltools::HTML("<strong>Note:</strong> When toggled on, auto-optimization automatically tweaks the chemical shift, half bandwidth, and J-coupling value(s) subject to the tolerances set for each parameter. \n This automatic parameter adjustment occurs whenever 'Check Signal Fit' is pressed.")
+    })
 
     # Observer to measure distances with box select
     output$distance_text <- renderUI({
