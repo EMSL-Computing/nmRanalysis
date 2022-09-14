@@ -168,6 +168,10 @@ xpmt_data_uploadServer <- function(id){
                                                                         input$instrument_strength == "" | is.na(as.numeric(input$instrument_strength)),
                                                                         text = "Numeric value required.")
 
+
+                                          req(!(input$temperature == "" | is.na(as.numeric(input$temperature))))
+                                          req(!(input$instrument_strength == "" | is.na(as.numeric(input$instrument_strength))))
+
                                           # Will not evaluate unless edata and fdata are supplied.
                                           # as well as field strength, ph, and solvent
                                           req(input$uploaded_nmR_edata)
@@ -220,10 +224,18 @@ xpmt_data_uploadServer <- function(id){
                                           xpmt_conc <- NA
 
                                           if(input$pH != ""){
+                                            shinyFeedback::feedbackDanger("pH",
+                                                                          is.na(as.numeric(input$pH)),
+                                                                          text = "The specified value must be numeric.")
+                                            req(!is.na(as.numeric(input$pH)))
                                             xpmt_ph <- as.numeric(input$pH)
                                           }
 
                                           if(input$concentration != ""){
+                                            shinyFeedback::feedbackDanger("concentration",
+                                                                          is.na(as.numeric(input$concentration)),
+                                                                          text = "The specified value must be numeric.")
+                                            req(!is.na(as.numeric(input$concentration)))
                                             xpmt_conc <- as.numeric(input$concentration)
                                           }
 
