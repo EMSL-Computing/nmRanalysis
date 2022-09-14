@@ -204,28 +204,38 @@ ref_data_uploadServer <- function(id, xpmt_data, ref_db){
                                            req(input$columns)
 
                                            metab_names_table <- refmet_file()
+
+                                           shinyFeedback::feedbackDanger("columns",
+                                                                         any(is.null(metab_names_table[[input$columns]])),
+                                                                         "Invalid column selected.")
+                                           req(!any(is.null(metab_names_table[[input$columns]])))
+
                                            metab_names_table <- metab_names_table[!is.na(metab_names_table[[input$columns]]),]
 
                                            # Pulls reference metabolites of interest from uploaded file based on column header selected
                                            # that corresponds to the CAS number
                                            user.refchoices <- as.list(metab_names_table[[input$columns]])
 
+                                           check1 <- Reduce("c", lapply(user.refchoices, function(x){x %in% bmse_associations$CASno}))
+
                                            if(length(user.refchoices) == 0 |
-                                              all(grepl("^[A-Za-z]+$",user.refchoices))){
+                                              all(grepl("^[A-Za-z]+$",user.refchoices)) |
+                                              all(!check1)){
                                              shinyWidgets::show_alert(
                                                title = "No CAS numbers found.",
                                                text = "No CAS numbers were detected in the selected column. Data were either improperly formatted,
-                                               or the selected column does not contain CAS numbers.",
+                                               or the selected column does not contain CAS numbers that are available in our database.",
                                                type = "error"
                                              )
                                            }
 
                                            shinyFeedback::feedbackDanger("columns",
                                                                          length(user.refchoices) == 0 |
-                                                                           all(grepl("^[A-Za-z]+$",user.refchoices)),
+                                                                           all(grepl("^[A-Za-z]+$",user.refchoices)) |
+                                                                           all(!check1),
                                                                          "No CAS numbers detected in selected column.")
 
-                                           req(length(user.refchoices) != 0 & !all(grepl("^[A-Za-z]+$",user.refchoices)))
+                                           req(length(user.refchoices) != 0 & !all(grepl("^[A-Za-z]+$",user.refchoices)) & any(check1))
 
 
                                            # Checks whether all metabolites in list are contained in app database
@@ -460,6 +470,7 @@ ref_data_uploadServer <- function(id, xpmt_data, ref_db){
                      type = "warning"
                    )
                  })
+
 
     # Module output
     reactive({
