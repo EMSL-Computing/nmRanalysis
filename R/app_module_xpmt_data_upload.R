@@ -60,10 +60,10 @@ xpmt_data_uploadUI <- function(id, ref_db){
 
                                                  fluidRow(
                                                    column(width = 6,
-                                                          textInput(inputId     = ns("pH"),
-                                                                    label       = "pH:",
+                                                          textInput(inputId     = ns("temperature"),
+                                                                    label       = "Temperature (K)",
                                                                     value       = "",
-                                                                    placeholder = "e.g. 7.4")),
+                                                                    placeholder = "e.g. 298")),
 
                                                    column(width = 6,
                                                           textInput(inputId     = ns("instrument_strength"),
@@ -79,10 +79,10 @@ xpmt_data_uploadUI <- function(id, ref_db){
                                                                       c('H2O' = "h2o",
                                                                         "D2O" = "d2o"))),
                                                    column(width = 6,
-                                                          textInput(inputId     = ns("temperature"),
-                                                                    label       = "(Optional) Temperature (K)",
+                                                          textInput(inputId     = ns("pH"),
+                                                                    label       = "(Optional) pH:",
                                                                     value       = "",
-                                                                    placeholder = "e.g. 298"))
+                                                                    placeholder = "e.g. 7.4"))
 
 
                                                  ),
@@ -160,35 +160,82 @@ xpmt_data_uploadServer <- function(id){
                                                                         is.null(input$uploaded_nmR_edata$datapath),
                                                                         text = "Please provide a datafile.")
 
-                                          shinyFeedback::feedbackDanger("pH",
-                                                                        input$pH == "" | is.na(as.numeric(input$pH)),
+                                          shinyFeedback::feedbackDanger("temperature",
+                                                                        input$temperature == "" | is.na(as.numeric(input$temperature)),
                                                                         text = "Numeric value required.")
 
                                           shinyFeedback::feedbackDanger("instrument_strength",
                                                                         input$instrument_strength == "" | is.na(as.numeric(input$instrument_strength)),
                                                                         text = "Numeric value required.")
 
+
+                                          req(!(input$temperature == "" | is.na(as.numeric(input$temperature))))
+                                          req(!(input$instrument_strength == "" | is.na(as.numeric(input$instrument_strength))))
+
                                           # Will not evaluate unless edata and fdata are supplied.
                                           # as well as field strength, ph, and solvent
                                           req(input$uploaded_nmR_edata)
                                           req(input$instrument_strength)
-                                          req(input$pH)
+                                          req(input$temperature)
                                           req(input$solvent)
+
+                                          ext  <- tools::file_ext(input$uploaded_nmR_edata$datapath)
+                                          if(ext != "csv"){
+                                            shinyWidgets::show_alert(
+                                              title = "Incorrect format of experimental data file",
+                                              text = "Experimental data should be uploaded as a .csv file with
+                                              the first column containing the chemical shift values (ppm) and subsequent
+                                              columns the corresponding intensities for each sample spectrum. Column headers
+                                              should also be included.",
+                                              type = "error"
+                                            )
+                                          }
+                                          shinyFeedback::feedbackDanger("uploaded_nmR_edata",
+                                                                        !(ext == "csv"),
+                                                                        "Please upload a .csv file.")
+                                          req(ext == "csv")
 
                                           # Read in experimental data file
                                           xpmt.e_data <- load_file(path    = input$uploaded_nmR_edata$datapath,
                                                                    dataset = "experiment")
+                                          fmtcheck1   <- all(is.na(suppressWarnings(as.numeric(gsub("X", "", colnames(xpmt.e_data)[-1])))))
+                                          fmtcheck2   <- all(apply(xpmt.e_data,2,function(x){all(!is.na(suppressWarnings(as.numeric(x))))}))
 
-                                          xpmt_ph <- as.numeric(input$pH)
+                                          if(!fmtcheck1 | !fmtcheck2){
+                                            shinyWidgets::show_alert(
+                                              title = "Incorrect format of experimental data file",
+                                              text = "Experimental data should be uploaded as a .csv file with
+                                              the first column containing the chemical shift values (ppm) and subsequent
+                                              columns the corresponding intensities for each sample spectrum. Column headers
+                                              should also be included.",
+                                              type = "error"
+                                            )
+                                          }
+
+                                          shinyFeedback::feedbackDanger("uploaded_nmR_edata",
+                                                                        !fmtcheck1 | !fmtcheck2,
+                                                                        text = "Please provide a correctly formatted datafile.")
+
+                                          req(fmtcheck1 & fmtcheck2)
+
+                                          xpmt_temp <- as.numeric(input$temperature)
                                           xpmt_freq <- as.numeric(input$instrument_strength)
-                                          xpmt_temp <- NA
+                                          xpmt_ph   <- NA
                                           xpmt_conc <- NA
 
-                                          if(input$temperature != ""){
-                                            xpmt_temp <- as.numeric(input$temperature)
+                                          if(input$pH != ""){
+                                            shinyFeedback::feedbackDanger("pH",
+                                                                          is.na(as.numeric(input$pH)),
+                                                                          text = "The specified value must be numeric.")
+                                            req(!is.na(as.numeric(input$pH)))
+                                            xpmt_ph <- as.numeric(input$pH)
                                           }
 
                                           if(input$concentration != ""){
+                                            shinyFeedback::feedbackDanger("concentration",
+                                                                          is.na(as.numeric(input$concentration)),
+                                                                          text = "The specified value must be numeric.")
+                                            req(!is.na(as.numeric(input$concentration)))
                                             xpmt_conc <- as.numeric(input$concentration)
                                           }
 
@@ -210,8 +257,79 @@ xpmt_data_uploadServer <- function(id){
                                             )
 
                                           } else{
+
+                                            ext  <- tools::file_ext(input$uploaded_nmR_fdata$datapath)
+                                            if(ext != "csv"){
+                                              shinyWidgets::show_alert(
+                                                title = "Incorrect format of experimental metadata file",
+                                                text = "Experimental metadata should be uploaded as a .csv file with
+                                              the first column containing the names of uploaded sample spectra and subsequent
+                                              columns the associated metadata. The specified sample names should match the sample column
+                                                headers of the experimental data file. The metadata file should include column headers.",
+                                                type = "error"
+                                              )
+                                            }
+                                            shinyFeedback::feedbackDanger("uploaded_nmR_fdata",
+                                                                          !(ext == "csv"),
+                                                                          "Please upload a .csv file.")
+                                            req(ext == "csv")
+
+
                                             xpmt.f_data <- load_file(path    = input$uploaded_nmR_fdata$datapath,
                                                                      dataset = "experiment_metadata")
+
+                                            fmtcheck1   <- nrow(xpmt.f_data) == (ncol(xpmt.e_data)-1)
+                                            fmtcheck2   <- all(xpmt.f_data$Sample %in% colnames(xpmt.e_data)[-1])
+
+                                            if(!fmtcheck1 | !fmtcheck2){
+                                              shinyWidgets::show_alert(
+                                                title = "Incorrect format of experimental metadata file",
+                                                text = "Experimental metadata should be uploaded as a .csv file with
+                                              the first column containing the names of uploaded sample spectra and subsequent
+                                              columns the associated metadata. The specified sample names should match the sample column
+                                                headers of the experimental data file. The metadata file should include column headers.",
+                                                type = "error"
+                                              )
+                                            }
+
+                                            shinyFeedback::feedbackDanger("uploaded_nmR_fdata",
+                                                                          !fmtcheck1 | !fmtcheck2,
+                                                                          text = "Please provide a correctly formatted datafile.")
+
+                                            req(fmtcheck1 & fmtcheck2)
+
+                                            if(length(grep("pH", colnames(xpmt.f_data), ignore.case = TRUE)) == 0){
+                                              xpmt.f_data <- xpmt.f_data %>%
+                                                dplyr::mutate(pH = xpmt_ph)
+                                            }
+
+                                            if(length(grep("Solvent", colnames(xpmt.f_data), ignore.case = TRUE)) == 0){
+                                              xpmt.f_data <- xpmt.f_data %>%
+                                                dplyr::mutate(Solvent = input$solvent)
+                                            }
+
+                                            if(length(grep("Frequency", colnames(xpmt.f_data), ignore.case = TRUE)) == 0){
+                                              xpmt.f_data <- xpmt.f_data %>%
+                                                dplyr::mutate(Frequency = xpmt_freq)
+                                            }
+
+                                            if(length(grep("Temperature", colnames(xpmt.f_data), ignore.case = TRUE)) == 0){
+                                              xpmt.f_data <- xpmt.f_data %>%
+                                                dplyr::mutate(Temperature = xpmt_temp)
+                                            }
+
+                                            if(length(grep("Concentration", colnames(xpmt.f_data), ignore.case = TRUE)) == 0){
+                                              xpmt.f_data <- xpmt.f_data %>%
+                                                dplyr::mutate(Concentration = xpmt_conc)
+                                            }
+
+                                            shinyWidgets::show_alert(
+                                              title = "Uploaded metadata omitted one or more experimental conditions.",
+                                              text = "Omitted experimental conditions have been added based on the
+                                              user-specified inputs.",
+                                              type = "warning"
+                                            )
+
                                           }
 
                                           # Feed above into nmRanalysis function to create ppmData object

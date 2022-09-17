@@ -125,12 +125,41 @@ ref_data_uploadServer <- function(id, xpmt_data, ref_db){
       req(input$uploaded_refmet_file)
 
       ext  <- tools::file_ext(input$uploaded_refmet_file$datapath)
+      if(ext != "xlsx"){
+        shinyWidgets::show_alert(
+          title = "Incorrect file format.",
+          text = "The uploaded file should be a .xlsx file and of the same format as the typical Chenomx output file. Specifically,
+          column headers should be entered in the third row, and data in rows six and beyond. A column containing
+          the CAS numbers of target metabolites is required.",
+          type = "error"
+        )
+      }
+
       shinyFeedback::feedbackDanger("uploaded_refmet_file",
                                     !(ext == "xlsx"),
                                     "Please upload a .xlsx file.")
       req(ext == "xlsx")
       metab_names_table <- load_file(path    = input$uploaded_refmet_file$datapath,
                                      dataset = "metabolites")
+
+      fmtcheck1 <- !any(!is.na(suppressWarnings(as.numeric(colnames(metab_names_table)))))
+
+      if(!fmtcheck1){
+        shinyWidgets::show_alert(
+          title = "Incorrect file format.",
+          text = "The uploaded file should be a .xlsx file and of the same format as the typical Chenomx output file. Specifically,
+          column headers should be entered in the third row, and data in rows six and beyond. A column containing
+          the CAS numbers of target metabolites is required.",
+          type = "error"
+        )
+      }
+
+      shinyFeedback::feedbackDanger("uploaded_refmet_file",
+                                    !fmtcheck1,
+                                    "Please upload a correctly formatted file.")
+
+      req(fmtcheck1)
+
       return(metab_names_table)
     })
 
@@ -175,11 +204,39 @@ ref_data_uploadServer <- function(id, xpmt_data, ref_db){
                                            req(input$columns)
 
                                            metab_names_table <- refmet_file()
+
+                                           shinyFeedback::feedbackDanger("columns",
+                                                                         any(is.null(metab_names_table[[input$columns]])),
+                                                                         "Invalid column selected.")
+                                           req(!any(is.null(metab_names_table[[input$columns]])))
+
                                            metab_names_table <- metab_names_table[!is.na(metab_names_table[[input$columns]]),]
 
                                            # Pulls reference metabolites of interest from uploaded file based on column header selected
                                            # that corresponds to the CAS number
                                            user.refchoices <- as.list(metab_names_table[[input$columns]])
+
+                                           check1 <- Reduce("c", lapply(user.refchoices, function(x){x %in% bmse_associations$CASno}))
+
+                                           if(length(user.refchoices) == 0 |
+                                              all(grepl("^[A-Za-z]+$",user.refchoices)) |
+                                              all(!check1)){
+                                             shinyWidgets::show_alert(
+                                               title = "No CAS numbers found.",
+                                               text = "No CAS numbers were detected in the selected column. Data were either improperly formatted,
+                                               or the selected column does not contain CAS numbers that are available in our database.",
+                                               type = "error"
+                                             )
+                                           }
+
+                                           shinyFeedback::feedbackDanger("columns",
+                                                                         length(user.refchoices) == 0 |
+                                                                           all(grepl("^[A-Za-z]+$",user.refchoices)) |
+                                                                           all(!check1),
+                                                                         "No CAS numbers detected in selected column.")
+
+                                           req(length(user.refchoices) != 0 & !all(grepl("^[A-Za-z]+$",user.refchoices)) & any(check1))
+
 
                                            # Checks whether all metabolites in list are contained in app database
                                            # If there are, saves appropriate reactive value.
@@ -413,6 +470,7 @@ ref_data_uploadServer <- function(id, xpmt_data, ref_db){
                      type = "warning"
                    )
                  })
+
 
     # Module output
     reactive({
