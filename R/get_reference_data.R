@@ -88,10 +88,10 @@ as.bmseList <- function(casno_list,
     for (i in 1:length(casno_list)){
       subset <- bmse_associations %>% dplyr::filter(.data$CASno == casno_list[[i]],
                                                     .data$Solvent == solvent_type,
-                                                    .data$pH == ph)
+                                                    .data$Temperature == temperature)
 
-      if(!is.na(temperature)){
-        subset <- subset %>% dplyr::filter(.data$Temperature == temperature)
+      if(!is.na(ph)){
+        subset <- subset %>% dplyr::filter(.data$pH == ph)
       }
 
       if(!is.na(concentration)){
@@ -196,11 +196,12 @@ as.bmseListFromName <- function(name_list,
     #create list
     bmse_list <- list()
     for (i in 1:length(name_list)){
-      subset <- bmse_associations %>% dplyr::filter(.data$Solute == name_list[[i]],
+      subset <- bmse_associations %>% dplyr::filter(.data$CASno == casno_list[[i]],
                                                     .data$Solvent == solvent_type,
-                                                    .data$pH == ph)
-      if(!is.na(temperature)){
-        subset <- subset %>% dplyr::filter(.data$Temperature == temperature)
+                                                    .data$Temperature == temperature)
+
+      if(!is.na(ph)){
+        subset <- subset %>% dplyr::filter(.data$pH == ph)
       }
 
       if(!is.na(concentration)){
@@ -733,23 +734,23 @@ roi_ref_export <- function(name_list           = NULL,
 #'  51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
 #'
 #' @param roi_df data.frame, output of \code{roi_ref_export} with parameter \code{return_all = TRUE}
-#' @param pH single numeric value specifying experimental pH
+#' @param temperature single numeric value specifying experimental temperature (K)
 #' @param instrument_strength numeric value specifying the spectrometer frequency of the instrument used to collect the data
 #' @return data.frame
 #' @export
-nearest_match_metabs <- function(roi_df, pH, instrument_strength) {
+nearest_match_metabs <- function(roi_df, temperature, instrument_strength) {
 
   # use HMDB code as unique ID for specific solute/pH/field strength combination
   metab_id <- roi_df$HMDB_code
 
   # get experimental parameters associated w/each metab_id
-  metab_ph <- vector()
+  metab_temp <- vector()
   metab_FS <- vector()
   dist <- vector()
   for (i in 1:length(metab_id)) {
-    metab_ph[i] <- bmse_associations %>%
+    metab_temp[i] <- bmse_associations %>%
       dplyr::filter(.data$Entry_ID == metab_id[i]) %>%
-      dplyr::pull(pH) %>%
+      dplyr::pull(Temperature) %>%
       unique() %>%
       as.numeric()
 
@@ -760,10 +761,10 @@ nearest_match_metabs <- function(roi_df, pH, instrument_strength) {
       as.numeric()
 
     # calculate Euclidean distance
-    dist[i] <- sqrt((pH - metab_ph[i])^2 + (instrument_strength - metab_FS[i])^2)
+    dist[i] <- sqrt((temperature - metab_temp[i])^2 + (instrument_strength - metab_FS[i])^2)
   }
 
-  metabs <- as.data.frame(cbind(metab_id, metab_ph, metab_FS, as.numeric(dist))) %>%
+  metabs <- as.data.frame(cbind(metab_id, metab_temp, metab_FS, as.numeric(dist))) %>%
     dplyr::arrange(dist)
 
   return(metabs)
