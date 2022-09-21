@@ -597,6 +597,7 @@ ref_data_editingServer <- function(id, xpmt_data, ref_data, ref_db){
     # experimental spectrum. This is implemented through proxy updates for the sake of efficiency.
     observeEvent(c(input$sample_to_plot, xpmt_data()), priority = -1, {
       req(input$sample_to_plot)
+      req(input$sample_to_plot %in% names(xpmt_data()$e_data))
       req(input$which_refmet_dspedt)
 
       xpmt_data_sample <- xpmt_data()$e_data %>% dplyr::select(.data$PPM, .data[[input$sample_to_plot]])
@@ -1434,6 +1435,15 @@ ref_data_editingServer <- function(id, xpmt_data, ref_data, ref_db){
             )
           }
           req((temp$`J coupling 2 (Hz)` - input$gpp_j_coupling_variation) > 0)
+
+          if((temp$`J coupling 2 (Hz)` - temp$`J coupling (Hz)`) > 0){
+            shinyWidgets::show_alert(
+              title = "Fitting parameter error.",
+              text = "J coupling 2 must be smaller than J coupling.",
+              type = "error"
+            )
+          }
+          req((temp$`J coupling 2 (Hz)` - temp$`J coupling (Hz)`) <= 0)
         }
       } else if(temp$`Multiplicity` %in% c("1", "s")){
         if(temp$`J coupling (Hz)` != 0 | temp$`J coupling 2 (Hz)` != 0){
