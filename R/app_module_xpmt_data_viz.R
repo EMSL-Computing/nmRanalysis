@@ -129,7 +129,7 @@ xpmt_data_vizServer <- function(id, xpmt_data){
     rv <- reactiveValues(obs_show_subplot_suspend = TRUE,
                          subplot_dat = NULL)
 
-    observe({
+    observe(priority = 10, {
       req(xpmt_data())
       rv$modified_xpmt_data <- xpmt_data()
     })
@@ -211,6 +211,7 @@ xpmt_data_vizServer <- function(id, xpmt_data){
       # Will not evaluate unless experimental data has been uploaded
       req(xpmt_data())
       req(input$sample_to_plot)
+      req(input$sample_to_plot %in% names(xpmt_data()$e_data))
 
       # Code to resume the observer that was started in a suspended state. We also update the value of
       # rv$obs_show_subplot_suspend so that $resume() is not called every time this plot is rendered,
