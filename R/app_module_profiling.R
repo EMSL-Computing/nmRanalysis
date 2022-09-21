@@ -466,8 +466,6 @@ profilingServer <- function(id, xpmt_data, ref_data){
                    req(ref_data())
                    req(xpmt_data())
 
-
-
                    temp <- ref_data()$quantdata %>%
                      dplyr::mutate(ROI = paste0("(", .data$`ROI right edge (ppm)`, ", ", .data$`ROI left edge (ppm)`, ")")) %>%
                      dplyr::filter(ROI %in% input$ROI_to_plot_quantdat)
@@ -1080,11 +1078,11 @@ profilingServer <- function(id, xpmt_data, ref_data){
                             values_to = "Fitted Half Bandwidth (Hz)",
                             -.data$Sample)
 
-      tempdat <- dplyr::left_join(tempdat_quant, tempdat_err)
-      tempdat <- dplyr::left_join(tempdat, tempdat_sar)
-      tempdat <- dplyr::left_join(tempdat, tempdat_cs)
-      tempdat <- dplyr::left_join(tempdat, tempdat_int)
-      tempdat <- dplyr::left_join(tempdat, tempdat_hbw)
+      tempdat <- dplyr::left_join(tempdat_quant, tempdat_err, by = c("Sample", "Metabolite"))
+      tempdat <- dplyr::left_join(tempdat, tempdat_sar, by = c("Sample", "Metabolite"))
+      tempdat <- dplyr::left_join(tempdat, tempdat_cs, by = c("Sample", "Metabolite"))
+      tempdat <- dplyr::left_join(tempdat, tempdat_int, by = c("Sample", "Metabolite"))
+      tempdat <- dplyr::left_join(tempdat, tempdat_hbw, by = c("Sample", "Metabolite"))
 
 
       quant_refdata <- ref_data()$user_edited_refdata %>% dplyr::filter(.data$Quantify == 1)
@@ -1092,8 +1090,8 @@ profilingServer <- function(id, xpmt_data, ref_data){
       qmet_signums <- sub(".*_", "", tempdat$Metabolite)
 
       for(name in qmetnames){
-        signums <- qmet_signums[which(grepl(make.names(name), tempdat$Metabolite))]
-        tempdat$Metabolite[which(grepl(make.names(name), tempdat$Metabolite))] <- paste0(name, " [", signums, "]")
+        signums <- qmet_signums[grepl(make.names(name), tempdat$Metabolite)]
+        tempdat$Metabolite[grepl(make.names(name), tempdat$Metabolite)] <- paste0(name, " [", signums, "]")
       }
 
       refdat_info <- ref_data()$user_edited_refdata %>% dplyr::ungroup() %>%
@@ -1103,7 +1101,7 @@ profilingServer <- function(id, xpmt_data, ref_data){
                       .data$`J coupling (Hz)`, .data$`J coupling 2 (Hz)`, .data$`Roof effect`, .data$`Roof effect 2`) %>%
         dplyr::rename(Metabolite = SigName)
 
-      tempdat <- dplyr::left_join(tempdat, refdat_info)
+      tempdat <- dplyr::left_join(tempdat, refdat_info, by = "Metabolite")
 
       tempdat %>% dplyr::select(.data$Sample, .data$Metabolite, .data$`Fitted Chemical Shift (ppm)`, .data$`Fitted Intensity`,
                                 .data$`Fitted Half Bandwidth (Hz)`, .data$`Quantity`, .data$`Fitting Error`,
