@@ -228,10 +228,10 @@ profilingServer <- function(id, xpmt_data, ref_data){
                    }
                    req(all(temp$`ROI left edge (ppm)` > temp$`ROI right edge (ppm)`))
 
-                   if(any(temp$`Chemical shift tolerance (ppm)` > abs(temp$`ROI right edge (ppm)` - temp$`Chemical shift(ppm)`)) |
-                      any(temp$`Chemical shift tolerance (ppm)` > abs(temp$`ROI left edge (ppm)` - temp$`Chemical shift(ppm)`))){
-                     badsignals <- paste(temp$SigName[(temp$`Chemical shift tolerance (ppm)` > abs(temp$`ROI right edge (ppm)` - temp$`Chemical shift(ppm)`)) |
-                                                         (temp$`Chemical shift tolerance (ppm)` > abs(temp$`ROI left edge (ppm)` - temp$`Chemical shift(ppm)`))], collapse = "; ")
+                   if(any(temp$`Chemical shift tolerance (ppm)` > round(abs(temp$`ROI right edge (ppm)` - temp$`Chemical shift(ppm)`), 3)) |
+                      any(temp$`Chemical shift tolerance (ppm)` > round(abs(temp$`ROI left edge (ppm)` - temp$`Chemical shift(ppm)`), 3))){
+                     badsignals <- paste(temp$SigName[(temp$`Chemical shift tolerance (ppm)` > round(abs(temp$`ROI right edge (ppm)` - temp$`Chemical shift(ppm)`), 3)) |
+                                                         (temp$`Chemical shift tolerance (ppm)` > round(abs(temp$`ROI left edge (ppm)` - temp$`Chemical shift(ppm)`), 3))], collapse = "; ")
 
                      shinyWidgets::show_alert(
                        title = "Fitting parameter error.",
@@ -240,8 +240,8 @@ profilingServer <- function(id, xpmt_data, ref_data){
                        type = "error"
                      )
                    }
-                   req(all(temp$`Chemical shift tolerance (ppm)` <= abs(temp$`ROI right edge (ppm)` - temp$`Chemical shift(ppm)`)) &
-                         all(temp$`Chemical shift tolerance (ppm)` <= abs(temp$`ROI left edge (ppm)` - temp$`Chemical shift(ppm)`)))
+                   req(all(temp$`Chemical shift tolerance (ppm)` <= round(abs(temp$`ROI right edge (ppm)` - temp$`Chemical shift(ppm)`), 3)) &
+                         all(temp$`Chemical shift tolerance (ppm)` <= round(abs(temp$`ROI left edge (ppm)` - temp$`Chemical shift(ppm)`), 3)))
 
                    if(any((temp$`Half bandwidth (Hz)` - input$gpp_widthtolerance) <= 0)){
                      badsignals <- paste(temp$SigName[(temp$`Half bandwidth (Hz)` - input$gpp_widthtolerance) <= 0], collapse = "; ")
@@ -416,6 +416,7 @@ profilingServer <- function(id, xpmt_data, ref_data){
     # experimental spectrum. This is implemented through proxy updates for the sake of efficiency.
     observeEvent(c(input$sample_to_plot_quantdat, input$ROI_to_plot_quantdat, xpmt_data()), priority = -1, {
       req(input$sample_to_plot_quantdat)
+      req(input$sample_to_plot_quantdat %in% names(xpmt_data()$e_data))
       req(input$ROI_to_plot_quantdat)
       req(ref_data())
 
@@ -1230,6 +1231,7 @@ profilingServer <- function(id, xpmt_data, ref_data){
       isolate({
         profiling_data <- user_profiling()
         req(input$sample_to_plot)
+        req(input$sample_to_plot %in% names(xpmt_data()$e_data))
         req(input$refmet_to_plot)
 
         # Extract indices of reproducibility data that correspond to selected sample and metabolite
@@ -1387,6 +1389,7 @@ profilingServer <- function(id, xpmt_data, ref_data){
         req(xpmt_data())
         req(ref_data())
         req(input$sample_to_plot)
+        req(input$sample_to_plot %in% names(xpmt_data()$e_data))
         req(input$refmet_to_plot)
       })
 
