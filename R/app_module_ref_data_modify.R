@@ -382,7 +382,7 @@ ref_data_editingServer <- function(id, xpmt_data, ref_data, ref_db){
                                                     `Metabolite` = valid_newentries,
                                                     `Quantification Signal` = rep(1, length(valid_newentries)),
                                                     `Chemical shift(ppm)` = rep(0, length(valid_newentries)),
-                                                    `Chemical shift tolerance (ppm)` = rep(0.02, length(valid_newentries)),
+                                                    `Chemical shift tolerance (ppm)` = rep(0.005, length(valid_newentries)),
                                                     `Half bandwidth (Hz)` = rep(1, length(valid_newentries)),
                                                     `Multiplicity` = rep("1", length(valid_newentries)),
                                                     `J coupling (Hz)` = rep(0, length(valid_newentries)),
@@ -1387,16 +1387,16 @@ ref_data_editingServer <- function(id, xpmt_data, ref_data, ref_db){
       }
       req(temp$`ROI left edge (ppm)` > temp$`ROI right edge (ppm)`)
 
-      if(temp$`Chemical shift tolerance (ppm)` > abs(temp$`ROI right edge (ppm)` - temp$`Chemical shift(ppm)`) |
-         temp$`Chemical shift tolerance (ppm)` > abs(temp$`ROI left edge (ppm)` - temp$`Chemical shift(ppm)`)){
+      if(temp$`Chemical shift tolerance (ppm)` > round(abs(temp$`ROI right edge (ppm)` - temp$`Chemical shift(ppm)`), 3) |
+         temp$`Chemical shift tolerance (ppm)` > round(abs(temp$`ROI left edge (ppm)` - temp$`Chemical shift(ppm)`), 3)){
         shinyWidgets::show_alert(
           title = "Fitting parameter error.",
           text = "The chemical shift tolerance is larger than half the specified width of the signal region.",
           type = "error"
         )
       }
-      req(temp$`Chemical shift tolerance (ppm)` <= abs(temp$`ROI right edge (ppm)` - temp$`Chemical shift(ppm)`) &
-            temp$`Chemical shift tolerance (ppm)` <= abs(temp$`ROI left edge (ppm)` - temp$`Chemical shift(ppm)`))
+      req(temp$`Chemical shift tolerance (ppm)` <= round(abs(temp$`ROI right edge (ppm)` - temp$`Chemical shift(ppm)`), 3) &
+            temp$`Chemical shift tolerance (ppm)` <= round(abs(temp$`ROI left edge (ppm)` - temp$`Chemical shift(ppm)`), 3))
 
       if((temp$`Half bandwidth (Hz)` - input$gpp_widthtolerance) <= 0){
         shinyWidgets::show_alert(
@@ -2303,7 +2303,7 @@ ref_data_editingServer <- function(id, xpmt_data, ref_data, ref_db){
                                                   `Metabolite`                     = input$which_refmet_dspedt,
                                                   `Quantification Signal`          = rep(numSigs + 1, 1),
                                                   `Chemical shift(ppm)`            = rep(0, 1),
-                                                  `Chemical shift tolerance (ppm)` = rep(0.02, 1),
+                                                  `Chemical shift tolerance (ppm)` = rep(0.005, 1),
                                                   `Half bandwidth (Hz)`            = rep(1.4, 1),
                                                   `Multiplicity`                   = rep("1", 1),
                                                   `J coupling (Hz)`                = rep(0, 1),
