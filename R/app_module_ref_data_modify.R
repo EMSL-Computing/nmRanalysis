@@ -1405,7 +1405,7 @@ ref_data_editingServer <- function(id, xpmt_data, ref_data, ref_db){
           type = "error"
         )
       }
-      req((temp$`Half bandwidth (Hz)` - input$gpp_widthtolerance > 0))
+      req((temp$`Half bandwidth (Hz)` - input$gpp_widthtolerance) > 0)
 
       if(temp$`Multiplicity` %ni% c("1", "2", "3", "4", "s", "d", "t", "q", "dd")){
         shinyWidgets::show_alert(

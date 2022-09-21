@@ -212,7 +212,110 @@ profilingServer <- function(id, xpmt_data, ref_data){
                  {
                    req(isolate(ref_data()))
                    req(input$auto_profile > 0)
+                   ###
 
+                   temp <- ref_data()$quantdat %>%
+                     dplyr::mutate(SigName = paste0(.data$Metabolite, " [", .data$`Quantification Signal`, "]"))
+
+                   if(any(temp$`ROI left edge (ppm)` < temp$`ROI right edge (ppm)`)){
+                     badsignals <- paste(temp$SigName[(temp$`ROI left edge (ppm)` < temp$`ROI right edge (ppm)`)], collapse = "; ")
+                     shinyWidgets::show_alert(
+                       title = "Fitting parameter error.",
+                       text = paste("The signal left edge should be larger than the signal right edge.
+                       Revise the fitting parameters of the following signals:", badsignals),
+                       type = "error"
+                     )
+                   }
+                   req(all(temp$`ROI left edge (ppm)` > temp$`ROI right edge (ppm)`))
+
+                   if(any(temp$`Chemical shift tolerance (ppm)` > abs(temp$`ROI right edge (ppm)` - temp$`Chemical shift(ppm)`)) |
+                      any(temp$`Chemical shift tolerance (ppm)` > abs(temp$`ROI left edge (ppm)` - temp$`Chemical shift(ppm)`))){
+                     badsignals <- paste(temp$SigName[(temp$`Chemical shift tolerance (ppm)` > abs(temp$`ROI right edge (ppm)` - temp$`Chemical shift(ppm)`)) |
+                                                         (temp$`Chemical shift tolerance (ppm)` > abs(temp$`ROI left edge (ppm)` - temp$`Chemical shift(ppm)`))], collapse = "; ")
+
+                     shinyWidgets::show_alert(
+                       title = "Fitting parameter error.",
+                       text = paste("The chemical shift tolerance is larger than half the specified width of the signal region for the following
+                       signals:", badsignals),
+                       type = "error"
+                     )
+                   }
+                   req(all(temp$`Chemical shift tolerance (ppm)` <= abs(temp$`ROI right edge (ppm)` - temp$`Chemical shift(ppm)`)) &
+                         all(temp$`Chemical shift tolerance (ppm)` <= abs(temp$`ROI left edge (ppm)` - temp$`Chemical shift(ppm)`)))
+
+                   if(any((temp$`Half bandwidth (Hz)` - input$gpp_widthtolerance) <= 0)){
+                     badsignals <- paste(temp$SigName[(temp$`Half bandwidth (Hz)` - input$gpp_widthtolerance) <= 0], collapse = "; ")
+                     shinyWidgets::show_alert(
+                       title = "Fitting parameter error.",
+                       text = paste("The lower bandwidth bound based on the specified bandwidth and tolerance is less than or equal to 0 for the following
+                       signals:", badsignals),
+                       type = "error"
+                     )
+                   }
+                   req(all((temp$`Half bandwidth (Hz)` - input$gpp_widthtolerance) > 0))
+
+                   if(any(temp$`Multiplicity` %ni% c("1", "2", "3", "4", "s", "d", "t", "q", "dd"))){
+                     badsignals <- paste(temp$SigName[temp$`Multiplicity` %ni% c("1", "2", "3", "4", "s", "d", "t", "q", "dd")], collapse = "; ")
+                     shinyWidgets::show_alert(
+                       title = "Fitting parameter error.",
+                       text = paste("The specified multiplicity is not supported. Revise the fitting parameters of the
+                                    following signals:", badsignals),
+                       type = "error"
+                     )
+                   }
+                   req(all(temp$`Multiplicity` %in% c("1", "2", "3", "4", "s", "d", "t", "q", "dd")))
+
+                   if(any(temp$`Multiplicity` %ni% c("1", "s"))){
+                     temp2 <- temp %>% dplyr::filter(.data$`Multiplicity` %ni% c("1", "s"))
+
+                     if(any((temp2$`J coupling (Hz)` - input$gpp_j_coupling_variation) <= 0)){
+                       badsignals <- paste(temp2$SigName[(temp2$`J coupling (Hz)` - input$gpp_j_coupling_variation) <= 0], collapse = "; ")
+                       shinyWidgets::show_alert(
+                         title = "Fitting parameter error.",
+                         text = paste("The lower J-coupling bound based on the specified J-coupling and tolerance must be
+                                       greater than 0 for non-singlet multiplicities. Revise the following signals:", badsignals),
+                         type = "error"
+                       )
+                     }
+                     req(all((temp2$`J coupling (Hz)` - input$gpp_j_coupling_variation) > 0))
+
+                     if(any(temp2$`J coupling 2 (Hz)` != 0)){
+                       temp2b <- temp2 %>% dplyr::filter(.data$`J coupling 2 (Hz)` != 0)
+                       if(any((temp2b$`J coupling 2 (Hz)` - input$gpp_j_coupling_variation) <= 0)){
+                         badsignals <- paste(temp2b$SigName[(temp2b$`J coupling 2 (Hz)` - input$gpp_j_coupling_variation) <= 0], collapse = "; ")
+                         shinyWidgets::show_alert(
+                           title = "Fitting parameter error.",
+                           text = paste("The lower J-coupling bound based on the specified J-coupling 2 and tolerance
+                                        must be greater than 0 for non-singlet multiplicities.  Revise the following signals:", badsignals),
+                           type = "error"
+                         )
+                       }
+                       req(all((temp2b$`J coupling 2 (Hz)` - input$gpp_j_coupling_variation) > 0))
+
+                       if(any((temp2b$`J coupling 2 (Hz)` - temp2b$`J coupling (Hz)`) > 0)){
+                         badsignals <- paste(temp2b$SigName[(temp2b$`J coupling 2 (Hz)` - temp2b$`J coupling (Hz)`) > 0], collapse = "; ")
+                         shinyWidgets::show_alert(
+                           title = "Fitting parameter error.",
+                           text = paste("J coupling 2 must be smaller than J coupling. Revise the following signals:", badsignals),
+                           type = "error"
+                         )
+                       }
+                       req(all((temp2b$`J coupling 2 (Hz)` - temp2b$`J coupling (Hz)`) <= 0))
+                     }
+                   } else if(temp$`Multiplicity` %in% c("1", "s")){
+                     temp3 <- temp %>% dplyr::filter(.data$`Multiplicity` %in% c("1", "s"))
+                     if(any(temp3$`J coupling (Hz)` != 0) | any(temp3$`J coupling 2 (Hz)` != 0)){
+                       badsignals <- paste(temp3$SigName[temp3$`J coupling (Hz)` != 0 | temp3$`J coupling 2 (Hz)` != 0], collapse = "; ")
+                       shinyWidgets::show_alert(
+                         title = "Fitting parameter error.",
+                         text = paste("J-coupling values should be set to 0 for singlets. Revise the following signals:", badsignals),
+                         type = "error"
+                       )
+                     }
+                     req(all(temp3$`J coupling (Hz)` == 0) & all(temp3$`J coupling 2 (Hz)` == 0))
+                   }
+
+                   ###
                    shinyWidgets::ask_confirmation(
                      inputId = NS(id, "profile_confirm"),
                      title = "Are you sure you would like to begin profiling?",
