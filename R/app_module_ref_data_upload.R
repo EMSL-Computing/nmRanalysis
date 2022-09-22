@@ -129,7 +129,7 @@ ref_data_uploadServer <- function(id, xpmt_data, ref_db, connec){
       ext  <- tools::file_ext(input$uploaded_refmet_file$datapath)
       if(ext != "xlsx"){
         shinyWidgets::show_alert(
-          title = "Incorrect file format.",
+          title = "File type not supported.",
           text = "The uploaded file should be a .xlsx file and of the same format as the typical Chenomx output file. Specifically,
           column headers should be entered in the third row, and data in rows six and beyond. A column containing
           the CAS numbers of target metabolites is required.",
@@ -148,7 +148,7 @@ ref_data_uploadServer <- function(id, xpmt_data, ref_db, connec){
 
       if(!fmtcheck1){
         shinyWidgets::show_alert(
-          title = "Incorrect file format.",
+          title = "Improperly formatted column headers.",
           text = "The uploaded file should be a .xlsx file and of the same format as the typical Chenomx output file. Specifically,
           column headers should be entered in the third row, and data in rows six and beyond. A column containing
           the CAS numbers of target metabolites is required.",

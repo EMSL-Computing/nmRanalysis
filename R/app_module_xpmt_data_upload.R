@@ -182,7 +182,7 @@ xpmt_data_uploadServer <- function(id){
                                           ext  <- tools::file_ext(input$uploaded_nmR_edata$datapath)
                                           if(ext != "csv"){
                                             shinyWidgets::show_alert(
-                                              title = "Incorrect format of experimental data file",
+                                              title = "Experimental data file type not supported",
                                               text = "Experimental data should be uploaded as a .csv file with
                                               the first column containing the chemical shift values (ppm) and subsequent
                                               columns the corresponding intensities for each sample spectrum. Column headers
@@ -198,12 +198,14 @@ xpmt_data_uploadServer <- function(id){
                                           # Read in experimental data file
                                           xpmt.e_data <- load_file(path    = input$uploaded_nmR_edata$datapath,
                                                                    dataset = "experiment")
-                                          fmtcheck1   <- all(is.na(suppressWarnings(as.numeric(gsub("X", "", colnames(xpmt.e_data)[-1])))))
-                                          fmtcheck2   <- all(apply(xpmt.e_data,2,function(x){all(!is.na(suppressWarnings(as.numeric(x))))}))
+                                          # Fill in all NA intensity values with 0 (as per RY)
+                                          xpmt.e_data <- xpmt.e_data %>% dplyr::mutate_at(c(2:ncol(xpmt.e_data)), ~replace(., is.na(.), 0))
 
-                                          if(!fmtcheck1 | !fmtcheck2){
+                                          # Check that no column names are strictly numeric, which may imply a lack of headers
+                                          fmtcheck1   <- all(is.na(suppressWarnings(as.numeric(gsub("X", "", colnames(xpmt.e_data)[-1])))))
+                                          if(!fmtcheck1){
                                             shinyWidgets::show_alert(
-                                              title = "Incorrect format of experimental data file",
+                                              title = "Experimental data column headers should not be numeric.",
                                               text = "Experimental data should be uploaded as a .csv file with
                                               the first column containing the chemical shift values (ppm) and subsequent
                                               columns the corresponding intensities for each sample spectrum. Column headers
@@ -213,10 +215,30 @@ xpmt_data_uploadServer <- function(id){
                                           }
 
                                           shinyFeedback::feedbackDanger("uploaded_nmR_edata",
-                                                                        !fmtcheck1 | !fmtcheck2,
+                                                                        !fmtcheck1,
                                                                         text = "Please provide a correctly formatted datafile.")
 
-                                          req(fmtcheck1 & fmtcheck2)
+                                          req(fmtcheck1)
+
+                                          # Check that the column values are all numeric, or may be represented as numeric.
+                                          fmtcheck2   <- all(apply(xpmt.e_data,2,function(x){all(!is.na(suppressWarnings(as.numeric(x))))}))
+
+                                          if(!fmtcheck2){
+                                            shinyWidgets::show_alert(
+                                              title = "One or more experimental data columns contains character-valued entries.",
+                                              text = "Experimental data should be uploaded as a .csv file with
+                                              the first column containing the chemical shift values (ppm) and subsequent
+                                              columns the corresponding intensities for each sample spectrum. Column headers
+                                              should also be included.",
+                                              type = "error"
+                                            )
+                                          }
+
+                                          shinyFeedback::feedbackDanger("uploaded_nmR_edata",
+                                                                        !fmtcheck2,
+                                                                        text = "Please provide a correctly formatted datafile.")
+
+                                          req(fmtcheck2)
 
                                           xpmt_temp <- as.numeric(input$temperature)
                                           xpmt_freq <- as.numeric(input$instrument_strength)
@@ -261,7 +283,7 @@ xpmt_data_uploadServer <- function(id){
                                             ext  <- tools::file_ext(input$uploaded_nmR_fdata$datapath)
                                             if(ext != "csv"){
                                               shinyWidgets::show_alert(
-                                                title = "Incorrect format of experimental metadata file",
+                                                title = "Experimental metadata file type not supported",
                                                 text = "Experimental metadata should be uploaded as a .csv file with
                                               the first column containing the names of uploaded sample spectra and subsequent
                                               columns the associated metadata. The specified sample names should match the sample column
@@ -278,25 +300,39 @@ xpmt_data_uploadServer <- function(id){
                                             xpmt.f_data <- load_file(path    = input$uploaded_nmR_fdata$datapath,
                                                                      dataset = "experiment_metadata")
 
+                                            # Check that uploaded metadata has as many entries (rows) as there are samples
                                             fmtcheck1   <- nrow(xpmt.f_data) == (ncol(xpmt.e_data)-1)
-                                            fmtcheck2   <- all(xpmt.f_data$Sample %in% colnames(xpmt.e_data)[-1])
-
-                                            if(!fmtcheck1 | !fmtcheck2){
+                                            if(!fmtcheck1){
                                               shinyWidgets::show_alert(
-                                                title = "Incorrect format of experimental metadata file",
-                                                text = "Experimental metadata should be uploaded as a .csv file with
-                                              the first column containing the names of uploaded sample spectra and subsequent
-                                              columns the associated metadata. The specified sample names should match the sample column
-                                                headers of the experimental data file. The metadata file should include column headers.",
+                                                title = "Experimental metadata entry mismatch",
+                                                text = "The number of samples detected in the experimental metadata file does not match
+                                                the number of uploaded experimental data samples.",
                                                 type = "error"
                                               )
                                             }
 
                                             shinyFeedback::feedbackDanger("uploaded_nmR_fdata",
-                                                                          !fmtcheck1 | !fmtcheck2,
+                                                                          !fmtcheck1,
                                                                           text = "Please provide a correctly formatted datafile.")
 
-                                            req(fmtcheck1 & fmtcheck2)
+                                            req(fmtcheck1)
+
+                                            fmtcheck2   <- all(xpmt.f_data$Sample %in% colnames(xpmt.e_data)[-1])
+
+                                            if(!fmtcheck2){
+                                              shinyWidgets::show_alert(
+                                                title = "Experimental metadata entry mismatch",
+                                                text = "The sample names detected in the experimental metadata file do not match
+                                                those specified in the experimental data file.",
+                                                type = "error"
+                                              )
+                                            }
+
+                                            shinyFeedback::feedbackDanger("uploaded_nmR_fdata",
+                                                                          !fmtcheck2,
+                                                                          text = "Please provide a correctly formatted datafile.")
+
+                                            req(fmtcheck2)
 
                                             if(length(grep("pH", colnames(xpmt.f_data), ignore.case = TRUE)) == 0){
                                               xpmt.f_data <- xpmt.f_data %>%
@@ -323,12 +359,20 @@ xpmt_data_uploadServer <- function(id){
                                                 dplyr::mutate(Concentration = xpmt_conc)
                                             }
 
-                                            shinyWidgets::show_alert(
-                                              title = "Uploaded metadata omitted one or more experimental conditions.",
-                                              text = "Omitted experimental conditions have been added based on the
+                                            if(length(grep("pH", colnames(xpmt.f_data), ignore.case = TRUE)) == 0 |
+                                               length(grep("Solvent", colnames(xpmt.f_data), ignore.case = TRUE)) == 0 |
+                                               length(grep("Frequency", colnames(xpmt.f_data), ignore.case = TRUE)) == 0 |
+                                               length(grep("Temperature", colnames(xpmt.f_data), ignore.case = TRUE)) == 0 |
+                                               length(grep("Concentration", colnames(xpmt.f_data), ignore.case = TRUE)) == 0){
+
+                                              shinyWidgets::show_alert(
+                                                title = "Uploaded metadata omitted one or more experimental conditions.",
+                                                text = "Omitted experimental conditions have been added based on the
                                               user-specified inputs.",
-                                              type = "warning"
-                                            )
+                                                type = "warning"
+                                              )
+
+                                            }
 
                                           }
 
