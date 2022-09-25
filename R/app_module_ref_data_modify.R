@@ -382,7 +382,7 @@ ref_data_editingServer <- function(id, xpmt_data, ref_data, ref_db){
                                                     `Metabolite` = valid_newentries,
                                                     `Quantification Signal` = rep(1, length(valid_newentries)),
                                                     `Chemical shift(ppm)` = rep(0, length(valid_newentries)),
-                                                    `Chemical shift tolerance (ppm)` = rep(0.02, length(valid_newentries)),
+                                                    `Chemical shift tolerance (ppm)` = rep(0.005, length(valid_newentries)),
                                                     `Half bandwidth (Hz)` = rep(1, length(valid_newentries)),
                                                     `Multiplicity` = rep("1", length(valid_newentries)),
                                                     `J coupling (Hz)` = rep(0, length(valid_newentries)),
@@ -597,6 +597,7 @@ ref_data_editingServer <- function(id, xpmt_data, ref_data, ref_db){
     # experimental spectrum. This is implemented through proxy updates for the sake of efficiency.
     observeEvent(c(input$sample_to_plot, xpmt_data()), priority = -1, {
       req(input$sample_to_plot)
+      req(input$sample_to_plot %in% names(xpmt_data()$e_data))
       req(input$which_refmet_dspedt)
 
       xpmt_data_sample <- xpmt_data()$e_data %>% dplyr::select(.data$PPM, .data[[input$sample_to_plot]])
@@ -1386,16 +1387,16 @@ ref_data_editingServer <- function(id, xpmt_data, ref_data, ref_db){
       }
       req(temp$`ROI left edge (ppm)` > temp$`ROI right edge (ppm)`)
 
-      if(temp$`Chemical shift tolerance (ppm)` > abs(temp$`ROI right edge (ppm)` - temp$`Chemical shift(ppm)`) |
-         temp$`Chemical shift tolerance (ppm)` > abs(temp$`ROI left edge (ppm)` - temp$`Chemical shift(ppm)`)){
+      if(temp$`Chemical shift tolerance (ppm)` > round(abs(temp$`ROI right edge (ppm)` - temp$`Chemical shift(ppm)`), 3) |
+         temp$`Chemical shift tolerance (ppm)` > round(abs(temp$`ROI left edge (ppm)` - temp$`Chemical shift(ppm)`), 3)){
         shinyWidgets::show_alert(
           title = "Fitting parameter error.",
           text = "The chemical shift tolerance is larger than half the specified width of the signal region.",
           type = "error"
         )
       }
-      req(temp$`Chemical shift tolerance (ppm)` <= abs(temp$`ROI right edge (ppm)` - temp$`Chemical shift(ppm)`) &
-            temp$`Chemical shift tolerance (ppm)` <= abs(temp$`ROI left edge (ppm)` - temp$`Chemical shift(ppm)`))
+      req(temp$`Chemical shift tolerance (ppm)` <= round(abs(temp$`ROI right edge (ppm)` - temp$`Chemical shift(ppm)`), 3) &
+            temp$`Chemical shift tolerance (ppm)` <= round(abs(temp$`ROI left edge (ppm)` - temp$`Chemical shift(ppm)`), 3))
 
       if((temp$`Half bandwidth (Hz)` - input$gpp_widthtolerance) <= 0){
         shinyWidgets::show_alert(
@@ -1404,7 +1405,7 @@ ref_data_editingServer <- function(id, xpmt_data, ref_data, ref_db){
           type = "error"
         )
       }
-      req((temp$`Half bandwidth (Hz)` - input$gpp_widthtolerance > 0))
+      req((temp$`Half bandwidth (Hz)` - input$gpp_widthtolerance) > 0)
 
       if(temp$`Multiplicity` %ni% c("1", "2", "3", "4", "s", "d", "t", "q", "dd")){
         shinyWidgets::show_alert(
@@ -1434,6 +1435,15 @@ ref_data_editingServer <- function(id, xpmt_data, ref_data, ref_db){
             )
           }
           req((temp$`J coupling 2 (Hz)` - input$gpp_j_coupling_variation) > 0)
+
+          if((temp$`J coupling 2 (Hz)` - temp$`J coupling (Hz)`) > 0){
+            shinyWidgets::show_alert(
+              title = "Fitting parameter error.",
+              text = "J coupling 2 must be smaller than J coupling.",
+              type = "error"
+            )
+          }
+          req((temp$`J coupling 2 (Hz)` - temp$`J coupling (Hz)`) <= 0)
         }
       } else if(temp$`Multiplicity` %in% c("1", "s")){
         if(temp$`J coupling (Hz)` != 0 | temp$`J coupling 2 (Hz)` != 0){
@@ -2293,7 +2303,7 @@ ref_data_editingServer <- function(id, xpmt_data, ref_data, ref_db){
                                                   `Metabolite`                     = input$which_refmet_dspedt,
                                                   `Quantification Signal`          = rep(numSigs + 1, 1),
                                                   `Chemical shift(ppm)`            = rep(0, 1),
-                                                  `Chemical shift tolerance (ppm)` = rep(0.02, 1),
+                                                  `Chemical shift tolerance (ppm)` = rep(0.005, 1),
                                                   `Half bandwidth (Hz)`            = rep(1.4, 1),
                                                   `Multiplicity`                   = rep("1", 1),
                                                   `J coupling (Hz)`                = rep(0, 1),
