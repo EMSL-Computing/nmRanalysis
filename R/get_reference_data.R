@@ -151,7 +151,7 @@ as.bmseListFromName <- function(name_list,
                                 return_metabs = "all",
                                 solvent_type = NULL,
                                 ph = NULL,
-                                instrument_strength,
+                                instrument_strength = NULL,
                                 temperature         = NULL,
                                 concentration       = NULL){
 
@@ -196,7 +196,7 @@ as.bmseListFromName <- function(name_list,
     #create list
     bmse_list <- list()
     for (i in 1:length(name_list)){
-      subset <- bmse_associations %>% dplyr::filter(.data$CASno == casno_list[[i]],
+      subset <- bmse_associations %>% dplyr::filter(.data$Solute == name_list[[i]],
                                                     .data$Solvent == solvent_type,
                                                     .data$Temperature == temperature)
 
@@ -458,7 +458,8 @@ get_spectra_data <- function(ID_list){
           return(length(peak_groups) == nrow(spectra_data_subset))
         })
 
-        tol              <- max(tol_candidates[tempind]) #ppm
+        tol              <- suppressWarnings(max(tol_candidates[tempind])) #ppm
+        if (tol == -Inf) {tol <- 0.1}
         x                <- as.numeric(peaksdata$Chem_shift_val)
         split_idxs       <- which(abs(diff(x)) > tol) + 1
         peak_groups      <- split(x, cumsum(seq_along(x) %in% split_idxs))
