@@ -1,10 +1,12 @@
 ---
 title: "nmRanalysis Manual"
 author: "Javier E. Flores, Anastasiya V. Prymolenna, Natalie M. Winans, Allison Thompson, William R. Kew, Robert P. Young, Lisa M. Bramer"
-date: "Last updated: 08/16/2021"
+date: "Last updated: 09/26/2021"
 output:
   BiocStyle::html_document:
-    toc_float: true
+    toc_float: 
+      collapsed: true
+    number_sections: false
     code_folding: show
     lib_dir: trelli
 ---
