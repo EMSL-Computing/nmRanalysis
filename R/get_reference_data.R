@@ -20,7 +20,7 @@
 #'@param return_metabs string, must be one of "exact_match" or "all". Defaults to "all". If "exact_match", returns metabolites that exactly match specified experimental conditions (solvent type, pH, and instrument strength). If "all", returns all entries corresponding to supplied CAS numbers, experimental conditions ignored.
 #'@param solvent_type choose from available solvents 'D2O', 'H2O', ...
 #'@param ph numeric value specifying pH of experimental conditions
-#'@param instrument_strength numeric value specifying experimental instrument strength
+#'@param instrument_strength numeric value specifying spectrometer frequency
 #'@param temperature numeric value specifying the temperature
 #'@param concentration numeric value specifying the concentration
 #'
@@ -51,7 +51,7 @@ as.bmseList <- function(casno_list,
   }
 
   if(return_metabs == "exact_match" & (is.null(solvent_type) | is.null(ph) | is.null(instrument_strength))){
-    stop('Solvent type, ph, and spectrometer frequency must be specified if return_metabs = "exact_match"')
+    stop('Solvent type, ph, and instrument strength must be specified if return_metabs = "exact_match"')
   }
 
   # if(return_metabs == "nearest_match" & (is.null(solvent_type) | is.null(ph))){
@@ -137,7 +137,7 @@ as.bmseList <- function(casno_list,
 #'@param return_metabs string, must be one of "exact_match" or "all". Defaults to "all". If "exact_match", returns metabolites that exactly match specified experimental conditions (solvent type, pH, and instrument strength). If "all", returns all entries corresponding to supplied CAS numbers, experimental conditions ignored.
 #'@param solvent_type choose from available solvents 'D2O', 'H2O', ...
 #'@param ph numerical value specifying pH of the experimental conditions
-#'@param instrument_strength numeric value specifying experimental instrument strength
+#'@param instrument_strength numeric value specifying spectrometer frequency
 #'@param temperature numeric value specifying the temperature
 #'@param concentration numeric value specifying the concentration
 #'
@@ -151,7 +151,7 @@ as.bmseListFromName <- function(name_list,
                                 return_metabs = "all",
                                 solvent_type = NULL,
                                 ph = NULL,
-                                instrument_strength,
+                                instrument_strength = NULL,
                                 temperature         = NULL,
                                 concentration       = NULL){
 
@@ -165,7 +165,7 @@ as.bmseListFromName <- function(name_list,
   }
 
   if(return_metabs == "exact_match" & (is.null(solvent_type) | is.null(ph) | is.null(instrument_strength))){
-    stop('Solvent type, ph, and spectrometer frequency must be specified if return_metabs = "exact_match"')
+    stop('Solvent type, ph, and instrument strength must be specified if return_metabs = "exact_match"')
   }
 
   # fail check if one metabolite name is not in the db
@@ -196,7 +196,7 @@ as.bmseListFromName <- function(name_list,
     #create list
     bmse_list <- list()
     for (i in 1:length(name_list)){
-      subset <- bmse_associations %>% dplyr::filter(.data$CASno == casno_list[[i]],
+      subset <- bmse_associations %>% dplyr::filter(.data$Solute == name_list[[i]],
                                                     .data$Solvent == solvent_type,
                                                     .data$Temperature == temperature)
 
@@ -458,7 +458,8 @@ get_spectra_data <- function(ID_list){
           return(length(peak_groups) == nrow(spectra_data_subset))
         })
 
-        tol              <- max(tol_candidates[tempind]) #ppm
+        tol              <- suppressWarnings(max(tol_candidates[tempind])) #ppm
+        if (tol == -Inf) {tol <- 0.1}
         x                <- as.numeric(peaksdata$Chem_shift_val)
         split_idxs       <- which(abs(diff(x)) > tol) + 1
         peak_groups      <- split(x, cumsum(seq_along(x) %in% split_idxs))
@@ -663,7 +664,7 @@ export_roi_file <- function(spectra_df,
 #' @param solvent_type the experimental solvent, choose from available solvents 'D2O', 'H2O', ...
 #' @param half_bandwidth This will be set to 1.4 unless otherwise specified
 #' @param roi_tol The chemical shift tolerance, tolerance for the location of the peak center. Default is 0.005.
-#' @param instrument_strength the field strength of the instrument used to collect the data
+#' @param instrument_strength the spectrometer frequency of the instrument used to collect the data
 #' @param temperature numeric value specifying the temperature
 #' @param concentration numeric value specifying the concentration
 #'
@@ -735,7 +736,7 @@ roi_ref_export <- function(name_list           = NULL,
 #'
 #' @param roi_df data.frame, output of \code{roi_ref_export} with parameter \code{return_all = TRUE}
 #' @param temperature single numeric value specifying experimental temperature (K)
-#' @param instrument_strength single numeric value specifying experimental instrument strength
+#' @param instrument_strength numeric value specifying the spectrometer frequency of the instrument used to collect the data
 #' @return data.frame
 #' @export
 nearest_match_metabs <- function(roi_df, temperature, instrument_strength) {
