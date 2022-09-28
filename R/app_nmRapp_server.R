@@ -50,6 +50,11 @@ nmRapp_server <- function(input, output, session) {
   # value is the output of as.ppmData() given the user specified experimental
   # conditions
 
+  #get your user name based on 'Sys.getenv' (static object)
+  user.name <- paste0("Logged in as: ",Sys.getenv(c("SHINYPROXY_USERNAME")))
+  #test user.name easy by printing on console
+  print(user.name)
+
   connec <- reactive({
 
     connect_db()

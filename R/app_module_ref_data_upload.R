@@ -34,9 +34,30 @@ ref_data_uploadUI <- function(id, ref_db){
   ns <- NS(id)
   tagList(
     h4("Reference Metabolite Data"),
-    selectInput(ns("ref_upload_method"), "Select an import method for reference metabolite(s):",
-                c("Upload a file" = "file",
-                  "Specify from list" = "list")),
+    #Toggle
+      shinyWidgets::prettySwitch(
+        inputId = ns("tog_prevornew"),
+        label = "Use previous session",
+        value = FALSE,
+        status = "success",
+        fill = TRUE
+      ),
+    tabsetPanel(
+      id = ns("prevornot"),
+      type = "hidden",
+      tabPanelBody(
+        value = "New",
+        selectInput(ns("ref_upload_method"), "Select an import method for reference metabolite(s):",
+                    c("Upload a file" = "file",
+                      "Specify from list" = "list"))
+      ),
+      tabPanelBody(
+        value = "Previous",
+        # Toggle goes here
+        h4("")
+      )
+    )
+    ,
     tabsetPanel(
       id = ns("refmet_upload"),
       type = "hidden",
@@ -52,6 +73,31 @@ ref_data_uploadUI <- function(id, ref_db){
         # have data for at the supplied experimental conditions.
         selectizeInput(ns("user_refmets"), label = "List reference metabolite(s) of interest:",
                        choices = unique(ref_db$Solute), multiple = TRUE)
+      ),
+      tabPanelBody(
+        value = "Previous",
+        # Note: may want to later update to make choices only the set of metabolites that we
+        # have data for at the supplied experimental conditions.
+        selectizeInput(ns("user_timestamps"), label = "Choose a timestamp from a previous session:",
+                       choices = unique(ref_db$Solute), multiple = TRUE)
+      )
+    ),
+    tabsetPanel(
+      id = ns("mixsource_tabs"),
+      type = "hidden",
+      tabPanelBody(
+        value = "Mix",
+        shinyWidgets::prettySwitch(
+          inputId = ns("tog_mix"),
+          label = "Include query from curated metabolites",
+          value = FALSE,
+          status = "success",
+          fill = TRUE
+        ),
+      ),
+      tabPanelBody(
+        value = "Nomix",
+        h4("")
       )
     ),
     # clickable button
@@ -113,6 +159,21 @@ ref_data_uploadServer <- function(id, xpmt_data, ref_db, connec){
     # Initialize reactiveValues needed by this module
     rv <- reactiveValues(casno_not_in_db = NULL)
 
+    observe({
+      req(xpmt_data())
+
+      if(input$tog_prevornew == TRUE){
+        updateTabsetPanel(inputId = "prevornot", selected =  "Previous")
+        updateTabsetPanel(inputId = "refmet_upload", selected =  "Previous")
+        updateTabsetPanel(inputId = "mixsource_tabs", selected =  "Nomix")
+      }
+
+      if(input$tog_prevornew == FALSE){
+        updateTabsetPanel(inputId = "prevornew", selected =  "New")
+        updateTabsetPanel(inputId = "refmet_upload", selected =  input$ref_upload_method)
+        updateTabsetPanel(inputId = "mixsource_tabs", selected =  "Mix")
+      }
+    })
     # Observer to control which set of options for refmet upload are displayed: file upload or manual specification
     observeEvent(c(input$ref_upload_method),
                  {
@@ -171,6 +232,8 @@ ref_data_uploadServer <- function(id, xpmt_data, ref_db, connec){
       req(xpmt_data())
       req(input$ref_upload_method == 'file')
       req(refmet_file())
+
+      input$tog_prevornew
 
       metab_names_table           <- refmet_file()
       vars                        <- names(metab_names_table)
@@ -372,6 +435,35 @@ ref_data_uploadServer <- function(id, xpmt_data, ref_db, connec){
                                                                          "No ROI data available.")
 
                                            req(nrow(user_reference_data) > 0)
+
+                                           if(input$tog_mix){
+
+                                             profiling.df <- query_table(db_connection = connec(), table_name="profiling_parameters")
+                                             user.name <- Sys.getenv(c("SHINYPROXY_USERNAME"))
+                                             #specify authorized user group to subset on
+                                             user_authparameter_data <- subset(profiling.df, user=user.name)
+                                             user_authparameter_data <- profiling.df %>% dplyr::filter(.data$Metabolite %in% input$user_refmets) %>%
+                                               dplyr::select(-user, -rowid, -id, -Quantify)
+                                             # rbind the two dataframes
+                                             user_reference_data <- rbind.data.frame(user_reference_data,
+                                                                                     user_authparameter_data)
+                                             # final step = average like in commented code below.
+
+                                           }
+
+                                            user_reference_data <- user_reference_data %>%
+                                              dplyr::group_by(.data$`Quantification Mode`, .data$`Metabolite`, .data$`Quantification Signal`, .data$`Frequency (MHz)`,
+                                                              .data$`pH`, .data$`Concentration (mM)`, .data$`Temperature (K)`, .data$`Solvent`) %>%
+                                              dplyr::summarise(dplyr::across(dplyr::all_of(c('ROI left edge (ppm)', 'ROI right edge (ppm)', 'Chemical shift(ppm)',	'Chemical shift tolerance (ppm)',
+                                                                                             'Half bandwidth (Hz)', 'J coupling (Hz)',	'Roof effect', 'J coupling 2 (Hz)',
+                                                                                             'Roof effect 2')), mean, na.rm = TRUE),
+                                                               dplyr::across(dplyr::all_of(c('Multiplicity')), getmode, useNA = "no")) %>%
+                                              dplyr::select(.data$`ROI left edge (ppm)`, .data$`ROI right edge (ppm)`, .data$`Quantification Mode`,
+                                                            .data$`Metabolite`,	.data$`Quantification Signal`, .data$`Chemical shift(ppm)`,
+                                                            .data$`Chemical shift tolerance (ppm)`, .data$`Half bandwidth (Hz)`, .data$`Multiplicity`,
+                                                            .data$`J coupling (Hz)`,	.data$`Roof effect`, .data$`J coupling 2 (Hz)`, .data$`Roof effect 2`,
+                                                            .data$`Frequency (MHz)`, .data$`pH`, .data$`Concentration (mM)`, .data$`Temperature (K)`, .data$`Solvent`) %>%
+                                              dplyr::arrange(.data$`ROI left edge (ppm)`)
 
 
                                            # Filter to get exact or best match
