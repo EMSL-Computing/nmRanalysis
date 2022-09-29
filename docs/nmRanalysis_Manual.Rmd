@@ -144,7 +144,6 @@ On this page, the user is prompted to select an import method for reference meta
 
 * **To specify metabolites from a list**, click the "List reference metabolite(s) of interest" box, where you can type the names of metabolites or scroll through the options to select metabolites present in the reference database. Once satisfied with your selection, click the "Query Reference Database" button. This initiates a search against our database(s) for entries corresponding to the provided list of metabolites.
 
-
 ## Plots and Tables
 
 When the query has been processed, a spectrum plot will appear in the right pane showing the location(s) of the first metabolite peak(s), indicated by the black arrow(s). These metabolite labels can be dragged and dropped to spread them out and make them easier to read. Select the blue and white gear icon at the top left of the plot pane to select which spectrum to plot and select which metabolite to display and edit.
@@ -209,7 +208,6 @@ When finished editing reference data and adjusting the signal fits, click the "P
 ## Profiling Algorithm
 
 The signal fits and corresponding fitting error calculated by *nmRanalysis* are obtained using the quantitative algorithm from the package [*rDolphin*](https://link.springer.com/article/10.1007/s11306-018-1319-y). However, in *nmRanalysis*, rDolphin's original algorithm has been extended to accommodate a common additional splitting pattern, namely the doublet of doublets (dd).
-
 
 ## Quantification Data
 
