@@ -246,12 +246,12 @@ ref_data_editingServer <- function(id, xpmt_data, ref_data, ref_db){
                      added.refchoices <- as.list(input$refmet_toadd)
 
                      # create an ROI reference object using nmRanalysis to be rendered as a table in the UI
-                     added_reference_data <- roi_ref_export(name_list           = added.refchoices,
-                                                            solvent_type        = attr(xpmt_data(), "exp_info")$solvent,
-                                                            ph                  = attr(xpmt_data(), "exp_info")$ph,
-                                                            instrument_strength = attr(xpmt_data(), "exp_info")$instrument_strength,
-                                                            temperature         = attr(xpmt_data(), "exp_info")$temperature,
-                                                            concentration       = attr(xpmt_data(), "exp_info")$concentration)
+                     added_reference_data <- suppressMessages(roi_ref_export(name_list           = added.refchoices,
+                                                                             solvent_type        = attr(xpmt_data(), "exp_info")$solvent,
+                                                                             ph                  = attr(xpmt_data(), "exp_info")$ph,
+                                                                             instrument_strength = attr(xpmt_data(), "exp_info")$instrument_strength,
+                                                                             temperature         = attr(xpmt_data(), "exp_info")$temperature,
+                                                                             concentration       = attr(xpmt_data(), "exp_info")$concentration))
 
                      if(is.null(added_reference_data)){
                        shinyFeedback::feedbackDanger("refmet_toadd",
