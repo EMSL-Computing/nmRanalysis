@@ -274,7 +274,7 @@ xpmt_data_uploadServer <- function(id){
 
                                             shinyWidgets::show_alert(
                                               title = "Experimental metadata not provided.",
-                                              text = "Default metadata will be automatically generated.",
+                                              text = "A default set of metadata will be automatically generated using the specified experimental conditions.",
                                               type = "warning"
                                             )
 
