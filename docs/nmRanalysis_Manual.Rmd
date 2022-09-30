@@ -1,0 +1,258 @@
+---
+title: "nmRanalysis Manual"
+author: "Javier E. Flores, Anastasiya V. Prymolenna, Natalie M. Winans, Allison Thompson, William R. Kew, Robert P. Young, Lisa M. Bramer"
+date: "Last updated: 09/28/2021"
+output:
+  BiocStyle::html_document:
+    toc_float: 
+      collapsed: true
+    number_sections: false
+    code_folding: show
+    lib_dir: trelli
+---
+
+```{r Setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE,
+                      fig.align = 'center')
+library(knitr)
+library(readxl)
+```
+
+# nmRanalysis Description
+
+## Abstract
+Nuclear Magnetic Resonance (NMR) spectroscopy is an indispensable tool for the characterization and quantification of metabolites and other chemical compounds. This quantitative analytic technique requires minimal sample preparation and is non-destructive, advantages that allow for highly reproducible experiments and a more automated data acquisition workflow. Post-acquisition processing, however, involves several manual and time-consuming operations. Among the most tedious of these operations is metabolite quantification, where spectroscopists determine the abundances (i.e. concentrations) of a targeted list of metabolites. Recognizing the inefficiency and lack of reproducibility inherent to this process, we have developed *nmRanalysis*, an open-source, user-friendly, R-Shiny web-application for semi-automated metabolite quantification. As a semi-automated solution to NMR quantification, *nmRanalysis* does not require manual shape-fitting to quantify metabolites. Rather, quantification in *nmRanalysis* is driven by the [*rDolphin* algorithm](https://github.com/danielcanueto/rDolphin) that requires the adjustment of a small set of parameter values (e.g. signal location, J-coupling, multiplicity) whose initial values are supplied to users by an expanding public data repository. Furthermore, several of these parameters may be automatically optimized by the underlying algorithm (subject to user-supplied constraints) for individual and/or batches of spectra, allowing for a more efficient signal-fitting workflow. Preliminary comparisons to standard workflows (i.e. Chenomx) indicate a 50% reduction in processing time with comparable levels of quantification accuracy. This software is publicly available for [download through GitHub](https://github.com/EMSL-Computing/nmRanalysis) and may additionally be accessed as a web-application through EMSL’s Kubernetes resource.
+
+## User Interface Workflow
+
+```{r, echo = F, out.width='100%'}
+include_graphics("UI_workflow.png")
+```
+
+The general *nmRnalaysis* workflow is depicted in the above figure. In step A, users first upload the NMR experimental data files containing the chemical shifts and intensities of the sample spectra of interest. An associated metadata file may additionally be uploaded that contains information on each uploaded spectrum (e.g. sample type, source, etc.). In step B, users specify known experimental conditions under which uploaded samples were collected. These experimental conditions are automatically appended to any uploaded metadata, or, if no metadata are provided, form the basis of auto-generated metadata for the uploaded experimental samples. Detailed information on the application elements that pertain to steps A and B are provided in the [Data Upload and Processing] section of this manual. In steps C through E, users iteratively adjust fitting parameters corresponding to known signals of a user-specified target list of metabolites. The effect of each adjustment on the fit is assessed until the user is satisfied with the result. Detailed information on application elements that pertain to steps C through E are provided in the [Reference Data Editing] section of this manual. Once the user is satisfied with their fitting parameter adjustments, the user is then prompted to initiate a batch quantification (i.e., profiling) procedure, during which the adjusted fitting parameters are optimized (subject to user-supplied tolerances) across all uploaded sample spectra. Last, in step F, the batch quantification results are visualized and made available for download. Detailed information on application elements that pertain to steps D through F are provided in the [Profiling] section of this manual.
+
+# App Installation & Launch
+
+**Note:** Installation is only necessary if the user wants to run *nmRanalysis* locally, and not as a web application.
+
+## Installation
+
+1. Optional: If you are using a Windows machine and you do not already have it, install [Git Bash for Windows](https://git-scm.com/download/win).
+
+2. If you do not have Docker installed, the easiest way is to [install Docker for desktop](https://docs.docker.com/engine/install/).
+
+3. Open a terminal window (Bash if using Windows) and type the following command: 
+
+```{bash, eval = F}
+git clone https://github.com/EMSL-Computing/nmRanalysis.git
+```
+
+This creates a local directory (named nmRanalysis) on your machine and downloads the contents of the nmRanalysis GitHub repository into this directory.
+
+4. Navigate to the *nmRanalysis* directory with a `cd` command. For example:
+
+```{bash, eval = F}
+cd nmRanalysis
+```
+
+5. Build the docker container image for the nmRanalysis application with the following command:
+
+```{bash, eval = F}
+docker compose up --build
+```
+
+Building this image allows you to run a self-contained instance of the nmRanalysis application that does not require you to download any other external software or dependencies.
+
+**Note: The build will take ~30 minutes the very first time.** Subsequent updates where only *nmRanalysis* and not its dependencies are loaded should take only a couple of minutes.
+
+## Launch
+
+Once the image is built and the container is running, you should get the terminal message:
+
+"Listening on http:<!-- -->//0.0.0.0:3838"
+
+To launch the app, open a web browser and type in "localhost:3838". You are now free to do your analyses through the app!
+
+## Troubleshooting
+
+* `renv` failed to install a dependency
+
+If you have trouble with installing dependencies through `renv`, you might need to change the CRAN repository.
+
+1. Navigate to the nmRanalysis directory on your machine and open the file labeled 'Dockerfile' with a text editor.
+2. Look for the line that reads:
+```{r, eval = FALSE}
+RUN R -e "install.packages('remotes', repos = c(CRAN = 'http://cran.us.r-project.org'), dependencies = TRUE)"
+```
+
+Replace that line with:
+```{r, eval = FALSE}
+RUN R -e "install.packages('remotes', repos = c(CRAN = 'http://cran.rstudio.com/'), dependencies = TRUE)"
+```
+
+3. Save the Dockerfile changes and, in an open terminal window, repeat steps 4 and 5 of the installation instructions.
+
+# Data Upload and Processing
+
+This page prompts the user to upload two files:
+
+1. A **required NMR spectra file** containing a $p * (n + 1)$ data table of spectra data, where p is the number of unique chemical shifts at which the signal intensities of n sample spectra were measured. The first column of this file should be labeled with the header “PPM” and contain the *p* chemical shift values of the spectra. Subsequent columns should be labeled with headers indicating the sample names, and these columns should contain the measured intensities corresponding to each of the *p* chemical shift values. The upload NMR spectra file must be a .csv file. Sample name headers should not begin with a numeric character (e.g., “1-sample” is not valid header, but “sample-1” is).
+
+2. An **optional metadata file** containing a data table with $n$ rows. Each row corresponds to each of the samples in the NMR spectra file. The first column of the metadata file should contain the sample names, where these names are identical to those specified as headers in the NMR spectra file. Subsequent columns may contain any other qualitative and/or quantitative traits of each sample. Column headers should be included. Column headers that begin with a numeric character are not allowed. The optional metadata file must be a .csv file.  Note that if a metadata file is not provided, these data will be automatically generated from the NMR spectra file and the specified experimental conditions.”
+
+To upload experimental data files, click on the "Browse..." button, then select files. 
+
+If desired, perform peak alignment by toggling the "Align Spectra" button to "ON". This will add several minutes to the data processing time. If this option is selected, the data will be run through the hierarchical Cluster-based Peak Alignment (CluPA) algorithm provided by the [speaq R package](https://github.com/Beirnaert/speaq).
+
+```{r, echo = F, out.width = "100%"}
+include_graphics("CluPA.png")
+```
+
+Enter values for the experimental conditions Temperature (K), Spectrometer Frequency (MHz), Solvent, and, if known, pH and Concentration (mM). Note that “Concentration (mM)” refers to the concentration of the standard (e.g., DSS) in the sample. 
+
+When all required files and options have been provided/specified, click the “Process Data” button. Keep in mind that if “Align Spectra” is set to “ON”, this process will take several minutes.
+
+```{r, echo = F}
+include_graphics("upload_data.gif")
+```
+
+## Plots and Tables
+
+When the data have been processed, an interactive plot of spectra and a data table will appear in the right panel. This plot and all others generated within the app are produced with the [Plotly](https://plotly.com/r/) package and allow for interactivity such as zooming and panning. By hovering over the plot, the user will see the exact chemical shift and intensity values associated with specific peaks. Additional interactive features can be accessed using the icons that appear at the top right of each plot. This plot and others throughout the app can be saved in their current state at any time as a PNG file by clicking the camera icon on the top right of the plot pane.
+
+Clicking on the blue and white gear icon on the top left of the plot pane will show a small menu panel with options that allow the user to choose which spectrum to plot, show a subplot on box select, or apply filters by PPM. 
+
+```{r, echo = F}
+include_graphics("upload_plots.gif")
+```
+
+If the "Show subplot on box select" toggle is applied, a small plot viewer will pop up when a portion of the plot is selected with the box select tool. This subplot shows the selected region, with the current sample highlighted in blue. By clicking the legend item corresponding to the current sample, the blue line is toggled off and the user can see what the other sample spectra look like in that subplot region. Hover over the grey sample lines to see which sample each line represents.
+
+```{r, echo = F}
+include_graphics("subplot_box_select.gif")
+```
+
+Chemical shift filters are applied by specifying a range of chemical shift values (in PPM) to omit from the plot. There is no limit to the number of filters that may be applied. To remove a filter, the user must type the exact chemical shift values that were initially specified for the desired filter.
+
+Progress to the next step by clicking the "Reference Data Editing" button.
+
+# Reference Data Editing
+
+On this page, the user is prompted to select an import method for reference metabolite(s), either through uploading a file or specifying from list.
+
+* **To specify reference metabolites using an uploaded file**, the file must be in the format of Chenomx ouput. These are tabular XLSX files in which the column names are located in the third row and the data begin on the sixth row. This file must include a column containing the CAS numbers of the relevant metabolites. An example of this file format can be downloaded [here](./ref_metab_CAS_list.xlsx).
+
+* **To specify metabolites from a list**, click the "List reference metabolite(s) of interest" box, where you can type the names of metabolites or scroll through the options to select metabolites present in the reference database. Once satisfied with your selection, click the "Query Reference Database" button. This initiates a search against our database(s) for entries corresponding to the provided list of metabolites.
+
+## Plots and Tables
+
+When the query has been processed, a spectrum plot will appear in the right pane showing the location(s) of the first metabolite peak(s), indicated by the black arrow(s). These metabolite labels can be dragged and dropped to spread them out and make them easier to read. Select the blue and white gear icon at the top left of the plot pane to select which spectrum to plot and select which metabolite to display and edit.
+
+To fine-tune the signal fits of identified metabolites, first drag and stretch the red line along the x-axis on the plot so that it spans the width of the desired spectral signal. The black arrow should point to the center of the signal. The tolerance about the signal center may be adjusted in the data table below the plot. This tolerance controls how much the signal center is allowed to shift during signal fitting.
+
+```{r, echo = F}
+include_graphics("ref_dat_edit.gif")
+```
+
+Additionally, the box select option can be used to measure the difference in PPM, Hz, and intensity between two peaks.
+
+```{r, echo = F}
+include_graphics("box_select_dist.gif")
+```
+
+A data table of matching metabolites is provided below the spectrum plot. These are the closest-matching metabolites based on the values specified on the the previous page for spectrometer frequency, pH, concentration, temperature, and solvent. Most of the fields in this data table are editable, allowing the user to change, for example, the chemical shift tolerance or multiplicity of a given metabolite. 
+
+## Add/Remove Metabolites
+
+The Add/Remove Metabolites panel allows the user to add metabolites from a list ("Select from Existing") or by specifying a new metabolite. Metabolites can be removed from the analysis by choosing from the drop down menu "Select Metabolite(s) to Remove." An updated data table is produced below the metabolite selection pane. When metabolites are added manually, they will be assigned default values including a chemical shift of 0 PPM. These values can be edited in the data table.
+
+## Global Profiling Parameters
+
+The following parameters are available for signal fit tuning by clicking the "Global Profiling Parameters" bar:
+
+* **Bandwidth Tolerance (Hz):** plus-minus value controlling tolerance for half bandwidth 
+* **Pseudo-Voigt Lineshape Gaussian Ratio:** value between 0 and 1, signifies ratio of Gaussian to Lorentzian lineshape
+* **J-coupling Tolerance (Hz):** plus-minus value controlling tolerance for J-coupling
+* **Acceptable Fitting Error (%):** percentage error value at which the optimization algorithm will cease iteration if the maximum fitting iterations parameter has not yet been reached
+* **Maximum fitting parameter optimization iterations** integer value, number of iterations (see description of Acceptable Fitting Error)
+* **Background Signal (BGS) Density:** integer value that specifies the number of background signals (unknown metabolites) that would be expected to overlap over the span of 1 PPM
+* **BGS Pseudo-Voigt Lineshape Gaussian Ratio:** value between 0 and 1, refers to lineshape of background signals
+* **BGS Bandwidth (Hz):** specifies bandwidth for all background signals, default parameter values are derived from [*rDolphin*](https://github.com/danielcanueto/rDolphin/blob/master/inst/extdata/fitting_variables.csv)
+* **BGS Bandwidth Tolerance (Hz):** plus-minus value controlling tolerance for BGS bandwidth
+
+## Metabolite Signal Options
+
+To see all of the available metabolites matching your query, toggle the "Display All Reference Entries" switch on the "Metabolite Signal Options" menu. If desired, toggle "Set Signal-Wide Half Bandwidth" to set the half bandwidth to the same value for the entire set of signals. Disable this feature to change values individually.
+
+New metabolite signals can be manually added to the plot by clicking the "Add New Signal" button. By default, this new signal will be placed at a chemical shift of 0 PPM and will have the same values of the experimental parameters (spectrometer frequency, pH, concentration, temperature, and solvent) as were specified on the data upload page. These fields can be manually edited. 
+
+## Check Signal Fit
+
+At any time during the fine-tuning process, the desired signal fit can be checked by clicking "Save" and then "Check Signal Fit." A subplot will pop up showing the fitting error computed between the generated and observed spectra. This plot will consist of the following lines, which can be toggled on or off by clicking their respective labels in the legend:
+
+* **Generated:** sum of signal line and background signal line
+* **Background:** fitted to signals that may be present but are not accounted for in the spectrum. Essentially, this line represents an attempt to fit a signal to any hypothetical background metabolites that have been omitted because they can't be identified (refer to [*rDolphin* publication](https://link.springer.com/article/10.1007/s11306-018-1319-y) for more details).
+* **Metabolite:** actual signal line, labeled with name of metabolite
+
+
+```{r, echo = F, out.width='85%', fig.align='center'}
+include_graphics("check_signal_fit.png")
+```
+
+If the Auto-optimize switch is toggled on, checking the signal fit will automatically adjust parameters such as half bandwidth and J coupling, and these values will be updated in the data table. Otherwise, only the optimized fit based on the user-supplied fitting parameters is displayed and corresponding parameters are not auto-updated. If satisfied with the results, click “Save” to preserve the values. If not satisfied with the changes, click “Revert Last Save” or “Revert All Saves” to return to a prior state.
+
+When finished editing reference data and adjusting the signal fits, click the "Profiling" button on the bottom of the left panel to continue to the next page.
+
+# Profiling
+
+## Profiling Algorithm
+
+The signal fits and corresponding fitting error calculated by *nmRanalysis* are obtained using the quantitative algorithm from the package [*rDolphin*](https://link.springer.com/article/10.1007/s11306-018-1319-y). However, in *nmRanalysis*, rDolphin's original algorithm has been extended to accommodate a common additional splitting pattern, namely the doublet of doublets (dd).
+
+## Quantification Data
+
+Upon clicking through to the "Profiling" page, the user will see a summary plot and data table of all of the edits made on the previous pages but with peaks aggregated into regions of interest (ROIs). These ROIs combine signals close to one another and group them into a single region. These groupings account for overlapping or non-overlapping signals.
+
+The "Signal View" and "Metabolite View" tabs are empty until profiling is performed, at which time they will be populated with final results and visualizations.
+
+Clicking on the gear icon at the top left of the spectral plot brings up drop-down menus allowing the user to select the spectrum to plot and the region of interest (ROI) whose fitting data should be displayed. The ROIs are represented by ordered pairs of PPM values. 
+
+The [Global Profiling Parameters] values from the previous page will be carried over to the profiling page. However, these values can be adjusted from the drop-down panel on the left before profiling (e.g., to specify leeway in bandwidth or J-coupling tolerance, etc.). When satisfied with your selections, click the "Profile" button. This process takes longer when there are more metabolites to profile. When profiling is complete, the display automatically switches to the "Signal View" tab.
+
+## Signal View
+
+The signal view tab contains a customizable [Trelliscope](https://hafen.github.io/trelliscopejs/index.html) display of metabolite peaks, which can be enlarged by clicking the diagonal opposing arrows icon in gray at the bottom right of the plot pane. These plots consist of signal-by-signal fits of a signal to particular spectrum region.
+
+The user can change number of plots viewed at once by adjusting parameters in the "Grid" menu on the left side of the plot pane. Choose which data to display by adjusting the "Labels" parameters. Filtering and sorting can be performed on the basis of sample, signal, fitting error, etc. 
+
+```{r, echo = F, out.width='120%'}
+include_graphics("trelliscope.gif")
+```
+
+The individual plots in the Trelliscope display each show four lines:
+
+* **Generated Background:** akin to residual signal (described in [Check Signal Fit])
+* **Generated Spectrum:** sum of quantified signal, background signal, and any surrounding signals (not necessarily displayed here - can be found in metabolite view)
+* **Original Spectrum:** observed original spectrum
+* **Quantified Signal:** line that corresponds to the fit of the labeled signal
+
+```{r, echo = F, out.width='60%', fig.align='center'}
+include_graphics("indiv_trell_plot.png")
+```
+
+If fit is very good, with low error, the original spectrum and quantified signal lines will be hard to tell apart.
+
+A data table containing the **full profiling results** with rows corresponding to each signal fit is provided below the plots. This table can be filtered by typing into the entry boxes below the column titles. A filtered version of the data table can be saved by clicking  "Download Current Page (CSV)" or save the entire data table containing all entries by clicking "Download Full Results (CSV)." 
+
+```{r, echo = F}
+include_graphics("signal_view_dt.gif")
+```
+
+
+## Metabolite View
+
+This tab displays an interactive plot showing the entirety of each spectrum, with all regions of interest associated with each profiled metabolite. Each metabolite signal annotation points to the center of its corresponding signal. By clicking on the blue and white cog icon on the top left of the plot, the user can select which spectrum and metabolites to view. As in previous panels, there is an option to view fits across sample spectra by toggling "Show subplot on box select" in the cog icon menu.
+
+```{r, echo = F}
+include_graphics("metab_view.gif")
+```
