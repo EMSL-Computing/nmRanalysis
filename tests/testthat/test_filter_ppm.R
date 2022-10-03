@@ -6,7 +6,7 @@ data("f_data")
 ppmData <- as.ppmData(e_data = e_data,
                       f_data = f_data,
                       edata_cname = "PPM", fdata_cname = "Sample",
-                      instrument_strength = 600, ph = 7.33, solvent = "h2o")
+                      instrument_strength = 600, temperature = 298, solvent = "h2o")
 
 test_that("error thrown when incorrect data is supplied", {
   expect_error(filter_ppm(ppmData = ppmData$e_data, range = list(min = 2, max = 5)),
