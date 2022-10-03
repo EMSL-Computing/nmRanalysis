@@ -49,13 +49,13 @@
 #' @author Allison Thompson
 #'
 #' @export
-as.ppmData <- function(e_data, f_data, edata_cname, fdata_cname, align = FALSE, instrument_strength, ph = NA, solvent, temperature, concentration = NA, ...){
+as.ppmData <- function(e_data, f_data, edata_cname, fdata_cname, align = FALSE, instrument_strength, ph = NULL, solvent, temperature, concentration = NULL, ...){
   .as.ppmData(e_data, f_data, edata_cname, fdata_cname, align, instrument_strength, ph = ph, solvent, temperature, concentration = concentration, ...)
 }
 
 ## ppm data ##
 .as.ppmData <- function(e_data, f_data, edata_cname, fdata_cname, align,
-                        instrument_strength, ph = NA, solvent, temperature, concentration = NA,
+                        instrument_strength, ph = NULL, solvent, temperature, concentration = NULL,
                         check.names = TRUE){
 
   # initial checks #
@@ -124,14 +124,14 @@ as.ppmData <- function(e_data, f_data, edata_cname, fdata_cname, align = FALSE, 
     stop("temperature must be a numeric value indicating the temperature of the sample")
   }
 
-  if(!is.na(ph)){
+  if(!is.null(ph)){
     # check that ph is numeric #
     if(class(ph) != "numeric"){
       stop("ph must be a numeric value indicating the pH of the sample")
     }
   }
 
-  if(!is.na(concentration)){
+  if(!is.null(concentration)){
     # check that concentration is numeric #
     if(class(concentration) != "numeric"){
       stop("concentration must be a numeric value indicating the sample concentration")

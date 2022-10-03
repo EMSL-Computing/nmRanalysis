@@ -7,7 +7,7 @@ data("example_metabs")
 ppmData <- as.ppmData(e_data = e_data,
                       f_data = f_data,
                       edata_cname = "PPM", fdata_cname = "Sample",
-                      instrument_strength = 600, ph = 7.33, solvent = "h2o")
+                      instrument_strength = 600, temperature = 298, solvent = "h2o")
 
 imported_data <- ppmData_to_rDolphin(ppmData = ppmData,
                                      metabs = example_metabs)
