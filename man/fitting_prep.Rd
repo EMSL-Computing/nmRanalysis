@@ -13,21 +13,21 @@ fitting_prep(
 )
 }
 \arguments{
-\item{Xdata}{}
+\item{Xdata}{dataframe of chemical shift values.}
 
-\item{Ydata}{}
+\item{Ydata}{dataframe of intensity values.}
 
-\item{initial_fit_parameters}{}
+\item{initial_fit_parameters}{dataframe of signal fitting parameters}
 
-\item{program_parameters}{}
+\item{program_parameters}{list of global profiling parameters}
 
-\item{created_baseline}{}
+\item{created_baseline}{dataframe of baseline intensity values}
 }
 \description{
 rDolphin: fitting_prep
 }
 \details{
-This function was forked directly from rDolphin (https://github.com/danielcanueto/rDolphin/tree/master/R). This is function is used to collate 
+This function was forked directly from rDolphin (https://github.com/danielcanueto/rDolphin/tree/master/R). This is function is used to collate
 the data necessary for the downstream fitting algorithm and associated functions. Modifications have been made to the original function to allow for
 the fitting of double-doublets. Generally speaking, this involves the addition of new fields (a second J-coupling field and second
 roof effect field) containing parameters necessary to fit this new pattern.

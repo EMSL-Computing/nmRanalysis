@@ -32,7 +32,7 @@ roi_ref_export(
 
 \item{roi_tol}{The chemical shift tolerance, tolerance for the location of the peak center. Default is 0.005.}
 
-\item{instrument_strength}{the field strength of the instrument used to collect the data}
+\item{instrument_strength}{the spectrometer frequency of the instrument used to collect the data}
 
 \item{temperature}{numeric value specifying the temperature}
 

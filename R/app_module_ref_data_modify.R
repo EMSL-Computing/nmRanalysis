@@ -267,11 +267,16 @@ ref_data_editingServer <- function(id, xpmt_data, ref_data, ref_db){
                      req(nrow(added_reference_data) > 0)
 
                      # Filter to get exact or best match
-                     xpmt_conds <- data.frame(`Frequency (MHz)`    = attr(xpmt_data(), "exp_info")$instrument_strength,
-                                              `pH`                 = attr(xpmt_data(), "exp_info")$ph,
-                                              `Concentration (mM)` = attr(xpmt_data(), "exp_info")$concentration,
-                                              `Temperature (K)`    = attr(xpmt_data(), "exp_info")$temperature,
-                                              `Solvent`            = attr(xpmt_data(), "exp_info")$solvent,
+                     xpmt_conds <- data.frame(`Frequency (MHz)`    = ifelse(is.null(attr(xpmt_data(), "exp_info")$instrument_strength),
+                                                                            NA, attr(xpmt_data(), "exp_info")$instrument_strength),
+                                              `pH`                 = ifelse(is.null(attr(xpmt_data(), "exp_info")$ph),
+                                                                            NA, attr(xpmt_data(), "exp_info")$ph),
+                                              `Concentration (mM)` = ifelse(is.null(attr(xpmt_data(), "exp_info")$concentration),
+                                                                            NA, attr(xpmt_data(), "exp_info")$concentration),
+                                              `Temperature (K)`    = ifelse(is.null(attr(xpmt_data(), "exp_info")$temperature),
+                                                                            NA, attr(xpmt_data(), "exp_info")$temperature),
+                                              `Solvent`            = ifelse(is.null(attr(xpmt_data(), "exp_info")$solvent),
+                                                                            NA, attr(xpmt_data(), "exp_info")$solvent),
                                               check.names = FALSE)
                      xpmt_conds <- xpmt_conds[, colSums(is.na(xpmt_conds)) == 0]
                      cols_to_match <- colnames(xpmt_conds)
@@ -390,11 +395,21 @@ ref_data_editingServer <- function(id, xpmt_data, ref_data, ref_db){
                                                     `J coupling 2 (Hz)` = rep(0, length(valid_newentries)),
                                                     `Roof effect 2` = rep(0, length(valid_newentries)),
                                                     `Quantify` = rep(1, length(valid_newentries)),
-                                                    `Frequency (MHz)` = rep(attr(xpmt_data(), "exp_info")$instrument_strength, length(valid_newentries)),
-                                                    `pH` = rep(attr(xpmt_data(), "exp_info")$ph, length(valid_newentries)),
-                                                    `Concentration (mM)` = rep(attr(xpmt_data(), "exp_info")$concentration, length(valid_newentries)),
-                                                    `Temperature (K)` = rep(attr(xpmt_data(), "exp_info")$temperature, length(valid_newentries)),
-                                                    `Solvent` = rep(attr(xpmt_data(), "exp_info")$solvent, length(valid_newentries)),
+                                                    `Frequency (MHz)` = ifelse(is.null(attr(xpmt_data(), "exp_info")$instrument_strength),
+                                                                               rep(NA, length(valid_newentries)),
+                                                                               rep(attr(xpmt_data(), "exp_info")$instrument_strength, length(valid_newentries))),
+                                                    `pH` = ifelse(is.null(attr(xpmt_data(), "exp_info")$ph),
+                                                                  rep(NA, length(valid_newentries)),
+                                                                  rep(attr(xpmt_data(), "exp_info")$ph, length(valid_newentries))),
+                                                    `Concentration (mM)` = ifelse(is.null(attr(xpmt_data(), "exp_info")$concentration),
+                                                                                  rep(NA, length(valid_newentries)),
+                                                                                  rep(attr(xpmt_data(), "exp_info")$concentration, length(valid_newentries))),
+                                                    `Temperature (K)` = ifelse(is.null(attr(xpmt_data(), "exp_info")$temperature),
+                                                                               rep(NA, length(valid_newentries)),
+                                                                               rep(attr(xpmt_data(), "exp_info")$temperature, length(valid_newentries))),
+                                                    `Solvent` = ifelse(is.null(attr(xpmt_data(), "exp_info")$solvent),
+                                                                       rep(NA, length(valid_newentries)),
+                                                                       rep(attr(xpmt_data(), "exp_info")$solvent, length(valid_newentries))),
                                                     `rowid` = paste0(valid_newentries, "1"),
                                                     check.names = FALSE)
 
@@ -783,8 +798,6 @@ ref_data_editingServer <- function(id, xpmt_data, ref_data, ref_db){
                    req(input$which_refmet_dspedt)
                    req(input$revert_all_refmet_save_changes > 0)
 
-
-
                    rv <- refmet_revert_update(updated_refmet = input$which_refmet_dspedt,
                                               rvlist = rv,
                                               all = TRUE)
@@ -821,13 +834,13 @@ ref_data_editingServer <- function(id, xpmt_data, ref_data, ref_db){
       req(ref_data())
       req(input$which_refmet_dspedt)
 
-
       og_version <- rv$unedited_bestmatch_ref_data %>%
         dplyr::filter(.data$Metabolite %in% input$which_refmet_dspedt) %>%
         dplyr::arrange(.data$`Quantification Signal`)
       curr_version <- rv$user_reference_data %>%
         dplyr::filter(.data$Metabolite %in% input$which_refmet_dspedt) %>%
         dplyr::arrange(.data$`Quantification Signal`)
+
       req(!identical(og_version, curr_version))
 
       actionButton(NS(id, "revert_all_refmet_save_changes"),
@@ -1349,11 +1362,16 @@ ref_data_editingServer <- function(id, xpmt_data, ref_data, ref_db){
       }
 
       # Change experimental conditions of final quantification data to reflect that of the current experimental sample
-      tempdf$`Frequency (MHz)`    <- attr(xpmt_data(), "exp_info")$instrument_strength
-      tempdf$pH                   <- attr(xpmt_data(), "exp_info")$ph
-      tempdf$`Concentration (mM)` <- attr(xpmt_data(), "exp_info")$concentration
-      tempdf$`Temperature (K)`    <- attr(xpmt_data(), "exp_info")$temperature
-      tempdf$Solvent              <- attr(xpmt_data(), "exp_info")$solvent
+      tempdf$`Frequency (MHz)`    <- ifelse(is.null(attr(xpmt_data(), "exp_info")$instrument_strength),
+                                            NA, attr(xpmt_data(), "exp_info")$instrument_strength)
+      tempdf$pH                   <- ifelse(is.null(attr(xpmt_data(), "exp_info")$ph),
+                                            NA, attr(xpmt_data(), "exp_info")$ph)
+      tempdf$`Concentration (mM)` <- ifelse(is.null(attr(xpmt_data(), "exp_info")$concentration),
+                                            NA, attr(xpmt_data(), "exp_info")$concentration)
+      tempdf$`Temperature (K)`    <- ifelse(is.null(attr(xpmt_data(), "exp_info")$temperature),
+                                            NA, attr(xpmt_data(), "exp_info")$temperature)
+      tempdf$Solvent              <- ifelse(is.null(attr(xpmt_data(), "exp_info")$solvent),
+                                            NA, attr(xpmt_data(), "exp_info")$solvent)
 
       # Create new reactive value to store the ROI-collapsed data
       rv$quantdat <- tempdf
@@ -1754,11 +1772,16 @@ ref_data_editingServer <- function(id, xpmt_data, ref_data, ref_db){
       }
 
       # Change experimental conditions of final quantification data to reflect that of the current experimental sample
-      tempdf$`Frequency (MHz)`    <- attr(xpmt_data(), "exp_info")$instrument_strength
-      tempdf$pH                   <- attr(xpmt_data(), "exp_info")$ph
-      tempdf$`Concentration (mM)` <- attr(xpmt_data(), "exp_info")$concentration
-      tempdf$`Temperature (K)`    <- attr(xpmt_data(), "exp_info")$temperature
-      tempdf$Solvent              <- attr(xpmt_data(), "exp_info")$solvent
+      tempdf$`Frequency (MHz)`    <- ifelse(is.null(attr(xpmt_data(), "exp_info")$instrument_strength),
+                                            NA, attr(xpmt_data(), "exp_info")$instrument_strength)
+      tempdf$pH                   <- ifelse(is.null(attr(xpmt_data(), "exp_info")$ph),
+                                            NA, attr(xpmt_data(), "exp_info")$ph)
+      tempdf$`Concentration (mM)` <- ifelse(is.null(attr(xpmt_data(), "exp_info")$concentration),
+                                            NA, attr(xpmt_data(), "exp_info")$concentration)
+      tempdf$`Temperature (K)`    <- ifelse(is.null(attr(xpmt_data(), "exp_info")$temperature),
+                                            NA, attr(xpmt_data(), "exp_info")$temperature)
+      tempdf$Solvent              <- ifelse(is.null(attr(xpmt_data(), "exp_info")$solvent),
+                                            NA, attr(xpmt_data(), "exp_info")$solvent)
 
       # End recompute version of quantdat
 
@@ -2311,11 +2334,16 @@ ref_data_editingServer <- function(id, xpmt_data, ref_data, ref_db){
                                                   `J coupling 2 (Hz)`              = rep(0, 1),
                                                   `Roof effect 2`                  = rep(0, 1),
                                                   `Quantify`                       = rep(1, 1),
-                                                  `Frequency (MHz)`                = rep(attr(xpmt_data(), "exp_info")$instrument_strength, 1),
-                                                  `pH`                             = rep(attr(xpmt_data(), "exp_info")$ph, 1),
-                                                  `Concentration (mM)`             = rep(attr(xpmt_data(), "exp_info")$concentration, 1),
-                                                  `Temperature (K)`                = rep(attr(xpmt_data(), "exp_info")$temperature, 1),
-                                                  `Solvent`                        = rep(attr(xpmt_data(), "exp_info")$solvent, 1),
+                                                  `Frequency (MHz)`                = ifelse(is.null(attr(xpmt_data(), "exp_info")$instrument_strength),
+                                                                                            NA, attr(xpmt_data(), "exp_info")$instrument_strength),
+                                                  `pH`                             = ifelse(is.null(attr(xpmt_data(), "exp_info")$ph),
+                                                                                            NA, attr(xpmt_data(), "exp_info")$ph),
+                                                  `Concentration (mM)`             = ifelse(is.null(attr(xpmt_data(), "exp_info")$concentration),
+                                                                                            NA, attr(xpmt_data(), "exp_info")$concentration),
+                                                  `Temperature (K)`                = ifelse(is.null(attr(xpmt_data(), "exp_info")$temperature),
+                                                                                            NA, attr(xpmt_data(), "exp_info")$temperature),
+                                                  `Solvent`                        = ifelse(is.null(attr(xpmt_data(), "exp_info")$solvent),
+                                                                                            NA, attr(xpmt_data(), "exp_info")$solvent),
                                                   `rowid`                          = paste0(input$which_refmet_dspedt, numSigs + 1),
                                                   check.names = FALSE)
 
@@ -2443,11 +2471,16 @@ ref_data_editingServer <- function(id, xpmt_data, ref_data, ref_db){
         # Change experimental conditions of final quantification data to reflect that of the current experimental sample
         # This is already done for quantdat when it is created
         list(user_edited_refdata = rv$user_reference_data %>%
-               dplyr::mutate(`Frequency (MHz)`    = attr(xpmt_data(), "exp_info")$instrument_strength,
-                             pH                   = attr(xpmt_data(), "exp_info")$ph,
-                             `Concentration (mM)` = attr(xpmt_data(), "exp_info")$concentration,
-                             `Temperature (K)`    = attr(xpmt_data(), "exp_info")$temperature,
-                             Solvent              = attr(xpmt_data(), "exp_info")$solvent),
+               dplyr::mutate(`Frequency (MHz)`    = ifelse(is.null(attr(xpmt_data(), "exp_info")$instrument_strength),
+                                                           NA, attr(xpmt_data(), "exp_info")$instrument_strength),
+                             pH                   = ifelse(is.null(attr(xpmt_data(), "exp_info")$ph),
+                                                           NA, attr(xpmt_data(), "exp_info")$ph),
+                             `Concentration (mM)` = ifelse(is.null(attr(xpmt_data(), "exp_info")$concentration),
+                                                           NA, attr(xpmt_data(), "exp_info")$concentration),
+                             `Temperature (K)`    = ifelse(is.null(attr(xpmt_data(), "exp_info")$temperature),
+                                                           NA, attr(xpmt_data(), "exp_info")$temperature),
+                             Solvent              = ifelse(is.null(attr(xpmt_data(), "exp_info")$solvent),
+                                                           NA, attr(xpmt_data(), "exp_info")$solvent)),
              quantdata           = rv$quantdat,
              global_parameters   = gpps)
         })

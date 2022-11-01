@@ -297,6 +297,16 @@ xpmt_data_vizServer <- function(id, xpmt_data){
                    req(xpmt_data())
                    req(input$apply_filter > 0)
 
+                   shinyFeedback::feedbackDanger("range",
+                                                 input$range[1] > input$range[2],
+                                                 'Filter range format is "a to b", where a < b.')
+
+                   req(input$range[1] < input$range[2])
+
+                   allfilts <- rlist::list.ungroup(rlist::list.select(attr(rv$modified_xpmt_data, "filters"), range))
+                   idx_of_filt2add <- which(lapply(allfilts, function(x){all(input$range %in% c(x$min, x$max))}) == TRUE)
+                   req(length(idx_of_filt2add) == 0)
+
                    rv$modified_xpmt_data <- filter_ppm(rv$modified_xpmt_data,
                                                        range = list(min = min(as.numeric(input$range)),
                                                                     max = max(as.numeric(input$range))))
@@ -318,7 +328,10 @@ xpmt_data_vizServer <- function(id, xpmt_data){
                    req(input$remove_filter > 0)
 
                    allfilts       <- rlist::list.ungroup(rlist::list.select(attr(rv$modified_xpmt_data, "filters"), range))
+                   req(allfilts)
+
                    idx_of_filt2rm <- which(lapply(allfilts, function(x){all(input$range %in% c(x$min, x$max))}) == TRUE)
+                   req(idx_of_filt2rm)
 
                    rv$modified_xpmt_data <- remove_filter_ppm(rv$modified_xpmt_data,
                                                               filters = as.numeric(idx_of_filt2rm))

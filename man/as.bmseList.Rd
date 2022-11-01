@@ -17,13 +17,13 @@ as.bmseList(
 \arguments{
 \item{casno_list}{list of CAS registry numbers written as characters}
 
-\item{return_metabs}{string, must be one of "exact_match" or "all". Defaults to "all". If "exact_match", returns metabolites that exactly match specified experimental conditions (solvent type, pH, and instrument strength). If "all", returns all entries corresponding to supplied CAS numbers, experimental conditions ignored.}
+\item{return_metabs}{string, must be one of "exact_match" or "all". Defaults to "all". If "exact_match", returns metabolites that exactly match specified experimental conditions (solvent type, temperature, and instrument strength). If "all", returns all entries corresponding to supplied CAS numbers, experimental conditions ignored.}
 
 \item{solvent_type}{choose from available solvents 'D2O', 'H2O', ...}
 
 \item{ph}{numeric value specifying pH of experimental conditions}
 
-\item{instrument_strength}{numeric value specifying experimental instrument strength}
+\item{instrument_strength}{numeric value specifying spectrometer frequency}
 
 \item{temperature}{numeric value specifying the temperature}
 
