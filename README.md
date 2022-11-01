@@ -42,11 +42,6 @@
 
 - `renv` failed to install a dependency
 
-## User Manual
-
-A complete user's manual for nmRanalysis can be found here:
-https://htmlpreview.github.io/?https://github.com/EMSL-Computing/nmRanalysis/blob/master/docs/nmRanalysis_Manual.html
-
 If you have trouble with installing dependencies through `renv`. You might need to change the CRAN respository.
 
  1. Open the Dockerfile in a text editor
@@ -55,3 +50,8 @@ If you have trouble with installing dependencies through `renv`. You might need 
  to 
  `RUN R -e "install.packages('remotes', repos = c(CRAN = 'http://cran.rstudio.com/'), dependencies = TRUE)"`
  3. Save the Dockerfile changes and re-run the build command.
+
+## User Manual
+
+A complete user's manual for nmRanalysis can be found here:
+https://htmlpreview.github.io/?https://github.com/EMSL-Computing/nmRanalysis/blob/master/docs/nmRanalysis_Manual.html
