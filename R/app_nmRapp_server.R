@@ -180,6 +180,8 @@ nmRapp_server <- function(input, output, session) {
 
   observe({
     req(profiling_results())
+    updateTabsetPanel(inputId = "sigview_tab1", selected = "sigview_show")
+    updateTabsetPanel(inputId = "metview_tab1", selected = "metview_show")
     updateTabsetPanel(inputId = "profout_tabs", selected = "Signal View")
   })
 

@@ -331,6 +331,7 @@ xpmt_data_vizServer <- function(id, xpmt_data){
                    req(allfilts)
 
                    idx_of_filt2rm <- which(lapply(allfilts, function(x){all(input$range %in% c(x$min, x$max))}) == TRUE)
+                   req(idx_of_filt2rm)
 
                    rv$modified_xpmt_data <- remove_filter_ppm(rv$modified_xpmt_data,
                                                               filters = as.numeric(idx_of_filt2rm))
