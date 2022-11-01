@@ -1,10 +1,10 @@
 #' rDolphin: fitting_prep
 #'
-#' @param Xdata
-#' @param Ydata
-#' @param initial_fit_parameters
-#' @param program_parameters
-#' @param created_baseline
+#' @param Xdata dataframe of chemical shift values.
+#' @param Ydata dataframe of intensity values.
+#' @param initial_fit_parameters dataframe of signal fitting parameters
+#' @param program_parameters list of global profiling parameters
+#' @param created_baseline dataframe of baseline intensity values
 #'
 #' @details This function was forked directly from rDolphin (https://github.com/danielcanueto/rDolphin/tree/master/R). This is function is used to collate
 #' the data necessary for the downstream fitting algorithm and associated functions. Modifications have been made to the original function to allow for

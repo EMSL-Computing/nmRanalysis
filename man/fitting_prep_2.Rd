@@ -21,36 +21,36 @@ fitting_prep_2(
 )
 }
 \arguments{
-\item{Xdata}{}
+\item{Xdata}{dataframe of chemical shift values.}
 
-\item{Ydata}{}
+\item{Ydata}{dataframe of intensity values.}
 
-\item{initial_fit_parameters}{}
+\item{initial_fit_parameters}{dataframe of signal fitting parameters}
 
-\item{program_parameters}{}
+\item{program_parameters}{list of global profiling parameters}
 
-\item{created_baseline}{}
+\item{created_baseline}{dataframe of baseline intensity values}
 
-\item{max_shift}{}
+\item{max_shift}{dataframe of max chemical shift values}
 
-\item{min_shift}{}
+\item{min_shift}{dataframe of min chemical shift values}
 
-\item{max_intensity}{}
+\item{max_intensity}{dataframe of max intensity values}
 
-\item{min_intensity}{}
+\item{min_intensity}{dataframe of min intensity values}
 
-\item{max_width}{}
+\item{max_width}{dataframe of max half bandwidth values}
 
-\item{min_width}{}
+\item{min_width}{dataframe of min half bandwidth values}
 
-\item{spectrum_index}{}
+\item{spectrum_index}{index of sample spectrum to be fitted}
 
-\item{signal_index}{}
+\item{signal_index}{index of signal to be fitted}
 }
 \description{
 rDolphin: fitting_prep_2
 }
 \details{
-This function was forked directly from rDolphin (https://github.com/danielcanueto/rDolphin/tree/master/R). This is function is used to collate 
+This function was forked directly from rDolphin (https://github.com/danielcanueto/rDolphin/tree/master/R). This is function is used to collate
 the data necessary for the downstream fitting algorithm and associated functions, assuming that profiling has occurred at least once before.
 }

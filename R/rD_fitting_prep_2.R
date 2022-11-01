@@ -1,18 +1,18 @@
 #' rDolphin: fitting_prep_2
 #'
-#' @param Xdata
-#' @param Ydata
-#' @param initial_fit_parameters
-#' @param program_parameters
-#' @param created_baseline
-#' @param max_shift
-#' @param min_shift
-#' @param max_intensity
-#' @param min_intensity
-#' @param max_width
-#' @param min_width
-#' @param spectrum_index
-#' @param signal_index
+#' @param Xdata dataframe of chemical shift values.
+#' @param Ydata dataframe of intensity values.
+#' @param initial_fit_parameters dataframe of signal fitting parameters
+#' @param program_parameters list of global profiling parameters
+#' @param created_baseline dataframe of baseline intensity values
+#' @param max_shift dataframe of max chemical shift values
+#' @param min_shift dataframe of min chemical shift values
+#' @param max_intensity dataframe of max intensity values
+#' @param min_intensity dataframe of min intensity values
+#' @param max_width dataframe of max half bandwidth values
+#' @param min_width dataframe of min half bandwidth values
+#' @param spectrum_index index of sample spectrum to be fitted
+#' @param signal_index index of signal to be fitted
 #'
 #' @details This function was forked directly from rDolphin (https://github.com/danielcanueto/rDolphin/tree/master/R). This is function is used to collate
 #' the data necessary for the downstream fitting algorithm and associated functions, assuming that profiling has occurred at least once before.

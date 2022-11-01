@@ -242,8 +242,8 @@ xpmt_data_uploadServer <- function(id){
 
                                           xpmt_temp <- as.numeric(input$temperature)
                                           xpmt_freq <- as.numeric(input$instrument_strength)
-                                          xpmt_ph   <- NA
-                                          xpmt_conc <- NA
+                                          xpmt_ph   <- NULL
+                                          xpmt_conc <- NULL
 
                                           if(input$pH != ""){
                                             shinyFeedback::feedbackDanger("pH",

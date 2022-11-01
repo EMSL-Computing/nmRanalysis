@@ -7,15 +7,17 @@
 signal_fitting(parS, Xdata, multiplicities, roof_effect, roof_effect2, freq)
 }
 \arguments{
-\item{parS}{}
+\item{parS}{vector of signal fitting parameters}
 
-\item{Xdata}{}
+\item{Xdata}{dataframe of chemical shift values}
 
-\item{multiplicities}{}
+\item{multiplicities}{vector of signal multiplicity values}
 
-\item{roof_effect}{}
+\item{roof_effect}{vector of signal roof effect values}
 
-\item{freq}{}
+\item{roof_effect2}{vector of signal roof effect 2 values. Applicable only if one or more signals is of non-first-order multiplicity.}
+
+\item{freq}{spectrometer frequency}
 }
 \description{
 rDolphin: signal_fitting

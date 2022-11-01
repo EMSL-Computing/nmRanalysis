@@ -339,7 +339,6 @@ profilingServer <- function(id, xpmt_data, ref_data){
       req(input$ROI_to_plot_quantdat)
 
 
-
       temp <- ref_data()$quantdata %>%
         dplyr::mutate(ROI = paste0("(", .data$`ROI right edge (ppm)`, ", ", .data$`ROI left edge (ppm)`, ")")) %>%
         dplyr::filter(ROI %in% input$ROI_to_plot_quantdat)

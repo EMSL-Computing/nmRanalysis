@@ -11,10 +11,10 @@ as.ppmData(
   fdata_cname,
   align = FALSE,
   instrument_strength,
-  ph,
+  ph = NULL,
   solvent,
-  temperature = NA,
-  concentration = NA,
+  temperature,
+  concentration = NULL,
   ...
 )
 }

@@ -1,10 +1,11 @@
 #' rDolphin: signal_fitting
 #'
-#' @param parS
-#' @param Xdata
-#' @param multiplicities
-#' @param roof_effect
-#' @param freq
+#' @param parS vector of signal fitting parameters
+#' @param Xdata dataframe of chemical shift values
+#' @param multiplicities vector of signal multiplicity values
+#' @param roof_effect vector of signal roof effect values
+#' @param roof_effect2 vector of signal roof effect 2 values. Applicable only if one or more signals is of non-first-order multiplicity.
+#' @param freq spectrometer frequency
 #'
 #' @details This function was forked directly from rDolphin (https://github.com/danielcanueto/rDolphin/tree/master/R). This is the function
 #' that fits the lineshape patterns according to the specified fitting parameters. Modifications have been made to the original function to allow for
