@@ -54,7 +54,13 @@ Imports:
     rjson,
     dbscan,
     data.table,
-    tibble
+    tibble,
+    speaq,
+    htmltools,
+    minpack.lm,
+    reshape2,
+    rlist,
+    shinyBS
 Suggests:
     knitr,
     rmarkdown,

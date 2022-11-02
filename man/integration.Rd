@@ -7,19 +7,19 @@
 integration(clean_fit, Xdata, Ydata, buck_step, interface = "F")
 }
 \arguments{
-\item{clean_fit}{}
+\item{clean_fit}{Either "Y" or "N".}
 
-\item{Xdata}{}
+\item{Xdata}{Dataframe of sample chemical shift (ppm) values.}
 
-\item{Ydata}{}
+\item{Ydata}{Dataframe of intensity values.}
 
-\item{buck_step}{}
+\item{buck_step}{The difference between two adjacent chemical shift values (i.e. ppm resolution)}
 
-\item{interface}{}
+\item{interface}{Either "T" or "F". Indicates whether data for plotting should be generated.}
 }
 \description{
 rDolphin: integration
 }
 \details{
-This function was forked directly from rDolphin (https://github.com/danielcanueto/rDolphin/tree/master/R). This function performs quantification through integration.
+This function is based on code that was forked directly from rDolphin (https://github.com/danielcanueto/rDolphin/tree/master/R). This function performs quantification through integration.
 }

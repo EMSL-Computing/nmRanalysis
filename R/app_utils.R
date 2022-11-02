@@ -47,6 +47,7 @@
 #'  51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
 #'
 #' @param x A vector
+#' @param ... Additional arguments to pass to \code{table()}
 #'
 #' @details This function determines the most common value in a vector. In the event of a tie, this function returns
 #' the value that is first as ordered by \code{table()}. Whether the vector is numeric or character, this
