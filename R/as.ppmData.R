@@ -24,11 +24,13 @@
 #' @param edata_cname character string specifying the name of the column containing the ppm identifiers in \code{e_data} and \code{e_meta} (if applicable).
 #' @param fdata_cname character string specifying the name of the column containing the sample identifiers in \code{f_data}.
 #'
-#' @param aign logical, defaults to FALSE. If TRUE, aligns e_data using the CluPA spectrum alignment algorithm from the `speaq` R package
+#' @param align logical, defaults to FALSE. If TRUE, aligns e_data using the CluPA spectrum alignment algorithm from the `speaq` R package
 #'
 #' @param instrument_strength numeric value specifying the strength (in MHz) of the NMR instrument samples were run on.
 #' @param ph numeric value specifying the pH samples were run at.
 #' @param solvent character string defining solvent used. Possible solvents are 'h2o' and 'd2o'.
+#' @param temperature numeric value specifying the temperature (in K) of the experiment
+#' @param concentration numeric value specifying the concentration (in mM) of the standard (e.g. DSS) used in the experiment
 #'
 #' @param ... further arguments
 #'

@@ -21,7 +21,7 @@ values in x if provided) and values in v.
 rDolphin: peakdet
 }
 \details{
-This function was forked directly from rDolphin (https://github.com/danielcanueto/rDolphin/tree/master/R). From rDolphin: 
+This function is based on code that was forked directly from rDolphin (https://github.com/danielcanueto/rDolphin/tree/master/R). From rDolphin:
 
 A peak detection algorithm for R; finds local maxima and minima. Based on an algorithm for MATLAB by Eli Billauer (http://www.billauer.co.il/peakdet.html).
 This function is released to the public domain; any use is allowed.

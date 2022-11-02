@@ -30,55 +30,55 @@ profiling_func(
 )
 }
 \arguments{
-\item{spectrum_index}{}
+\item{spectrum_index}{Index of sample spectrum to be fitted}
 
-\item{signals_codes}{}
+\item{signals_codes}{Signal indices to be fitted}
 
-\item{imported_data}{}
+\item{imported_data}{Data object containing all experimental data, metadata, and program parameters}
 
-\item{ROI_buckets}{}
+\item{ROI_buckets}{Indices for the ROI}
 
-\item{fitting_type}{}
+\item{fitting_type}{One of "Clean Sum", "Baseline Sum", "Clean Fitting", or "Baseline Fitting".}
 
-\item{program_parameters}{}
+\item{program_parameters}{List of parameters relevant to fitting algorithm.}
 
-\item{Xdata}{}
+\item{Xdata}{Dataframe of sample chemical shift (ppm) values.}
 
-\item{Ydata}{}
+\item{Ydata}{Dataframe of intensity values.}
 
-\item{final_output}{}
+\item{final_output}{Dataframe for final quantifications}
 
-\item{reproducibility_data}{}
+\item{reproducibility_data}{Dataframe for all fitting information}
 
-\item{ROI_profile}{}
+\item{ROI_profile}{ROI fitting parameter data}
 
-\item{baselinedataset}{}
+\item{baselinedataset}{Dataframe of baseline intensities}
 
-\item{signals_to_quantify}{}
+\item{signals_to_quantify}{Indices of signals that were quantified}
 
-\item{pb}{}
+\item{pb}{progress bar object}
 
-\item{reimplementation}{}
+\item{reimplementation}{Whether this is a subsequent implementation of algorithm}
 
-\item{max_shift}{}
+\item{max_shift}{Only applicable if reimplementation. Dataframe of max chemical shift values}
 
-\item{min_shift}{}
+\item{min_shift}{Only applicable if reimplementation. Dataframe of min chemical shift values}
 
-\item{max_intensity}{}
+\item{max_intensity}{Only applicable if reimplementation. Dataframe of max intensities}
 
-\item{min_intensity}{}
+\item{min_intensity}{Only applicable if reimplementation. Dataframe of min intensities}
 
-\item{max_width}{}
+\item{max_width}{Only applicable if reimplementation. Dataframe of max linewidth}
 
-\item{min_width}{}
+\item{min_width}{Only applicable if reimplementation. Dataframe of min linewidth}
 
-\item{signal_index}{}
+\item{signal_index}{Dataframe of max linewidth}
 }
 \description{
 rDolphin: profiling_func
 }
 \details{
-This function was forked directly from rDolphin (https://github.com/danielcanueto/rDolphin/tree/master/R). This is one of the
+This function is based on code that was forked directly from rDolphin (https://github.com/danielcanueto/rDolphin/tree/master/R). This is one of the
 main functions used by rDolphin to perform automatic profiling. Modifications have been made to the original function to allow for
 the fitting of double-doublets. Generally speaking, this involves the addition of new fields (a second J-coupling field and second
 roof effect field) containing parameters necessary to fit this new pattern.

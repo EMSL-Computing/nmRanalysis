@@ -7,19 +7,19 @@
 fittingloop_bg(FeaturesMatrix, Xdata, Ydata, program_parameters)
 }
 \arguments{
-\item{FeaturesMatrix}{}
+\item{FeaturesMatrix}{Dataframe containing signal parameter information (e.g. multiplicity, roof effects)}
 
-\item{Xdata}{}
+\item{Xdata}{Dataframe of sample chemical shift (ppm) values.}
 
-\item{Ydata}{}
+\item{Ydata}{Dataframe of intensity values.}
 
-\item{program_parameters}{}
+\item{program_parameters}{List of parameters relevant to fitting algorithm.}
 }
 \description{
 rDolphin: fittingloop_bg
 }
 \details{
-This function was forked directly from rDolphin (https://github.com/danielcanueto/rDolphin/tree/master/R). This function is responsible
+This function is based on code that was forked directly from rDolphin (https://github.com/danielcanueto/rDolphin/tree/master/R). This function is responsible
 for fitting background signals to the observed data. Modifications have been made to the original function to allow for
 the fitting of double-doublets. Generally speaking, this involves the addition of new fields (a second J-coupling field and second
 roof effect field) containing parameters necessary to fit this new pattern.

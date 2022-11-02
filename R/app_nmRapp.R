@@ -16,6 +16,7 @@
 #'  with this program; if not, write to the Free Software Foundation, Inc.,
 #'  51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
 #'
+#' @param launch.browser logical indicating whether the app should be launched in a browser window.
 #' @param ... additional arguments to be passed to shinyApp().
 #'
 #' @details Calls to this function create a new instance of a shiny app developed for semi-automated

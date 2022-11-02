@@ -7,14 +7,14 @@
 peakpvoigt(x, p)
 }
 \arguments{
-\item{x}{}
+\item{x}{signal fitting parameters}
 
-\item{p}{}
+\item{p}{chemical shift values}
 }
 \description{
 rDolphin: peakpvoigt
 }
 \details{
-This function was forked directly from rDolphin (https://github.com/danielcanueto/rDolphin/tree/master/R). This is the
+This function is based on code that was forked directly from rDolphin (https://github.com/danielcanueto/rDolphin/tree/master/R). This is the
 pseudovoigt lineshape function.
 }

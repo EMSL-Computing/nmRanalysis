@@ -21,36 +21,36 @@ fitting_prep_2(
 )
 }
 \arguments{
-\item{Xdata}{dataframe of chemical shift values.}
+\item{Xdata}{Dataframe of sample chemical shift (ppm) values.}
 
-\item{Ydata}{dataframe of intensity values.}
+\item{Ydata}{Dataframe of intensity values.}
 
-\item{initial_fit_parameters}{dataframe of signal fitting parameters}
+\item{initial_fit_parameters}{Dataframe of signal fitting parameters}
 
-\item{program_parameters}{list of global profiling parameters}
+\item{program_parameters}{List of parameters relevant to fitting algorithm.}
 
-\item{created_baseline}{dataframe of baseline intensity values}
+\item{created_baseline}{Dataframe of baseline intensity values}
 
-\item{max_shift}{dataframe of max chemical shift values}
+\item{max_shift}{Dataframe of max chemical shift values}
 
-\item{min_shift}{dataframe of min chemical shift values}
+\item{min_shift}{Dataframe of min chemical shift values}
 
-\item{max_intensity}{dataframe of max intensity values}
+\item{max_intensity}{Dataframe of max intensity values}
 
-\item{min_intensity}{dataframe of min intensity values}
+\item{min_intensity}{Dataframe of min intensity values}
 
-\item{max_width}{dataframe of max half bandwidth values}
+\item{max_width}{Dataframe of max half bandwidth values}
 
-\item{min_width}{dataframe of min half bandwidth values}
+\item{min_width}{Dataframe of min half bandwidth values}
 
-\item{spectrum_index}{index of sample spectrum to be fitted}
+\item{spectrum_index}{Index of sample spectrum to be fitted}
 
-\item{signal_index}{index of signal to be fitted}
+\item{signal_index}{Index of signal to be fitted}
 }
 \description{
 rDolphin: fitting_prep_2
 }
 \details{
-This function was forked directly from rDolphin (https://github.com/danielcanueto/rDolphin/tree/master/R). This is function is used to collate
+This function is based on code that was forked directly from rDolphin (https://github.com/danielcanueto/rDolphin/tree/master/R). This is function is used to collate
 the data necessary for the downstream fitting algorithm and associated functions, assuming that profiling has occurred at least once before.
 }
