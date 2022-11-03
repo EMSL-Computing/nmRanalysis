@@ -308,7 +308,7 @@ ref_data_uploadServer <- function(id, xpmt_data, ref_db){
                                              temp$Matchsum <- matchsum
 
                                              bestmatches[[unq_metabs[i]]] <- temp %>% dplyr::group_by(.data$`Quantification Signal`) %>%
-                                               dplyr::arrange(desc(.data$`Matchsum`)) %>%
+                                               dplyr::arrange(dplyr::desc(.data$`Matchsum`)) %>%
                                                dplyr::slice_head()
 
                                              rm(temp, matchvec, matchsum)
@@ -425,7 +425,7 @@ ref_data_uploadServer <- function(id, xpmt_data, ref_db){
                                              temp$Matchsum <- matchsum
 
                                              bestmatches[[unq_metabs[i]]] <- temp %>% dplyr::group_by(.data$`Quantification Signal`) %>%
-                                               dplyr::arrange(desc(.data$`Matchsum`)) %>%
+                                               dplyr::arrange(dplyr::desc(.data$`Matchsum`)) %>%
                                                dplyr::slice_head()
 
                                              rm(temp, matchvec, matchsum)

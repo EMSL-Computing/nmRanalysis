@@ -119,7 +119,7 @@ fittingloop <- function(FeaturesMatrix, Xdata, Ydata, program_parameters){
       ub <- as.vector(t(FeaturesMatrix[, c(seq(2, 10, 2), 14), drop = F]))
 
       set.seed(iter)
-      s0     <- lb + (ub - lb) * runif(length(ub))
+      s0     <- lb + (ub - lb) * stats::runif(length(ub))
       order1 <- order(rowMeans(FeaturesMatrix[signals_to_fit, 3:4, drop=F])[signals_to_fit])
 
       # aaa=iter%%3/3
@@ -213,7 +213,7 @@ fittingloop <- function(FeaturesMatrix, Xdata, Ydata, program_parameters){
         #An adapted MSE error is calculated, and the parameters of the optimization with less MSE are stored
         iter   <- iter + 1
         # modified to account for additional J coupling value and roof effect (for dd case)
-        order2 <- order(coef(nls.out)[which(seq_along(coef(nls.out)) %% 6 == 2)][signals_to_fit])
+        order2 <- order(stats::coef(nls.out)[which(seq_along(stats::coef(nls.out)) %% 6 == 2)][signals_to_fit])
 
         errorprov <- (sqrt(nls.out$deviance / length(Ydata))) * 100 / (max(Ydata) - min(Ydata))
         if (is.nan(errorprov) || is.na(errorprov)){
@@ -221,7 +221,7 @@ fittingloop <- function(FeaturesMatrix, Xdata, Ydata, program_parameters){
         }
         if (errorprov < error1 && identical(order1,order2)) {
           error1    <- errorprov
-          paramprov <- coef(nls.out)
+          paramprov <- stats::coef(nls.out)
 
         } else if (errorprov > worsterror) {
           worsterror <- errorprov
@@ -249,7 +249,7 @@ fittingloop <- function(FeaturesMatrix, Xdata, Ydata, program_parameters){
         iter <- iter + 1
 
         # modified to account for second J coupling value
-        order2 <- order(coef(nls.out)[which(seq_along(coef(nls.out)) %% 6 == 2)][signals_to_fit])
+        order2 <- order(stats::coef(nls.out)[which(seq_along(stats::coef(nls.out)) %% 6 == 2)][signals_to_fit])
 
         # #Procedure to calculate the fititng error in all the ROI
         #An adapted MSE error is calculated, and the parameters of the optimization with less MSE are stored
@@ -260,7 +260,7 @@ fittingloop <- function(FeaturesMatrix, Xdata, Ydata, program_parameters){
 
         if (errorprov < error1 && identical(order1, order2)) {
           error1 <- errorprov
-          paramprov <- coef(nls.out)
+          paramprov <- stats::coef(nls.out)
 
         } else if (errorprov > worsterror) {
           worsterror <- errorprov
@@ -300,7 +300,7 @@ fittingloop <- function(FeaturesMatrix, Xdata, Ydata, program_parameters){
     lb[change_indexes] <- ub[change_indexes] <- signals_parameters[change_indexes]
     while (iter < 3) {
       set.seed(iter)
-      s0 <- lb + (ub - lb) * runif(length(ub))
+      s0 <- lb + (ub - lb) * stats::runif(length(ub))
       nls.out <- minpack.lm::nls.lm(par            = s0, # modified to allow for additional J coupling value and roof effect (for dd case)
                                     fn             = residFun,
                                     observed       = Ydata,
@@ -328,7 +328,7 @@ fittingloop <- function(FeaturesMatrix, Xdata, Ydata, program_parameters){
 
       if (errorprov < error1) {
         error1    <- errorprov
-        paramprov <- coef(nls.out)
+        paramprov <- stats::coef(nls.out)
 
       } else if (errorprov > worsterror) {
         worsterror <- errorprov

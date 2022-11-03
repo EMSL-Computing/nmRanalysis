@@ -35,7 +35,7 @@ fittingloop_bg <- function(FeaturesMatrix, Xdata, Ydata, program_parameters){
   roof_effect    <- FeaturesMatrix[, 12]
   roof_effect2   <- FeaturesMatrix[, 15]
 
-  s0 <- lb + (ub - lb) * runif(length(ub))
+  s0 <- lb + (ub - lb) * stats::runif(length(ub))
 
   nls.out <- minpack.lm::nls.lm(par            = s0, # modified to allow for additional J coupling value (for dd case)
                                 fn             = residFun,
@@ -55,7 +55,7 @@ fittingloop_bg <- function(FeaturesMatrix, Xdata, Ydata, program_parameters){
                                 )
 
   # modified to allow for additional J coupling value (for dd case)
-  dummy <- list(BG_intensities = coef(nls.out)[which(seq(length(coef(nls.out))) %% 6 == 1)],
+  dummy <- list(BG_intensities = stats::coef(nls.out)[which(seq(length(stats::coef(nls.out))) %% 6 == 1)],
                 baseline       = Ydata - nls.out$fvec)
 
   return(dummy)
