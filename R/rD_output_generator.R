@@ -46,7 +46,7 @@ output_generator <- function(signals_to_quantify, fitted_signals, Ydata,
     #I calculate how much the quantified signal represents the total spectrum in the region where the region is located.
     output_data$signal_area_ratio <- append(output_data$signal_area_ratio, 100 -((abs(sum(subregion_spectrum) - sum(subregion_signals)) / sum(subregion_spectrum)) * 100))
     # normalized_rmse=cor(subregion_spectrum, subregion_fitted)
-    normalized_rmse               <- summary(lm(subregion_spectrum ~ subregion_fitted))$sigma / max(subregion_spectrum)
+    normalized_rmse               <- summary(stats::lm(subregion_spectrum ~ subregion_fitted))$sigma / max(subregion_spectrum)
     if (sum(subregion_signals) == 0){
       normalized_rmse <- 100
     }
@@ -64,7 +64,7 @@ output_generator <- function(signals_to_quantify, fitted_signals, Ydata,
 
   subregion_fitted                                 <- output_data$fitted_sum[ROI_buckets[bins]]
   subregion_spectrum                               <- Ydata[ROI_buckets[bins]]
-  error1                                           <- summary(lm(subregion_spectrum ~ subregion_fitted))$sigma / max(subregion_spectrum)
+  error1                                           <- summary(stats::lm(subregion_spectrum ~ subregion_fitted))$sigma / max(subregion_spectrum)
   output_data$quantification                       <- rowSums(fitted_signals[!BGsignals, , drop = F]) * buck_step
   output_data$quantification[-signals_to_quantify] <- NA
 

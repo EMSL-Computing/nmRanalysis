@@ -317,7 +317,7 @@ ref_data_editingServer <- function(id, xpmt_data, ref_data, ref_db){
                        temp$Matchsum <- matchsum
 
                        bestmatches[[unq_metabs[i]]] <- temp %>% dplyr::group_by(.data$`Quantification Signal`) %>%
-                         dplyr::arrange(desc(.data$`Matchsum`)) %>%
+                         dplyr::arrange(dplyr::desc(.data$`Matchsum`)) %>%
                          dplyr::slice_head()
 
                        rm(temp, matchvec, matchsum)
@@ -1790,7 +1790,7 @@ ref_data_editingServer <- function(id, xpmt_data, ref_data, ref_db){
 
       roidat <- tempdf %>%
         dplyr::mutate(Signal = paste0(.data$Metabolite, " [", .data$`Quantification Signal`, "]")) %>%
-        dplyr::filter(Signal == input$signal_to_check)
+        dplyr::filter(.data$Signal == input$signal_to_check)
       signames <- tempdf %>%
         dplyr::mutate(Signal = paste0(.data$Metabolite, " [", .data$`Quantification Signal`, "]")) %>%
         dplyr::filter(.data$`ROI left edge (ppm)` == roidat$`ROI left edge (ppm)`) %>% .$Signal
@@ -2206,10 +2206,10 @@ ref_data_editingServer <- function(id, xpmt_data, ref_data, ref_db){
     output$refmet_database <- DT::renderDataTable({
 
       bmse_associations %>%
-        dplyr::rename(`BMRB ID` = Entry_ID,
-                      `CAS No.` = CASno,
-                      `Spectrometer Frequency (MHz)` = Field_strength,
-                      `Metabolite` = Solute) %>%
+        dplyr::rename(`BMRB ID` = .data$Entry_ID,
+                      `CAS No.` = .data$CASno,
+                      `Spectrometer Frequency (MHz)` = .data$Field_strength,
+                      `Metabolite` = .data$Solute) %>%
         DT::datatable(rownames   = FALSE,
                       options = list(scrollX = TRUE))
     })

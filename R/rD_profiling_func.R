@@ -156,7 +156,7 @@ profiling_func <- function(spectrum_index, signals_codes, imported_data,ROI_buck
                               final_output    = final_output)
 
   if (!is.null(pb)){
-    setTxtProgressBar(pb, spectrum_index)
+    utils::setTxtProgressBar(pb, spectrum_index)
   }
 
   profiling_data <- list(final_output         = final_output,

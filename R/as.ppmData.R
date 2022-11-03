@@ -222,6 +222,10 @@ as.ppmData <- function(e_data, f_data, edata_cname, fdata_cname, align = FALSE, 
 #' @description This function takes the data.frame `e_data` and runs the CluPA spectrum alignment algorithm from the `speaq` R package
 #' @return a data.frame containing aligned spectra with same format as `e_data`
 #' @author Natalie Winans
+#'
+#' @importFrom magrittr %>%
+#' @importFrom rlang .data
+#'
 #' @export
 peak_alignment <- function(e_data, max_shift = NULL) {
   data <- as.matrix(t(e_data[,-1]))
@@ -246,11 +250,11 @@ peak_alignment <- function(e_data, max_shift = NULL) {
   res <- as.data.frame(Y) %>%
     `rownames<-`(X$label) %>%
     tibble::rownames_to_column() %>%
-    tidyr::pivot_longer(-rowname) %>%
-    tidyr::pivot_wider(names_from = rowname, values_from = value) %>%
+    tidyr::pivot_longer(-.data$rowname) %>%
+    tidyr::pivot_wider(names_from = .data$rowname, values_from = .data$value) %>%
     dplyr::mutate(PPM = e_data$PPM) %>%
-    dplyr::select(-name) %>%
-    dplyr::select(PPM, everything())
+    dplyr::select(-.data$name) %>%
+    dplyr::select(.data$PPM, tidyselect::everything())
 
   return(res)
 }

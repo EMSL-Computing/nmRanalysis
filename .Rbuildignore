@@ -3,3 +3,8 @@
 ^.*\.Rproj$
 ^\.Rproj\.user$
 ^LICENSE\.md$
+^.dockerignore
+^Dockerfile
+^docker-compose.yml
+^docs
+^DISCLAIMER.md
