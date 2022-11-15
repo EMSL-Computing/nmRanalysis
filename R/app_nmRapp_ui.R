@@ -54,7 +54,7 @@ nmRapp_ui <- function(request){
           # Specify the elements contained in the sidebarPanel
           sidebarPanel(
             xpmt_data_uploadUI(id = "xpmt", ref_db = bmse_associations),
-            uiOutput("wizard_exptoref_ui")
+            uiOutput("wizard_exptoid_ui")
           ),
 
           # Specify elements to include in main panel
@@ -76,6 +76,38 @@ nmRapp_ui <- function(request){
         )
       ),
 
+      tabPanelBody(
+        # "Data Processing",
+        value = "MetIDTab", # unique identifier for panel
+
+        # sidebarLayout specifies a template for the layout of the panel.
+        # This template is comprised of a sidebar panel and main panel.
+        sidebarLayout(
+          # Specify the elements contained in the sidebarPanel
+          sidebarPanel(
+            fluidRow(
+              column(6,
+                     shinyWidgets::actionBttn(
+                       inputId = "wizard_idtoexp",
+                       label = "Experimental Data Upload",
+                       style = "minimal",
+                       color = "primary",
+                       icon = icon("arrow-left"),
+                       size = "sm")
+              ),
+              column(3, offset = 3,
+                     uiOutput("wizard_idtoref_ui")
+              )
+            )
+          ),
+
+          # Specify elements to include in main panel
+          mainPanel(
+            h4("")
+          )
+        )
+      ),
+
       # The second tab of the UI
       tabPanelBody(
         # "Reference Metabolites",
@@ -87,8 +119,8 @@ nmRapp_ui <- function(request){
             fluidRow(
               column(6,
                      shinyWidgets::actionBttn(
-                       inputId = "wizard_reftoexp",
-                       label = "Experimental Data Upload",
+                       inputId = "wizard_reftoid",
+                       label = "Metabolite Identification",
                        style = "minimal",
                        color = "primary",
                        icon = icon("arrow-left"),

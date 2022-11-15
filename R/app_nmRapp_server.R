@@ -60,15 +60,15 @@ nmRapp_server <- function(input, output, session) {
   mod_xpmt_data <- xpmt_data_vizServer(id = "xpmt_viz", xpmt_data = xpmt_data)
 
   # Wizard button to navigate from experimental data upload page to reference data editing page
-  output$wizard_exptoref_ui <- renderUI({
+  output$wizard_exptoid_ui <- renderUI({
     req(mod_xpmt_data())
     tagList(
       h4(""),
       fluidRow(
         column(5, offset = 7,
                shinyWidgets::actionBttn(
-                 inputId = "wizard_exptoref",
-                 label = "Reference Data Editing",
+                 inputId = "wizard_exptoid",
+                 label = "Metabolite Identification",
                  style = "minimal",
                  color = "primary",
                  icon = icon("arrow-right"),
@@ -79,12 +79,44 @@ nmRapp_server <- function(input, output, session) {
     )
   })
 
-  observeEvent(input$wizard_exptoref, {
-    req(input$wizard_exptoref > 0)
+  observeEvent(input$wizard_exptoid, {
+    req(input$wizard_exptoid > 0)
+
+    updateTabsetPanel(session, "AllTabs",
+                      selected = "MetIDTab")
+  })
+
+
+  ### Tab: Metabolite Identification ------------------------------------------
+
+
+  # Wizard buttons to navigate from reference data editing page to metabolite identification page OR from
+  # reference data editing page to profiling page
+  output$wizard_idtoref_ui <- renderUI({
+
+    shinyWidgets::actionBttn(
+      inputId = "wizard_idtoref",
+      label = "Reference Data Editing",
+      style = "minimal",
+      color = "primary",
+      icon = icon("arrow-right"),
+      size = "sm")
+  })
+
+  observeEvent(input$wizard_idtoexp, {
+    req(input$wizard_idtoexp > 0)
+
+    updateTabsetPanel(session, "AllTabs",
+                      selected = "UploadTab")
+  })
+
+  observeEvent(input$wizard_idtoref, {
+    req(input$wizard_idtoref > 0)
 
     updateTabsetPanel(session, "AllTabs",
                       selected = "RefMetTab")
   })
+
 
   ### Tab: Reference Metabolites ----------------------------------------------
 
@@ -136,7 +168,7 @@ nmRapp_server <- function(input, output, session) {
                                          ref_data  = ref_data,
                                          ref_db    = bmse_associations)
 
-  # Wizard buttons to navigate from reference data editing page to experimental data upload page OR from
+  # Wizard buttons to navigate from reference data editing page to metabolite identification page OR from
   # reference data editing page to profiling page
   output$wizard_reftoprof_ui <- renderUI({
     req(mod_ref_data())
@@ -150,11 +182,11 @@ nmRapp_server <- function(input, output, session) {
       size = "sm")
   })
 
-  observeEvent(input$wizard_reftoexp, {
-    req(input$wizard_reftoexp > 0)
+  observeEvent(input$wizard_reftoid, {
+    req(input$wizard_reftoid > 0)
 
     updateTabsetPanel(session, "AllTabs",
-                      selected = "UploadTab")
+                      selected = "MetIDTab")
   })
 
   observeEvent(input$wizard_reftoprof, {
