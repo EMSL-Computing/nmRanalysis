@@ -36,6 +36,7 @@
 #'
 nmRapp_ui <- function(request){
   fluidPage(
+    uiOutput("user_manual_UI"),
     title = "nmRanalysis",
     tabsetPanel(
       id = "AllTabs",

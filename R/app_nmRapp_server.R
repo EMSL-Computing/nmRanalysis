@@ -51,6 +51,12 @@ nmRapp_server <- function(input, output, session) {
   # conditions
   xpmt_data       <- xpmt_data_uploadServer(id = "xpmt")
 
+  #user manual function
+  user_manual <-  a("User Manual", href="nmRanalysis_Manual.html")
+  output$user_manual_UI <- renderUI({
+    tagList(user_manual)
+  })
+
   observe({
     req(xpmt_data())
     updateTabsetPanel(inputId = "xpmtdat_tab1", selected = "xpmt_tab1_show")
