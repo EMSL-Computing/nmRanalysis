@@ -77,7 +77,7 @@ nmRapp_ui <- function(request){
       ),
 
       tabPanelBody(
-        # "Data Processing",
+        # "Metabolite Identification",
         value = "MetIDTab", # unique identifier for panel
 
         # sidebarLayout specifies a template for the layout of the panel.
@@ -85,6 +85,8 @@ nmRapp_ui <- function(request){
         sidebarLayout(
           # Specify the elements contained in the sidebarPanel
           sidebarPanel(
+            metid_peakfinderUI(id = "metid_viz"),
+            h4(""),
             fluidRow(
               column(6,
                      shinyWidgets::actionBttn(
@@ -103,6 +105,8 @@ nmRapp_ui <- function(request){
 
           # Specify elements to include in main panel
           mainPanel(
+            metid_vizoptionsUI(id = "metid_viz"),
+            metid_vizUI(id = "metid_viz"),
             h4("")
           )
         )
