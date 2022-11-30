@@ -398,9 +398,7 @@ metid_Server <- function(id, xpmt_data){
                    )
 
 
-                   e_data  <- xpmt_data()$e_data %>% dplyr::arrange(dplyr::desc(.data$PPM))
-                   spectra <- e_data %>% dplyr::select(-.data$PPM) %>% t()
-                   ppm     <- as.numeric(e_data[, 1, drop = TRUE])
+                   spectra <- xpmt_data()$e_data %>% dplyr::select(-.data$PPM) %>% t()
 
                    spectra_peaks <- speaq::detectSpecPeaks(X              = spectra,
                                                            nDivRange      = input$nDivRange,
@@ -436,8 +434,7 @@ metid_Server <- function(id, xpmt_data){
                    req(input$sample_to_plot)
                    req(rv$spectra_peaks)
 
-                   e_data  <- xpmt_data()$e_data %>% dplyr::arrange(dplyr::desc(.data$PPM))
-                   ppm     <- as.numeric(e_data[, 1, drop = TRUE])
+                   ppm     <- as.numeric(xpmt_data()$e_data[, 1, drop = TRUE])
 
                    selsamp_peaks <- rv$spectra_peaks[[which(names(rv$spectra_peaks) == input$sample_to_plot)]]
 
