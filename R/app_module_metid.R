@@ -60,7 +60,7 @@ metid_peakfinderUI <- function(id){
                                                           numericInput(inputId  = ns("baselineThresh"),
                                                                        label    = "Intensity Threshold:",
                                                                        value    = 50000)
-                                                   ),
+                                                   )
                                                  ),
                                                  style = "primary"
                                                  )
@@ -174,6 +174,7 @@ metid_Server <- function(id, xpmt_data){
     rv <- reactiveValues(obs_show_subplot_suspend = TRUE,
                          subplot_dat = NULL)
 
+
     # UI element creating a dropdown button containing several options that relate
     # to experimental data visualization for this tab. These options include:
     # 1) Choosing which sample spectrum to display
@@ -195,6 +196,18 @@ metid_Server <- function(id, xpmt_data){
                                      value   = FALSE,
                                      status  = "primary",
                                      right   = TRUE),
+
+        # Toggle for display of annotations
+        shinyWidgets::materialSwitch(inputId = NS(id, "show_annotations"),
+                                     label   = "Toggle detected feature annotations",
+                                     value   = TRUE,
+                                     status  = "primary",
+                                     right   = TRUE),
+
+        numericInput(inputId = NS(id, "peak_group_dist"),
+                     label   = "Annotation Grouping Threshold",
+                     value   = round(mean(diff(xpmt_data()$e_data$PPM)), 5),
+                     min     = min(diff(xpmt_data()$e_data$PPM))),
 
         circle = TRUE, status = "info",
         icon = icon("cog"), width = "300px",
@@ -428,15 +441,28 @@ metid_Server <- function(id, xpmt_data){
                    shinyWidgets::closeSweetAlert()
                  })
 
-    observeEvent(c(rv$spectra_peaks, input$sample_to_plot),
+    observeEvent(c(rv$spectra_peaks, input$sample_to_plot, input$peak_group_dist, input$show_annotations),
                  {
                    req(xpmt_data())
                    req(input$sample_to_plot)
+                   req(input$peak_group_dist)
                    req(rv$spectra_peaks)
+
+                   if(!input$show_annotations){
+                     plotly::plotlyProxyInvoke(metid_e_data_plot_proxy, "relayout",
+                                               list(annotations = NULL))
+                   }
+                   req(input$show_annotations)
 
                    ppm     <- as.numeric(xpmt_data()$e_data[, 1, drop = TRUE])
 
                    selsamp_peaks <- rv$spectra_peaks[[which(names(rv$spectra_peaks) == input$sample_to_plot)]]
+
+                   ppm_peaks         <- ppm[selsamp_peaks]
+                   ppm_peak_diffs    <- diff(ppm_peaks)
+                   split_idxs        <- which(ppm_peak_diffs > input$peak_group_dist) + 1
+                   peak_groups       <- split(ppm_peaks, cumsum(seq_along(ppm_peaks) %in% split_idxs))
+                   feature_locations <- Reduce("c", lapply(peak_groups, mean))
 
                    # Create default annot object to add as annotation to plot
                    ROI_annot <- list(
@@ -448,10 +474,10 @@ metid_Server <- function(id, xpmt_data){
                    )
 
                    ROI_annots <- list()
-                   for(i in 1:length(selsamp_peaks)){
-                     ROI_annot[["x"]]         <- ppm[selsamp_peaks[i]]
+                   for(i in 1:length(feature_locations)){
+                     ROI_annot[["x"]]         <- feature_locations[i]
                      ROI_annot[["text"]]      <- paste0(sprintf("<b>%s</b>", "PPM"), ": ",
-                                                        round(ppm[selsamp_peaks[i]], 5))
+                                                        round(feature_locations[i], 5))
                      ROI_annot[["arrowsize"]] <- 1
                      ROI_annot[["showarrow"]] <- TRUE
 
