@@ -109,6 +109,101 @@ metid_vizUI <- function(id){
   )
 }
 
+#' Module: UI elements specific to metabolite identification
+#'
+#' @description Copyright (C) 2022 Battelle Memorial Institute
+#'
+#'  This program is free software; you can redistribute it and/or modify
+#'  it under the terms of the GNU General Public License as published by
+#'  the Free Software Foundation; either version 2 of the License, or
+#'  (at your option) any later version.
+#'
+#'  This program is distributed in the hope that it will be useful,
+#'  but WITHOUT ANY WARRANTY; without even the implied warranty of
+#'  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+#'  GNU General Public License for more details.
+#'
+#'  You should have received a copy of the GNU General Public License along
+#'  with this program; if not, write to the Free Software Foundation, Inc.,
+#'  51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
+#'
+#' @param id A string denoting the namespace id.
+#'
+#' @details
+#'
+#'
+#' @import shiny
+#' @importFrom magrittr %>%
+#'
+metid_mainUI <- function(id){
+  ns <- NS(id)
+  tagList(
+    uiOutput(ns("metid_groupthresh_ui")),
+    tabsetPanel(
+      id = ns("metid_tabs"),
+      tabPanel(
+        title = "Feature Querying",
+        h4(""),
+        fluidRow(
+          column(width = 3,
+                 selectInput(inputId = ns("metid_queryset"),
+                             label   = "Query from:",
+                             choices = c("Detected Feature Set" = "det",
+                                         "Custom Feature Set" = "cust"),
+                             selected = c("cust"))
+                 ),
+          column(width = 4,
+                 tabsetPanel(
+                   id = ns("metid_queryset_tabs"),
+                   type = "hidden",
+                   selected = "cust",
+                   tabPanelBody(
+                     value = "det",
+                     selectInput(inputId = ns("metid_det"),
+                                 label   = "Select a detected feature location:",
+                                 choices = c(""))
+                   ),
+                   tabPanelBody(
+                     value = "cust",
+                     numericInput(inputId = ns("metid_cust"),
+                                  label   = "Specify a feature location:",
+                                  value   = 0)
+                   )
+                 )
+                 ),
+          column(width = 3,
+                 numericInput(inputId = ns("metid_querytol"),
+                              label   = "Specify the search tolerance:",
+                              value   = 0.01)
+          )
+        ),
+        # fluidRow(
+        #   column(
+        #     width = 3,
+        #     selectInput(inputId = ns("metid_queryset"),
+        #                 label   = "Query a detected feature location:",
+        #                 choices = NULL,
+        #                 selected = NULL)
+        #   ),
+        #   column(
+        #     width = 1,
+        #     h4("or", style="text-align: center;")
+        #   ),
+        #   column(
+        #     width = 3,
+        #     numericInput(inputID = ns("metid_custftr"),
+        #                  )
+        #   )
+        # )
+      ),
+      tabPanel(
+        title = "Identified Metabolites",
+        h4("TBD")
+      )
+    )
+  )
+}
+
 #' Module: UI elements specific to data visualization options
 #'
 #' @description Copyright (C) 2022 Battelle Memorial Institute
@@ -174,6 +269,34 @@ metid_Server <- function(id, xpmt_data){
     rv <- reactiveValues(obs_show_subplot_suspend = TRUE,
                          subplot_dat = NULL)
 
+    # Observer to control which set of options for feature querying is displayed
+    observeEvent(c(input$metid_queryset),
+                 {
+                   req(xpmt_data())
+
+                   updateTabsetPanel(inputId = "metid_queryset_tabs", selected = input$metid_queryset)
+                 })
+
+    observeEvent(c(rv$spectra_peaks, input$sample_to_plot, input$peak_group_dist),
+                 {
+                   req(xpmt_data())
+                   req(rv$spectra_peaks)
+                   req(input$sample_to_plot)
+                   req(input$peak_group_dist)
+
+                   ppm     <- as.numeric(xpmt_data()$e_data[, 1, drop = TRUE])
+
+                   selsamp_peaks <- rv$spectra_peaks[[which(names(rv$spectra_peaks) == input$sample_to_plot)]]
+
+                   ppm_peaks         <- ppm[selsamp_peaks]
+                   ppm_peak_diffs    <- diff(ppm_peaks)
+                   split_idxs        <- which(ppm_peak_diffs > input$peak_group_dist) + 1
+                   peak_groups       <- split(ppm_peaks, cumsum(seq_along(ppm_peaks) %in% split_idxs))
+                   feature_locations <- Reduce("c", lapply(peak_groups, mean))
+
+                   updateSelectInput(inputId = "metid_det", choices = round(feature_locations, 5))
+                 })
+
 
     # UI element creating a dropdown button containing several options that relate
     # to experimental data visualization for this tab. These options include:
@@ -204,16 +327,20 @@ metid_Server <- function(id, xpmt_data){
                                      status  = "primary",
                                      right   = TRUE),
 
-        numericInput(inputId = NS(id, "peak_group_dist"),
-                     label   = "Annotation Grouping Threshold",
-                     value   = round(mean(diff(xpmt_data()$e_data$PPM)), 5),
-                     min     = min(diff(xpmt_data()$e_data$PPM))),
 
         circle = TRUE, status = "info",
         icon = icon("cog"), width = "300px",
 
         tooltip = shinyWidgets::tooltipOptions(title = "Data Options")
       )
+    })
+
+    output$metid_groupthresh_ui <- renderUI({
+      req(xpmt_data())
+      numericInput(inputId = NS(id, "peak_group_dist"),
+                   label   = "Peak Grouping Threshold",
+                   value   = round(mean(diff(xpmt_data()$e_data$PPM)), 5),
+                   min     = min(diff(xpmt_data()$e_data$PPM)))
     })
 
     output$metid_e_data_plot <- plotly::renderPlotly({

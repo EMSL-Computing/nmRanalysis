@@ -85,7 +85,7 @@ nmRapp_ui <- function(request){
         sidebarLayout(
           # Specify the elements contained in the sidebarPanel
           sidebarPanel(
-            metid_peakfinderUI(id = "metid_viz"),
+            metid_peakfinderUI(id = "metid"),
             h4(""),
             fluidRow(
               column(6,
@@ -105,9 +105,9 @@ nmRapp_ui <- function(request){
 
           # Specify elements to include in main panel
           mainPanel(
-            metid_vizoptionsUI(id = "metid_viz"),
-            metid_vizUI(id = "metid_viz"),
-            h4("")
+            metid_vizoptionsUI(id = "metid"),
+            metid_vizUI(id = "metid"),
+            metid_mainUI(id = "metid")
           )
         )
       ),

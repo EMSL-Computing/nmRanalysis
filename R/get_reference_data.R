@@ -351,6 +351,12 @@ get_spectra_data <- function(ID_list){
         dplyr::mutate(Val = as.numeric(.data$Val)) %>%
         dplyr::filter(.data$Val <= 11) #contain only H atoms
 
+      if(nrow(csdata) == 0){
+        # In this case, there are no chemical shifts corresponding to H nmr.
+        message(sprintf("Message: No chemical shifts table found for entry %s", ID))
+        next
+      }
+
       #count up the peak counts by grouping unique values (not ideal)
       peak_quant <- csdata %>%
         dplyr::group_by(.data$Val) %>%
@@ -527,6 +533,7 @@ get_spectra_data <- function(ID_list){
 
     # append df of each ID to the main DF
     spectra_data <- rbind(spectra_data, spectra_data_subset)
+
   }
 
 
