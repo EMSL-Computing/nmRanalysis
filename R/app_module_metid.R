@@ -199,7 +199,7 @@ metid_Server <- function(id, xpmt_data){
 
         # Toggle for display of annotations
         shinyWidgets::materialSwitch(inputId = NS(id, "show_annotations"),
-                                     label   = "Toggle detected feature annotations",
+                                     label   = "Show detected feature annotations",
                                      value   = TRUE,
                                      status  = "primary",
                                      right   = TRUE),
