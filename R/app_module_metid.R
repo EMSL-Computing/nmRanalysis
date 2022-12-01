@@ -177,24 +177,8 @@ metid_mainUI <- function(id){
                               value   = 0.01)
           )
         ),
-        # fluidRow(
-        #   column(
-        #     width = 3,
-        #     selectInput(inputId = ns("metid_queryset"),
-        #                 label   = "Query a detected feature location:",
-        #                 choices = NULL,
-        #                 selected = NULL)
-        #   ),
-        #   column(
-        #     width = 1,
-        #     h4("or", style="text-align: center;")
-        #   ),
-        #   column(
-        #     width = 3,
-        #     numericInput(inputID = ns("metid_custftr"),
-        #                  )
-        #   )
-        # )
+        DT::dataTableOutput(ns("metid_query_table"))
+
       ),
       tabPanel(
         title = "Identified Metabolites",
@@ -268,6 +252,50 @@ metid_Server <- function(id, xpmt_data){
 
     rv <- reactiveValues(obs_show_subplot_suspend = TRUE,
                          subplot_dat = NULL)
+
+    output$metid_query_table <- DT::renderDT({
+
+      req(xpmt_data())
+
+      query_tol <- input$metid_querytol
+
+      if(input$metid_queryset == "cust"){
+        feature_loc <- as.numeric(input$metid_cust)
+        querymets <- refmets_full %>% dplyr::filter(.data$`Chemical shift(ppm)` >= (feature_loc - query_tol) &
+                                                      .data$`Chemical shift(ppm)` <= (feature_loc + query_tol))
+        querymets %>%
+          dplyr::rename(`Peak Location` = `Chemical shift(ppm)`) %>%
+          DT::datatable(rownames = FALSE,
+                        filter = "top",
+                        selection = "single",
+                        options = exprToFunction(
+                          list(dom = 'Bfrtip',
+                               scrollX = TRUE)),
+                        class = 'display') %>%
+          DT::formatRound(columns = c("Peak Location", "Frequency (MHz)",
+                                      "pH", "Concentration (mM)", "Temperature (K)"),
+                          digits = 3)
+
+      } else if(input$metid_queryset == "det"){
+        feature_loc <- as.numeric(input$metid_det)
+        querymets <- refmets_full %>% dplyr::filter(.data$`Chemical shift(ppm)` >= (feature_loc - query_tol) &
+                                                      .data$`Chemical shift(ppm)` <= (feature_loc + query_tol))
+        querymets %>%
+          dplyr::rename(`Peak Location` = `Chemical shift(ppm)`) %>%
+          DT::datatable(rownames = FALSE,
+                        filter = "top",
+                        selection = "single",
+                        options = exprToFunction(
+                          list(dom = 'Bfrtip',
+                               scrollX = TRUE)),
+                        class = 'display') %>%
+          DT::formatRound(columns = c("Peak Location", "Frequency (MHz)",
+                                      "pH", "Concentration (mM)", "Temperature (K)"),
+                          digits = 3)
+      }
+
+    })
+
 
     # Observer to control which set of options for feature querying is displayed
     observeEvent(c(input$metid_queryset),
