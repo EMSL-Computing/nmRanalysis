@@ -312,42 +312,114 @@ metid_Server <- function(id, xpmt_data){
         sample_to_plot <- input$sample_to_plot
         sourceid       <- "id_metid_selected_subplot"
 
-        df_long <- xpmt_data %>%
-          tidyr::pivot_longer(!.data$PPM, names_to = "Sample", values_to = "Intensity")
+        if(!is.null(rv$spectra_peaks)){
+          ppm     <- as.numeric(xpmt_data[, 1, drop = TRUE])
 
-        df_long <- df_long %>% dplyr::filter(.data$PPM >= min(brushed_data$x), .data$PPM <= max(brushed_data$x))
-        df_long_selsamp <- df_long %>% dplyr::filter(.data$Sample == sample_to_plot)
-        df_long_nonselsamp <- df_long %>% dplyr::filter(.data$Sample != sample_to_plot)
+          selsamp_peaks <- rv$spectra_peaks[[which(names(rv$spectra_peaks) == input$sample_to_plot)]]
 
-        p <- plotly::plot_ly(source = sourceid) %>%
-          plotly::config(displaylogo = FALSE,
-                         modeBarButtons = list(list("zoom2d"), list("zoomIn2d"),
-                                               list("zoomOut2d"), list("pan2d"), list("autoScale2d"),
-                                               list("resetScale2d"), list("toImage"))) %>%
-          plotly::layout(xaxis = list(title     = "PPM",
-                                      autorange = "reversed"),
-                         yaxis = list(title     = "Intensity"),
-                         showlegend = TRUE,
-                         dragmode = "zoom2d") %>%
-          plotly::add_trace(data = df_long_selsamp,
-                            x=~.data$PPM, y=~.data$Intensity, type = "scatter", mode = "lines", name = sample_to_plot,
-                            line = list(width = 1.3), hoverinfo = "text",
-                            hovertext = paste0("Sample: ", sample_to_plot,
-                                               "\nPPM: ", round(df_long_selsamp$PPM, 4),
-                                               "\nIntensity: ", round(df_long_selsamp$Intensity, 4))) %>%
-          plotly::add_trace(data = df_long_nonselsamp,
-                            x=~.data$PPM, y=~.data$Intensity, type = "scatter", name = ~.data$Sample,
-                            opacity = 0.3, mode = "lines", line = list(color = "#000000", width = 0.75),
-                            hoverinfo = "text", hovertext = paste0("Sample: ", df_long_nonselsamp$Sample,
-                                                                   "\nPPM: ", round(df_long_nonselsamp$PPM, 4),
-                                                                   "\nIntensity: ", round(df_long_nonselsamp$Intensity, 4)),
-                            showlegend = FALSE) %>%
-          plotly::config(edits = list(annotationTail     = TRUE,
-                                      annotationText     = FALSE,
-                                      annotationPosition = FALSE,
-                                      shapePosition      = TRUE))
+          ppm_peaks         <- ppm[selsamp_peaks]
+          ppm_peak_diffs    <- diff(ppm_peaks)
+          split_idxs        <- which(ppm_peak_diffs > input$peak_group_dist) + 1
+          peak_groups       <- split(ppm_peaks, cumsum(seq_along(ppm_peaks) %in% split_idxs))
+          feature_locations <- Reduce("c", lapply(peak_groups, mean))
+          filt_features     <- feature_locations[which(feature_locations >= min(brushed_data$x) & feature_locations <= max(brushed_data$x))]
+
+          # Create default annot object to add as annotation to plot
+          ROI_annot <- list(
+            y         = 0,
+            xref      = "x",
+            yref      = "y",
+            arrowhead = 4,
+            ay        = 40
+          )
+
+          ROI_annots <- list()
+          if(length(filt_features) > 0 & input$show_annotations){
+            for(i in 1:length(filt_features)){
+              ROI_annot[["x"]]         <- filt_features[i]
+              ROI_annot[["text"]]      <- paste0(sprintf("<b>%s</b>", "PPM"), ": ",
+                                                 round(filt_features[i], 5))
+              ROI_annot[["arrowsize"]] <- 1
+              ROI_annot[["showarrow"]] <- TRUE
+
+              ROI_annots               <- c(ROI_annots, list(ROI_annot))
+            }
+          }
+
+          df_long <- xpmt_data %>%
+            tidyr::pivot_longer(!.data$PPM, names_to = "Sample", values_to = "Intensity")
+
+          df_long <- df_long %>% dplyr::filter(.data$PPM >= min(brushed_data$x), .data$PPM <= max(brushed_data$x))
+          df_long_selsamp <- df_long %>% dplyr::filter(.data$Sample == sample_to_plot)
+          df_long_nonselsamp <- df_long %>% dplyr::filter(.data$Sample != sample_to_plot)
+
+          p <- plotly::plot_ly(source = sourceid) %>%
+            plotly::config(displaylogo = FALSE,
+                           modeBarButtons = list(list("zoom2d"), list("zoomIn2d"),
+                                                 list("zoomOut2d"), list("pan2d"), list("autoScale2d"),
+                                                 list("resetScale2d"), list("toImage"))) %>%
+            plotly::layout(xaxis = list(title     = "PPM",
+                                        autorange = "reversed"),
+                           yaxis = list(title     = "Intensity"),
+                           annotations = ROI_annots,
+                           showlegend = TRUE,
+                           dragmode = "zoom2d") %>%
+            plotly::add_trace(data = df_long_selsamp,
+                              x=~.data$PPM, y=~.data$Intensity, type = "scatter", mode = "lines", name = sample_to_plot,
+                              line = list(width = 1.3), hoverinfo = "text",
+                              hovertext = paste0("Sample: ", sample_to_plot,
+                                                 "\nPPM: ", round(df_long_selsamp$PPM, 4),
+                                                 "\nIntensity: ", round(df_long_selsamp$Intensity, 4))) %>%
+            plotly::add_trace(data = df_long_nonselsamp,
+                              x=~.data$PPM, y=~.data$Intensity, type = "scatter", name = ~.data$Sample,
+                              opacity = 0.3, mode = "lines", line = list(color = "#000000", width = 0.75),
+                              hoverinfo = "text", hovertext = paste0("Sample: ", df_long_nonselsamp$Sample,
+                                                                     "\nPPM: ", round(df_long_nonselsamp$PPM, 4),
+                                                                     "\nIntensity: ", round(df_long_nonselsamp$Intensity, 4)),
+                              showlegend = FALSE) %>%
+            plotly::config(edits = list(annotationTail     = TRUE,
+                                        annotationText     = FALSE,
+                                        annotationPosition = FALSE))
 
 
+
+        } else{
+          df_long <- xpmt_data %>%
+            tidyr::pivot_longer(!.data$PPM, names_to = "Sample", values_to = "Intensity")
+
+          df_long <- df_long %>% dplyr::filter(.data$PPM >= min(brushed_data$x), .data$PPM <= max(brushed_data$x))
+          df_long_selsamp <- df_long %>% dplyr::filter(.data$Sample == sample_to_plot)
+          df_long_nonselsamp <- df_long %>% dplyr::filter(.data$Sample != sample_to_plot)
+
+          p <- plotly::plot_ly(source = sourceid) %>%
+            plotly::config(displaylogo = FALSE,
+                           modeBarButtons = list(list("zoom2d"), list("zoomIn2d"),
+                                                 list("zoomOut2d"), list("pan2d"), list("autoScale2d"),
+                                                 list("resetScale2d"), list("toImage"))) %>%
+            plotly::layout(xaxis = list(title     = "PPM",
+                                        autorange = "reversed"),
+                           yaxis = list(title     = "Intensity"),
+                           showlegend = TRUE,
+                           dragmode = "zoom2d") %>%
+            plotly::add_trace(data = df_long_selsamp,
+                              x=~.data$PPM, y=~.data$Intensity, type = "scatter", mode = "lines", name = sample_to_plot,
+                              line = list(width = 1.3), hoverinfo = "text",
+                              hovertext = paste0("Sample: ", sample_to_plot,
+                                                 "\nPPM: ", round(df_long_selsamp$PPM, 4),
+                                                 "\nIntensity: ", round(df_long_selsamp$Intensity, 4))) %>%
+            plotly::add_trace(data = df_long_nonselsamp,
+                              x=~.data$PPM, y=~.data$Intensity, type = "scatter", name = ~.data$Sample,
+                              opacity = 0.3, mode = "lines", line = list(color = "#000000", width = 0.75),
+                              hoverinfo = "text", hovertext = paste0("Sample: ", df_long_nonselsamp$Sample,
+                                                                     "\nPPM: ", round(df_long_nonselsamp$PPM, 4),
+                                                                     "\nIntensity: ", round(df_long_nonselsamp$Intensity, 4)),
+                              showlegend = FALSE) %>%
+            plotly::config(edits = list(annotationTail     = TRUE,
+                                        annotationText     = FALSE,
+                                        annotationPosition = FALSE,
+                                        shapePosition      = TRUE))
+
+        }
 
         p
       })
