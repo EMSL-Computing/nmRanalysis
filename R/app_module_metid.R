@@ -177,6 +177,7 @@ metid_mainUI <- function(id){
                               value   = 0.01)
           )
         ),
+        htmlOutput(ns("common_peaks_text")),
         DT::dataTableOutput(ns("metid_query_table"))
 
       ),
@@ -317,7 +318,7 @@ metid_Server <- function(id, xpmt_data){
                    selsamp_peaks <- rv$spectra_peaks[[which(names(rv$spectra_peaks) == input$sample_to_plot)]]
 
                    ppm_peaks         <- ppm[selsamp_peaks]
-                   ppm_peak_diffs    <- diff(ppm_peaks)
+                   ppm_peak_diffs    <- abs(diff(ppm_peaks))
                    split_idxs        <- which(ppm_peak_diffs > input$peak_group_dist) + 1
                    peak_groups       <- split(ppm_peaks, cumsum(seq_along(ppm_peaks) %in% split_idxs))
                    feature_locations <- Reduce("c", lapply(peak_groups, mean))
@@ -325,12 +326,70 @@ metid_Server <- function(id, xpmt_data){
                    updateSelectInput(inputId = "metid_det", choices = round(feature_locations, 5))
                  })
 
+    output$common_peaks_text <- renderUI({
+
+      req(xpmt_data())
+      req(rv$spectra_peaks)
+      req(input$metid_querytol)
+      req(input$peak_group_dist)
+      req(input$metid_queryset)
+
+      xpmt_data <- xpmt_data()$e_data
+      query_tol <- input$metid_querytol
+      ppm       <- as.numeric(xpmt_data[, 1, drop = TRUE])
+
+      if(input$metid_queryset == "cust"){
+        req(input$metid_cust)
+        feature_loc <- as.numeric(input$metid_cust)
+
+        ppm_allfeats     <- lapply(rv$spectra_peaks, function(x, ppm, group_dist){
+
+          ppm_peaks         <- ppm[x]
+          ppm_peak_diffs    <- abs(diff(ppm_peaks))
+          split_idxs        <- which(ppm_peak_diffs > group_dist) + 1
+          peak_groups       <- split(ppm_peaks, cumsum(seq_along(ppm_peaks) %in% split_idxs))
+          feature_locations <- Reduce("c", lapply(peak_groups, mean))
+          return(feature_locations)
+        }, ppm = ppm, group_dist = input$peak_group_dist)
+
+        intfeat_samps <- Reduce("c", lapply(ppm_allfeats, function(x, loc, tol){
+          length(x[which(x <= (loc + tol) & x >= (loc - tol))])
+        }, loc = feature_loc, tol = query_tol))
+
+        sampcount <- sum(intfeat_samps > 0)
+
+        htmltools::HTML(paste0("Detected features within ", query_tol, " ppm of the specified location (",
+                               feature_loc, " ppm) are found in ", sampcount, " out of ", ncol(xpmt_data)-1, " sample spectra."))
+
+      } else if(input$metid_queryset == "det"){
+        req(input$metid_det)
+        feature_loc <- as.numeric(input$metid_det)
+
+        ppm_allfeats     <- lapply(rv$spectra_peaks, function(x, ppm, group_dist){
+
+          ppm_peaks         <- ppm[x]
+          ppm_peak_diffs    <- abs(diff(ppm_peaks))
+          split_idxs        <- which(ppm_peak_diffs > group_dist) + 1
+          peak_groups       <- split(ppm_peaks, cumsum(seq_along(ppm_peaks) %in% split_idxs))
+          feature_locations <- Reduce("c", lapply(peak_groups, mean))
+          return(feature_locations)
+        }, ppm = ppm, group_dist = input$peak_group_dist)
+
+        intfeat_samps <- Reduce("c", lapply(ppm_allfeats, function(x, loc, tol){
+          length(x[which(x <= (loc + tol) & x >= (loc - tol))])
+        }, loc = feature_loc, tol = query_tol))
+
+        sampcount <- sum(intfeat_samps > 0)
+
+        htmltools::HTML(paste0("Detected features within ", query_tol, " ppm of the specified location (",
+                               feature_loc, " ppm) are found in ", sampcount, " out of ", ncol(xpmt_data)-1, " sample spectra."))
+      }
+    })
 
     # UI element creating a dropdown button containing several options that relate
     # to experimental data visualization for this tab. These options include:
     # 1) Choosing which sample spectrum to display
     # 2) Toggle for whether subplots should be displayed on region select
-    # TO BE ADDED: Choice of which peak group to annotate on plot
     output$metid_vizoptions_ui <- renderUI({
 
       req(xpmt_data())
@@ -367,8 +426,8 @@ metid_Server <- function(id, xpmt_data){
       req(xpmt_data())
       numericInput(inputId = NS(id, "peak_group_dist"),
                    label   = "Peak Grouping Threshold",
-                   value   = round(mean(diff(xpmt_data()$e_data$PPM)), 5),
-                   min     = min(diff(xpmt_data()$e_data$PPM)))
+                   value   = max(0,round(mean(diff(xpmt_data()$e_data$PPM)), 5)),
+                   min     = max(0, min(diff(xpmt_data()$e_data$PPM))))
     })
 
     output$metid_e_data_plot <- plotly::renderPlotly({
@@ -473,7 +532,7 @@ metid_Server <- function(id, xpmt_data){
           selsamp_peaks <- rv$spectra_peaks[[which(names(rv$spectra_peaks) == input$sample_to_plot)]]
 
           ppm_peaks         <- ppm[selsamp_peaks]
-          ppm_peak_diffs    <- diff(ppm_peaks)
+          ppm_peak_diffs    <- abs(diff(ppm_peaks))
           split_idxs        <- which(ppm_peak_diffs > input$peak_group_dist) + 1
           peak_groups       <- split(ppm_peaks, cumsum(seq_along(ppm_peaks) %in% split_idxs))
           feature_locations <- Reduce("c", lapply(peak_groups, mean))
@@ -681,12 +740,13 @@ metid_Server <- function(id, xpmt_data){
                    }
                    req(input$show_annotations)
 
+
                    ppm     <- as.numeric(xpmt_data()$e_data[, 1, drop = TRUE])
 
                    selsamp_peaks <- rv$spectra_peaks[[which(names(rv$spectra_peaks) == input$sample_to_plot)]]
 
                    ppm_peaks         <- ppm[selsamp_peaks]
-                   ppm_peak_diffs    <- diff(ppm_peaks)
+                   ppm_peak_diffs    <- abs(diff(ppm_peaks))
                    split_idxs        <- which(ppm_peak_diffs > input$peak_group_dist) + 1
                    peak_groups       <- split(ppm_peaks, cumsum(seq_along(ppm_peaks) %in% split_idxs))
                    feature_locations <- Reduce("c", lapply(peak_groups, mean))
