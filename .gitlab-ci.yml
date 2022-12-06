@@ -7,7 +7,7 @@ stages:
 - build
 
 variables:
-  CONTAINER_TAG: 0.0.6
+  CONTAINER_TAG: 0.0.7
 
 #Check to see if the image already exists and blocks overwriting an existing image. (New image = new tag, never overwrite, is a best practice.)
 verify-new-image:
