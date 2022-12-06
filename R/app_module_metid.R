@@ -178,12 +178,47 @@ metid_mainUI <- function(id){
           )
         ),
         htmlOutput(ns("common_peaks_text")),
-        DT::dataTableOutput(ns("metid_query_table"))
-
+        fluidRow(
+          column(width = 6,
+                 DT::dataTableOutput(ns("metid_query_table"))
+          ),
+          column(width = 6,
+                 tabsetPanel(
+                   id = ns("metid_more_query_info"),
+                   type = "hidden",
+                   selected = "none",
+                   tabPanelBody(
+                     value = "none",
+                     h4("Select a candidate metabolite from the table.")
+                   ),
+                   tabPanelBody(
+                     value = "query_info",
+                     fluidRow(
+                       column(width = 9,
+                              "Add selected metabolite to list of identified metabolites: "),
+                       column(width = 3,
+                              actionButton(ns("metid_add"), "Add"))
+                     ),
+                     h4(""),
+                     DT::dataTableOutput(ns("selentry_table"))
+                   )
+                 )
+                 )
+        )
       ),
       tabPanel(
         title = "Identified Metabolites",
-        h4("TBD")
+        h4(""),
+        fluidRow(
+          column(width = 3,
+                 selectInput(inputId = ns("metids_list"),
+                             label   = "Identified Metabolites",
+                             choices = NULL)
+          ),
+          column(width = 2,
+                 actionButton(ns("metid_remove"), "Remove Metabolite")
+          )
+        )
       )
     )
   )
@@ -254,6 +289,19 @@ metid_Server <- function(id, xpmt_data){
     rv <- reactiveValues(obs_show_subplot_suspend = TRUE,
                          subplot_dat = NULL)
 
+    observeEvent(input$metid_add,{
+      rv$metids <- unique(c(rv$metids, rv$entry_info$Metabolite))
+      updateSelectInput(inputId = "metids_list", choices = rv$metids)
+    })
+
+    observeEvent(input$metid_remove,{
+      req(rv$metids)
+      rmidx <- which(rv$metids == input$metids_list)
+      rv$metids <- rv$metids[-rmidx]
+      updateSelectInput(inputId = "metids_list", choices = rv$metids)
+    })
+
+
     output$metid_query_table <- DT::renderDT({
 
       req(xpmt_data())
@@ -297,6 +345,122 @@ metid_Server <- function(id, xpmt_data){
 
     })
 
+    observeEvent(input$metid_query_table_rows_selected, ignoreNULL = FALSE, {
+      req(xpmt_data())
+      req(input$metid_querytol)
+      req(input$metid_queryset)
+
+      query_tol <- input$metid_querytol
+
+      if(input$metid_queryset == "cust"){
+        req(input$metid_cust)
+        feature_loc <- as.numeric(input$metid_cust)
+      } else if(input$metid_queryset == "det"){
+        req(input$metid_det)
+        feature_loc <- as.numeric(input$metid_det)
+      }
+
+      querymets <- refmets_full %>% dplyr::filter(.data$`Chemical shift(ppm)` >= (feature_loc - query_tol) &
+                                                    .data$`Chemical shift(ppm)` <= (feature_loc + query_tol))
+      tab <- querymets %>%
+        dplyr::rename(`Peak Location` = `Chemical shift(ppm)`)
+
+      selrow <- input$metid_query_table_rows_selected
+
+
+      if(!is.null(selrow)){
+        rv$entry_info <- tab[selrow, , drop = FALSE]
+        updateTabsetPanel(inputId = "metid_more_query_info", selected = "query_info")
+
+        tempdat <-  refmets_full %>% dplyr::filter(.data$Metabolite == rv$entry_info$Metabolite)
+
+        if(!is.na(rv$entry_info$`Frequency (MHz)`)){
+          tempdat <- tempdat %>% dplyr::filter(.data$`Frequency (MHz)` == rv$entry_info$`Frequency (MHz)`)
+        }
+
+        if(!is.na(rv$entry_info$pH)){
+          tempdat <- tempdat %>% dplyr::filter(.data$pH == rv$entry_info$pH)
+        }
+
+        if(!is.na(rv$entry_info$`Concentration (mM)`)){
+          tempdat <- tempdat %>% dplyr::filter(.data$`Concentration (mM)` == rv$entry_info$`Concentration (mM)`)
+        }
+
+        if(!is.na(rv$entry_info$`Temperature (K)`)){
+          tempdat <- tempdat %>% dplyr::filter(.data$`Temperature (K)` == rv$entry_info$`Temperature (K)`)
+        }
+
+        if(!is.na(rv$entry_info$Solvent)){
+          tempdat <- tempdat %>% dplyr::filter(.data$Solvent == rv$entry_info$Solvent)
+        }
+
+        # Create default annot object to add as annotation to plot
+        ROI_annot <- list(
+          y         = 0,
+          xref      = "x",
+          yref      = "y",
+          arrowhead = 4,
+          ay        = -40,
+          arrowcolor = "red"
+        )
+
+        ROI_annots <- list()
+        for(i in 1:nrow(tempdat)){
+          ROI_annot[["x"]]         <- tempdat$`Chemical shift(ppm)`[i]
+          ROI_annot[["text"]]      <- paste0(sprintf("<b>%s</b>", "Metabolite"), ": ",
+                                             tempdat$Metabolite[i], "<br> ",
+                                             sprintf("<b>%s</b>", "Peak"), ": ",
+                                             round(tempdat$`Chemical shift(ppm)`[i], 5), "<br> ",
+                                             sprintf("<b>%s</b>", "Multiplicity"), ": ",
+                                             tempdat$Multiplicity[i])
+          ROI_annot[["arrowsize"]] <- 1
+          ROI_annot[["showarrow"]] <- TRUE
+
+          ROI_annots               <- c(ROI_annots, list(ROI_annot))
+        }
+
+        rv$candidate_annots <- ROI_annots
+
+        plotly::plotlyProxyInvoke(metid_e_data_plot_proxy, "relayout",
+                                  list(annotations = c(rv$feat_annots, rv$candidate_annots)))
+
+
+
+      } else{
+        rv$entry_info <- NULL
+        updateTabsetPanel(inputId = "metid_more_query_info", selected = "none")
+
+        rv$candidate_annots <- NULL
+
+        plotly::plotlyProxyInvoke(metid_e_data_plot_proxy, "relayout",
+                                  list(annotations = c(rv$feat_annots, rv$candidate_annots)))
+      }
+
+    })
+
+    output$selentry_table <- DT::renderDT({
+
+      # In the future, would like to be able to filter by known experimental conditions, not just by
+      # metabolite name.
+      req(xpmt_data())
+      req(input$metid_query_table_rows_selected)
+      req(rv$entry_info)
+
+      otherpeaks <- refmets_full %>% dplyr::filter(.data$`Metabolite` == rv$entry_info$Metabolite)
+      otherpeaks %>%
+        dplyr::rename(`Peak Location` = `Chemical shift(ppm)`) %>%
+        DT::datatable(rownames = FALSE,
+                      filter = "top",
+                      selection = "single",
+                      options = exprToFunction(
+                        list(dom = 'Bfrtip',
+                             scrollX = TRUE)),
+                      class = 'display') %>%
+        DT::formatRound(columns = c("Peak Location", "Frequency (MHz)",
+                                    "pH", "Concentration (mM)", "Temperature (K)"),
+                        digits = 3)
+
+    })
 
     # Observer to control which set of options for feature querying is displayed
     observeEvent(c(input$metid_queryset),
@@ -475,18 +639,9 @@ metid_Server <- function(id, xpmt_data){
       df_long <- xpmt_data_sample %>%
         tidyr::pivot_longer(!.data$PPM, names_to = "Sample", values_to = "Intensity")
 
-      # # Clear shapes and annotations
-      # plotly::plotlyProxyInvoke(refmet_dspedt_plot_proxy, "relayout",
-      #                           list(annotations = NULL,
-      #                                shapes = NULL))
       # Clear plots
       plotly::plotlyProxyInvoke(metid_e_data_plot_proxy, "deleteTraces", as.list(as.integer(0)))
 
-      # # Line shape update
-      # ROI_lines <- ROI_line_gen(data = rv$dspedt_user_reference_data)
-      #
-      # # Annotation update
-      # ROI_annots <- ROI_annot_gen(data = rv$dspedt_user_reference_data)
 
       plotly::plotlyProxyInvoke(metid_e_data_plot_proxy, "addTraces",
                                 list(x    = df_long$PPM,
@@ -500,11 +655,6 @@ metid_Server <- function(id, xpmt_data){
       plotly::plotlyProxyInvoke(metid_e_data_plot_proxy, "relayout",
                                 list(title = paste("Experimental Data:", input$sample_to_plot)))
 
-      # plotly::plotlyProxyInvoke(refmet_dspedt_plot_proxy, "relayout",
-      #                           list(title = paste("Experimental Data:", input$sample_to_plot, "<br>", "<sup>",
-      #                                              input$which_refmet_dspedt, "Peak Location(s) displayed", "</sup>"),
-      #                                annotations = ROI_annots,
-      #                                shapes = ROI_lines))
     })
 
     # Plotting of the subplot of ppm data across all sample spectra at the selected region
@@ -538,6 +688,7 @@ metid_Server <- function(id, xpmt_data){
           feature_locations <- Reduce("c", lapply(peak_groups, mean))
           filt_features     <- feature_locations[which(feature_locations >= min(brushed_data$x) & feature_locations <= max(brushed_data$x))]
 
+
           # Create default annot object to add as annotation to plot
           ROI_annot <- list(
             y         = 0,
@@ -560,6 +711,10 @@ metid_Server <- function(id, xpmt_data){
             }
           }
 
+          cand_annots_keep_idxs <- Reduce("c", lapply(rv$candidate_annots, function(x, lb, ub){
+            (x$x >= lb) & (x$x <= ub)
+          }, lb = min(brushed_data$x), ub = max(brushed_data$x)))
+
           df_long <- xpmt_data %>%
             tidyr::pivot_longer(!.data$PPM, names_to = "Sample", values_to = "Intensity")
 
@@ -575,7 +730,7 @@ metid_Server <- function(id, xpmt_data){
             plotly::layout(xaxis = list(title     = "PPM",
                                         autorange = "reversed"),
                            yaxis = list(title     = "Intensity"),
-                           annotations = ROI_annots,
+                           annotations = c(ROI_annots, rv$candidate_annots[cand_annots_keep_idxs]),
                            showlegend = TRUE,
                            dragmode = "zoom2d") %>%
             plotly::add_trace(data = df_long_selsamp,
@@ -605,6 +760,10 @@ metid_Server <- function(id, xpmt_data){
           df_long_selsamp <- df_long %>% dplyr::filter(.data$Sample == sample_to_plot)
           df_long_nonselsamp <- df_long %>% dplyr::filter(.data$Sample != sample_to_plot)
 
+          cand_annots_keep_idxs <- Reduce("c", lapply(rv$candidate_annots, function(x, lb, ub){
+            (x$x >= lb) & (x$x <= ub)
+          }, lb = min(brushed_data$x), ub = max(brushed_data$x)))
+
           p <- plotly::plot_ly(source = sourceid) %>%
             plotly::config(displaylogo = FALSE,
                            modeBarButtons = list(list("zoom2d"), list("zoomIn2d"),
@@ -613,6 +772,7 @@ metid_Server <- function(id, xpmt_data){
             plotly::layout(xaxis = list(title     = "PPM",
                                         autorange = "reversed"),
                            yaxis = list(title     = "Intensity"),
+                           annotations = c(rv$candidate_annots[cand_annots_keep_idxs]),
                            showlegend = TRUE,
                            dragmode = "zoom2d") %>%
             plotly::add_trace(data = df_long_selsamp,
@@ -644,11 +804,6 @@ metid_Server <- function(id, xpmt_data){
     metid_subplot_proxy <- plotly::plotlyProxy("metid_selected_subplot")
 
     # Observer to control pop-up (i.e. modal) containing the subplot of spectral data at a selected region.
-    # Note: This works fine, but the only thing that I would like to change is
-    # loading of subsequent plots generated by different brush events.
-    # On initial plot, the loading spinner shows, but on subsequent plots, it does not.
-    # Not sure how to fix this yet, but I suspect the issue lies in the execution order.
-    # This observer triggers before "e_data_subplot" invalidates.
     obs_show_subplot <- observeEvent(plotly::event_data("plotly_brushed", source = "id_metid_e_data_plot"), suspended = TRUE, {
       req(input$show_subplot)
 
@@ -735,8 +890,9 @@ metid_Server <- function(id, xpmt_data){
                    req(rv$spectra_peaks)
 
                    if(!input$show_annotations){
+                     rv$feat_annots <- NULL
                      plotly::plotlyProxyInvoke(metid_e_data_plot_proxy, "relayout",
-                                               list(annotations = NULL))
+                                               list(annotations = c(rv$candidate_annots, rv$feat_annots)))
                    }
                    req(input$show_annotations)
 
@@ -771,8 +927,10 @@ metid_Server <- function(id, xpmt_data){
                      ROI_annots               <- c(ROI_annots, list(ROI_annot))
                    }
 
+                   rv$feat_annots <- ROI_annots
+
                    plotly::plotlyProxyInvoke(metid_e_data_plot_proxy, "relayout",
-                                             list(annotations = ROI_annots))
+                                             list(annotations = c(rv$candidate_annots, rv$feat_annots)))
 
                  })
 
