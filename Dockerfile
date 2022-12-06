@@ -50,6 +50,7 @@ RUN addgroup --system app \
 COPY * /srv/shiny/
 
 RUN chmod -R 755 /srv/shiny/
+RUN export GIT_SSL_NO_VERIFY=1
 RUN R -e "remotes::install_github('EMSL-Computing/nmRanalysis')"
 
 # Make the ShinyApp available at port 3838

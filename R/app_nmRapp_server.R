@@ -51,7 +51,8 @@ nmRapp_server <- function(input, output, session) {
   # conditions
 
   #get your user name based on 'Sys.getenv' (static object)
-  user.name <- paste0("Logged in as: ",Sys.getenv(c("SHINYPROXY_USERNAME")))
+  #user.name <- paste0("Logged in as: ",Sys.getenv(c("SHINYPROXY_USERNAME")))
+  user.name <- paste0("Logged in as: ",Sys.getenv(c("USERNAME")))
   #test user.name easy by printing on console
   print(user.name)
 

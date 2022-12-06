@@ -1611,10 +1611,12 @@ profilingServer <- function(id, xpmt_data, ref_data, connec){
     observeEvent(input$upload_ref_data_db, {
 
       req(input$upload_ref_data_db>0)
-      user.name <- Sys.getenv(c("USER"))
+      user.name <- Sys.getenv(c("USERNAME"))
+      timestamp <- Sys.time()
 
       df <- ref_data()$user_edited_refdata
       df['user'] <- user.name
+      df['session'] <- timestamp
 
       # connect to db table
       #create_new_table(connec(), "profiling_parameters", df)

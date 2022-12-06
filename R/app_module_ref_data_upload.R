@@ -76,10 +76,9 @@ ref_data_uploadUI <- function(id, ref_db){
       ),
       tabPanelBody(
         value = "Previous",
-        # Note: may want to later update to make choices only the set of metabolites that we
-        # have data for at the supplied experimental conditions.
+        # query user profiling parameter table to get options
         selectizeInput(ns("user_timestamps"), label = "Choose a timestamp from a previous session:",
-                       choices = unique(ref_db$Solute), multiple = TRUE)
+                       choices = NULL, multiple = TRUE)
       )
     ),
     tabsetPanel(
@@ -182,6 +181,23 @@ ref_data_uploadServer <- function(id, xpmt_data, ref_db, connec){
                    updateTabsetPanel(inputId = "refmet_upload", selected = input$ref_upload_method)
                  })
 
+    #observer to check for timestamp and query of user ref db
+    observe({
+      req(input$tog_prevornew == TRUE)
+      req(connec())
+
+      conn <- connec()
+      user <- Sys.getenv(c('USERNAME'))
+      query <- query_table(conn, profiling_parameters)
+      user_query <- subset(query, username = user)
+      time.chr <- lapply(user_query$session, as.character)
+      updateSelectizeInput(inputId = "user_timestamps", choices = unique(time.chr))
+
+
+    })
+
+
+
     # reactive to read in refmet file (when supplied)
     refmet_file <- reactive({
       req(xpmt_data())
@@ -257,6 +273,89 @@ ref_data_uploadServer <- function(id, xpmt_data, ref_db, connec){
 
                                        {
                                          req(xpmt_data())
+
+                                         if (input$user_timestamps != FALSE) {
+                                           browser()
+                                           saved.time <- input$user_timestamps
+                                           conn <- connec()
+                                           user <- Sys.getenv(c('USERNAME'))
+                                           query <- query_table(conn, profiling_parameters)
+                                           user_query <- subset(query, username = user)
+                                           user_time_query <- subset(user_query, session = saved.time)
+
+                                           #################
+                                           # Filter to get exact or best match
+                                           xpmt_conds <- data.frame(`Frequency (MHz)`    = attr(xpmt_data(), "exp_info")$instrument_strength,
+                                                                    `pH`                 = attr(xpmt_data(), "exp_info")$ph,
+                                                                    `Concentration (mM)` = attr(xpmt_data(), "exp_info")$concentration,
+                                                                    `Temperature (K)`    = attr(xpmt_data(), "exp_info")$temperature,
+                                                                    `Solvent`            = attr(xpmt_data(), "exp_info")$solvent,
+                                                                    check.names = FALSE)
+                                           xpmt_conds <- xpmt_conds[, colSums(is.na(xpmt_conds)) == 0]
+                                           cols_to_match <- colnames(xpmt_conds)
+
+                                           unq_metabs <- unique(user_time_query$Metabolite)
+                                           bestmatches <- vector("list")
+                                           for(i in 1:length(unq_metabs)){
+
+                                             temp <- user_time_query %>% dplyr::filter(.data$Metabolite == unq_metabs[i])
+
+                                             matchsum <- rep(0, times = nrow(temp))
+                                             if("pH" %in% cols_to_match){
+                                               # Note that we are building in a tolerance of 0.1 for pH matching - this may be too generous
+                                               matchvec <- ifelse(temp$pH < xpmt_conds$pH + 0.1 & temp$pH > xpmt_conds$pH - 0.1, 1, 0)
+                                               matchsum <- matchsum + matchvec
+                                             }
+
+                                             if("Frequency (MHz)" %in% cols_to_match){
+                                               matchvec <- ifelse(temp$`Frequency (MHz)` == xpmt_conds$`Frequency (MHz)`, 1, 0)
+                                               matchsum <- matchsum + matchvec
+                                             }
+
+                                             if("Concentration (mM)" %in% cols_to_match){
+                                               matchvec <- ifelse(temp$`Concentration (mM)` == xpmt_conds$`Concentration (mM)`, 1, 0)
+                                               matchsum <- matchsum + matchvec
+                                             }
+
+                                             if("Temperature (K)" %in% cols_to_match){
+                                               matchvec <- ifelse(temp$`Temperature (K)` == xpmt_conds$`Temperature (K)`, 1, 0)
+                                               matchsum <- matchsum + matchvec
+                                             }
+
+                                             if("Solvent" %in% cols_to_match){
+                                               matchvec <- ifelse(temp$`Solvent` == xpmt_conds$`Solvent`, 1, 0)
+                                               matchsum <- matchsum + matchvec
+                                             }
+
+                                             temp$Matchsum <- matchsum
+
+                                             bestmatches[[unq_metabs[i]]] <- temp %>% dplyr::group_by(.data$`Quantification Signal`) %>%
+                                               dplyr::arrange(desc(.data$`Matchsum`)) %>%
+                                               dplyr::slice_head()
+
+                                             rm(temp, matchvec, matchsum)
+                                           }
+
+                                           user_reference_data_bestmatch <- Reduce("rbind", bestmatches) %>%
+                                             dplyr::arrange(.data$`ROI left edge (ppm)`) %>%
+                                             dplyr::group_by(.data$Metabolite) %>%
+                                             dplyr::mutate(Quantify = ifelse(.data$`Multiplicity` %in% c("1", "2", "3", "4",
+                                                                                                         "s", "d", "t", "q",
+                                                                                                         "dd"), 1, 0),
+                                                           rowid    = paste0(.data$Metabolite, dplyr::row_number())) %>%
+                                             dplyr::select(.data$`ROI left edge (ppm)`, .data$`ROI right edge (ppm)`,
+                                                           .data$`Quantification Mode`, .data$`Metabolite`, .data$`Quantification Signal`,
+                                                           .data$`Chemical shift(ppm)`, .data$`Chemical shift tolerance (ppm)`,
+                                                           .data$`Half bandwidth (Hz)`, .data$`Multiplicity`, .data$`J coupling (Hz)`,
+                                                           .data$`Roof effect`, .data$`J coupling 2 (Hz)`, .data$`Roof effect 2`,
+                                                           .data$`Quantify`, .data$`Frequency (MHz)`, .data$`pH`, .data$`Concentration (mM)`,
+                                                           .data$`Temperature (K)`, .data$`Solvent`, .data$`rowid`)
+
+                                           #################
+
+                                           return(list(bestmatch_data = user_reference_data_bestmatch,
+                                                       full_data  = user_time_query))
+                                         }
 
                                          if (input$ref_upload_method == 'file') {
 
