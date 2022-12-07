@@ -839,7 +839,7 @@ metid_Server <- function(id, xpmt_data){
                    shinyWidgets::sendSweetAlert(
                      session = getDefaultReactiveDomain(),
                      title = "Detecting Peaks...",
-                     text = "This may take several minutes. Do not refresh the page or re-initiate the detection algorithm. This alert will close when identification is complete.",
+                     text = "This may take several minutes. Do not refresh the page or re-initiate the detection algorithm. This alert will close when detection is complete.",
                      type = NULL,
                      btn_labels = NULL,
                      btn_colors = NULL,
