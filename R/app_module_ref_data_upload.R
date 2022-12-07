@@ -274,7 +274,8 @@ ref_data_uploadServer <- function(id, xpmt_data, ref_db, connec){
                                        {
                                          req(xpmt_data())
 
-                                         if (isTRUE(input$user_timestamps)) {
+                                         #if (isTRUE(input$user_timestamps)) {
+                                         if (input$tog_prevornew) {
 
                                            saved.time <- input$user_timestamps
                                            conn <- connec()
@@ -282,6 +283,8 @@ ref_data_uploadServer <- function(id, xpmt_data, ref_db, connec){
                                            query <- query_table(conn, profiling_parameters)
                                            user_query <- subset(query, username = user)
                                            user_time_query <- subset(user_query, session = saved.time)
+
+                                           #display metabolites in side panel from user_time_query
 
                                            #################
                                            # Filter to get exact or best match
@@ -355,9 +358,7 @@ ref_data_uploadServer <- function(id, xpmt_data, ref_db, connec){
 
                                            return(list(bestmatch_data = user_reference_data_bestmatch,
                                                        full_data  = user_time_query))
-                                         }
-
-                                         if (input$ref_upload_method == 'file') {
+                                         } else if (input$ref_upload_method == 'file') {
 
                                            req(input$process_ref_inputs > 0)
 
