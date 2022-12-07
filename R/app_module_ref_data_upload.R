@@ -274,8 +274,8 @@ ref_data_uploadServer <- function(id, xpmt_data, ref_db, connec){
                                        {
                                          req(xpmt_data())
 
-                                         if (input$user_timestamps != FALSE) {
-                                           browser()
+                                         if (isTRUE(input$user_timestamps)) {
+
                                            saved.time <- input$user_timestamps
                                            conn <- connec()
                                            user <- Sys.getenv(c('USERNAME'))
