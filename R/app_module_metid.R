@@ -216,7 +216,8 @@ metid_mainUI <- function(id){
                        column(width = 6,
                               actionButton(ns("metid_add"), htmltools::HTML("<b>Add selection to identifications</b>")))
                      ),
-                     h4("")
+                     h4(""),
+                     htmlOutput(ns("candidate_text"))
                    )
                  )
                  )
@@ -562,6 +563,25 @@ metid_Server <- function(id, xpmt_data){
         htmltools::HTML(paste0("Detected features within ", query_tol, " ppm of the specified location (",
                                feature_loc, " ppm) are found in ", sampcount, " out of ", ncol(xpmt_data)-1, " sample spectra."))
       }
+    })
+
+    output$candidate_text <- renderUI({
+
+      req(xpmt_data())
+      req(input$metid_query_table_rows_selected)
+      req(rv$entry_info)
+
+      # browser()
+
+      isinlist <- ifelse(rv$entry_info$Metabolite %in% rv$metids, "Yes", "No")
+      currpeak <- rv$entry_info$`Peak Location`
+
+
+      htmltools::HTML(paste0("<b>Selected metabolite:</b> ", rv$entry_info$Metabolite, "<br>",
+                             "<b>Included in current identification list?</b> ", isinlist))
+
+
+
     })
 
     # UI element creating a dropdown button containing several options that relate
