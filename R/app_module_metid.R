@@ -55,11 +55,28 @@ metid_peakfinderUI <- function(id){
                                                                        value    = 0.8)
                                                    )
                                                  ),
+                                                 # fluidRow(
+                                                 #   column(width = 6,
+                                                 #          numericInput(inputId  = ns("snrThresh"),
+                                                 #                       label    = "Signal-to-Noise Threshold:",
+                                                 #                       value    = 0.8)
+                                                 #   ),
+                                                 #   column(width = 6,
+                                                 #          shinyWidgets::switchInput(inputId = ns("snr_show"),
+                                                 #                                       label   = "Visualize",
+                                                 #                                       value   = FALSE)
+                                                 #   )
+                                                 # ),
                                                  fluidRow(
                                                    column(width = 6,
                                                           numericInput(inputId  = ns("baselineThresh"),
                                                                        label    = "Intensity Threshold:",
                                                                        value    = 50000)
+                                                   ),
+                                                   column(width = 6,
+                                                          shinyWidgets::switchInput(inputId = ns("baseline_show"),
+                                                                                       label   = "Visualize",
+                                                                                       value   = FALSE)
                                                    )
                                                  ),
                                                  style = "primary"
@@ -288,6 +305,28 @@ metid_Server <- function(id, xpmt_data){
 
     rv <- reactiveValues(obs_show_subplot_suspend = TRUE,
                          subplot_dat = NULL)
+
+    observeEvent(c(input$baseline_show, input$baselineThresh), {
+      req(input$baselineThresh)
+      req(xpmt_data())
+
+      if(input$baseline_show){
+        plotly::plotlyProxyInvoke(metid_e_data_plot_proxy, "deleteTraces", list(as.integer(1)))
+
+        plotly::plotlyProxyInvoke(metid_e_data_plot_proxy, "addTraces",
+                                  list(x = xpmt_data()$e_data$PPM,
+                                       y = rep(input$baselineThresh, length(xpmt_data()$e_data$PPM)),
+                                       mode = "lines",
+                                       showlegend = FALSE,
+                                       line = list(dash = "dash")
+                                  ))
+      } else{
+        plotly::plotlyProxyInvoke(metid_e_data_plot_proxy, "deleteTraces", list(as.integer(1)))
+      }
+
+
+
+    })
 
     observeEvent(input$metid_add,{
       rv$metids <- unique(c(rv$metids, rv$entry_info$Metabolite))
