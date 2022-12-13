@@ -211,13 +211,12 @@ metid_mainUI <- function(id){
                    tabPanelBody(
                      value = "query_info",
                      fluidRow(
-                       column(width = 9,
-                              "Add selected metabolite to list of identified metabolites: "),
-                       column(width = 3,
-                              actionButton(ns("metid_add"), "Add"))
+                       # column(width = 9,
+                       #        "Add to identifications: "),
+                       column(width = 6,
+                              actionButton(ns("metid_add"), htmltools::HTML("<b>Add selection to identifications</b>")))
                      ),
-                     h4(""),
-                     DT::dataTableOutput(ns("selentry_table"))
+                     h4("")
                    )
                  )
                  )
@@ -233,7 +232,7 @@ metid_mainUI <- function(id){
                              choices = NULL)
           ),
           column(width = 2,
-                 actionButton(ns("metid_remove"), "Remove Metabolite")
+                 actionButton(ns("metid_remove"), htmltools::HTML("<b>Remove selection from identifications</b>"))
           )
         )
       )
@@ -474,30 +473,6 @@ metid_Server <- function(id, xpmt_data){
         plotly::plotlyProxyInvoke(metid_e_data_plot_proxy, "relayout",
                                   list(annotations = c(rv$feat_annots, rv$candidate_annots)))
       }
-
-    })
-
-    output$selentry_table <- DT::renderDT({
-
-      # In the future, would like to be able to filter by known experimental conditions, not just by
-      # metabolite name.
-      req(xpmt_data())
-      req(input$metid_query_table_rows_selected)
-      req(rv$entry_info)
-
-      otherpeaks <- refmets_full %>% dplyr::filter(.data$`Metabolite` == rv$entry_info$Metabolite)
-      otherpeaks %>%
-        dplyr::rename(`Peak Location` = `Chemical shift(ppm)`) %>%
-        DT::datatable(rownames = FALSE,
-                      filter = "top",
-                      selection = "single",
-                      options = exprToFunction(
-                        list(dom = 'Bfrtip',
-                             scrollX = TRUE)),
-                      class = 'display') %>%
-        DT::formatRound(columns = c("Peak Location", "Frequency (MHz)",
-                                    "pH", "Concentration (mM)", "Temperature (K)"),
-                        digits = 3)
 
     })
 
