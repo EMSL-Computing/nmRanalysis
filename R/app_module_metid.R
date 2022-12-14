@@ -571,16 +571,61 @@ metid_Server <- function(id, xpmt_data){
       req(input$metid_query_table_rows_selected)
       req(rv$entry_info)
 
-      # browser()
 
       isinlist <- ifelse(rv$entry_info$Metabolite %in% rv$metids, "Yes", "No")
       currpeak <- rv$entry_info$`Peak Location`
+      other_peaks <- refmets_full %>%
+        dplyr::filter(.data$`Metabolite` == rv$entry_info$Metabolite) %>%
+        dplyr::rename(`Peak Location` = `Chemical shift(ppm)`)
+
+      if(!is.na(rv$entry_info$`Frequency (MHz)`)){
+        other_peaks <- other_peaks %>% dplyr::filter(.data$`Frequency (MHz)` == rv$entry_info$`Frequency (MHz)`)
+      }
+
+      if(!is.na(rv$entry_info$pH)){
+        other_peaks <- other_peaks %>% dplyr::filter(.data$pH == rv$entry_info$pH)
+      }
+
+      if(!is.na(rv$entry_info$`Concentration (mM)`)){
+        other_peaks <- other_peaks %>% dplyr::filter(.data$`Concentration (mM)` == rv$entry_info$`Concentration (mM)`)
+      }
+
+      if(!is.na(rv$entry_info$`Temperature (K)`)){
+        other_peaks <- other_peaks %>% dplyr::filter(.data$`Temperature (K)` == rv$entry_info$`Temperature (K)`)
+      }
+
+      if(!is.na(rv$entry_info$Solvent)){
+        other_peaks <- other_peaks %>% dplyr::filter(.data$Solvent == rv$entry_info$Solvent)
+      }
 
 
-      htmltools::HTML(paste0("<b>Selected metabolite:</b> ", rv$entry_info$Metabolite, "<br>",
-                             "<b>Included in current identification list?</b> ", isinlist))
+      if(!is.null(rv$spectra_peaks)){
+        ppm     <- as.numeric(xpmt_data()$e_data[, 1, drop = TRUE])
+        peak_ppms <- lapply(rv$spectra_peaks, function(x, ppm){ppm[x]}, ppm = ppm)
 
+        proximity_info <- vector("list", length = nrow(other_peaks))
+        for(i in 1:nrow(other_peaks)){
+          proximity_check <- lapply(peak_ppms, function(x, loc, tol){
+            close_features <- x[x >= (loc - tol) & x <= (loc + tol)]
+            return(ifelse(length(close_features) > 0, 1, 0))
+          }, loc = other_peaks$`Peak Location`[i], tol = input$metid_querytol)
+          proximity_info[[i]] <- list(count = sum(Reduce("c", proximity_check)),
+                                      nosamps = names(proximity_check)[which(proximity_check == 0)])
+        }
+        other_peaks_counts <- Reduce("c", rlist::list.ungroup(rlist::list.select(proximity_info, count)))
+        other_peaks_locs <- paste0(other_peaks$`Peak Location`, " (", other_peaks_counts, "/",
+                                   ncol(xpmt_data()$e_data)-1, " samples with detected peaks within ", input$metid_querytol, " ppm)")
+        other_peaks_locs <- paste0(other_peaks_locs, collapse = "<br> &emsp; ")
 
+        htmltools::HTML(paste0("<b>Selected metabolite:</b> ", rv$entry_info$Metabolite, "<br>",
+                               "<b>Included in current identification list?</b> ", isinlist, "<br>",
+                               "<br>",
+                               "<b>All metabolite peak locations:</b>", "<br>",
+                               "&emsp; ", other_peaks_locs))
+      } else{
+        htmltools::HTML(paste0("<b>Selected metabolite:</b> ", rv$entry_info$Metabolite, "<br>",
+                               "<b>Included in current identification list?</b> ", isinlist))
+      }
 
     })
 
