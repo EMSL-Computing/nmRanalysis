@@ -56,7 +56,7 @@ Imports:
     data.table,
     tibble,
     DBI,
-    RPostgres
+    RPostgres,
     speaq,
     htmltools,
     minpack.lm,
