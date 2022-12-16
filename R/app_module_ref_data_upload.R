@@ -410,13 +410,12 @@ ref_data_uploadServer <- function(id, xpmt_data, ref_db, connec){
                                                                       table = data.frame(metab_names_table[metab_names_table[[input$columns]] %ni% ref_db$CASno, ,drop = FALSE]))
 
                                            # Feeds in above to nmRanalysis function that generates formatted dataframe of reference metabolite info
-                                           user_reference_data <- roi_ref_export(cas_list            = user.refchoices,
-                                                                                 solvent_type        = attr(xpmt_data(), "exp_info")$solvent,
-                                                                                 ph                  = attr(xpmt_data(), "exp_info")$ph,
-                                                                                 instrument_strength = attr(xpmt_data(), "exp_info")$instrument_strength,
-                                                                                 temperature         = attr(xpmt_data(), "exp_info")$temperature,
-                                                                                 concentration       = attr(xpmt_data(), "exp_info")$concentration,
-                                                                                 connec = connec())
+                                           user_reference_data <- suppressMessages(roi_ref_export(cas_list            = user.refchoices,
+                                                                                                  solvent_type        = attr(xpmt_data(), "exp_info")$solvent,
+                                                                                                  ph                  = attr(xpmt_data(), "exp_info")$ph,
+                                                                                                  instrument_strength = attr(xpmt_data(), "exp_info")$instrument_strength,
+                                                                                                  temperature         = attr(xpmt_data(), "exp_info")$temperature,
+                                                                                                  concentration       = attr(xpmt_data(), "exp_info")$concentration))
 
                                            shinyFeedback::feedbackDanger("uploaded_refmet_file",
                                                                          nrow(user_reference_data) == 0,
@@ -425,11 +424,16 @@ ref_data_uploadServer <- function(id, xpmt_data, ref_db, connec){
                                            req(nrow(user_reference_data) > 0)
 
                                            # Filter to get exact or best match
-                                           xpmt_conds <- data.frame(`Frequency (MHz)`    = attr(xpmt_data(), "exp_info")$instrument_strength,
-                                                                    `pH`                 = attr(xpmt_data(), "exp_info")$ph,
-                                                                    `Concentration (mM)` = attr(xpmt_data(), "exp_info")$concentration,
-                                                                    `Temperature (K)`    = attr(xpmt_data(), "exp_info")$temperature,
-                                                                    `Solvent`            = attr(xpmt_data(), "exp_info")$solvent,
+                                           xpmt_conds <- data.frame(`Frequency (MHz)`    = ifelse(is.null(attr(xpmt_data(), "exp_info")$instrument_strength),
+                                                                                                  NA, attr(xpmt_data(), "exp_info")$instrument_strength),
+                                                                    `pH`                 = ifelse(is.null(attr(xpmt_data(), "exp_info")$ph),
+                                                                                                  NA, attr(xpmt_data(), "exp_info")$ph),
+                                                                    `Concentration (mM)` = ifelse(is.null(attr(xpmt_data(), "exp_info")$concentration),
+                                                                                                  NA, attr(xpmt_data(), "exp_info")$concentration),
+                                                                    `Temperature (K)`    = ifelse(is.null(attr(xpmt_data(), "exp_info")$temperature),
+                                                                                                  NA, attr(xpmt_data(), "exp_info")$temperature),
+                                                                    `Solvent`            = ifelse(is.null(attr(xpmt_data(), "exp_info")$solvent),
+                                                                                                  NA, attr(xpmt_data(), "exp_info")$solvent),
                                                                     check.names = FALSE)
                                            xpmt_conds <- xpmt_conds[, colSums(is.na(xpmt_conds)) == 0]
                                            cols_to_match <- colnames(xpmt_conds)
@@ -470,7 +474,7 @@ ref_data_uploadServer <- function(id, xpmt_data, ref_db, connec){
                                              temp$Matchsum <- matchsum
 
                                              bestmatches[[unq_metabs[i]]] <- temp %>% dplyr::group_by(.data$`Quantification Signal`) %>%
-                                               dplyr::arrange(desc(.data$`Matchsum`)) %>%
+                                               dplyr::arrange(dplyr::desc(.data$`Matchsum`)) %>%
                                                dplyr::slice_head()
 
                                              rm(temp, matchvec, matchsum)
@@ -522,13 +526,12 @@ ref_data_uploadServer <- function(id, xpmt_data, ref_db, connec){
                                            rv$casno_not_in_db <- NULL
 
                                            # create an ROI reference object using nmRanalysis to be rendered as a table in the UI
-                                           user_reference_data <- roi_ref_export(name_list           = user.refchoices,
-                                                                                 solvent_type        = attr(xpmt_data(), "exp_info")$solvent,
-                                                                                 ph                  = attr(xpmt_data(), "exp_info")$ph,
-                                                                                 instrument_strength = attr(xpmt_data(), "exp_info")$instrument_strength,
-                                                                                 temperature         = attr(xpmt_data(), "exp_info")$temperature,
-                                                                                 concentration       = attr(xpmt_data(), "exp_info")$concentration,
-                                                                                 connec = connec())
+                                           user_reference_data <- suppressMessages(roi_ref_export(name_list           = user.refchoices,
+                                                                                                  solvent_type        = attr(xpmt_data(), "exp_info")$solvent,
+                                                                                                  ph                  = attr(xpmt_data(), "exp_info")$ph,
+                                                                                                  instrument_strength = attr(xpmt_data(), "exp_info")$instrument_strength,
+                                                                                                  temperature         = attr(xpmt_data(), "exp_info")$temperature,
+                                                                                                  concentration       = attr(xpmt_data(), "exp_info")$concentration))
 
                                            shinyFeedback::feedbackDanger("user_refmets",
                                                                          nrow(user_reference_data) == 0,
@@ -567,11 +570,16 @@ ref_data_uploadServer <- function(id, xpmt_data, ref_db, connec){
 
 
                                            # Filter to get exact or best match
-                                           xpmt_conds <- data.frame(`Frequency (MHz)`    = attr(xpmt_data(), "exp_info")$instrument_strength,
-                                                                    `pH`                 = attr(xpmt_data(), "exp_info")$ph,
-                                                                    `Concentration (mM)` = attr(xpmt_data(), "exp_info")$concentration,
-                                                                    `Temperature (K)`    = attr(xpmt_data(), "exp_info")$temperature,
-                                                                    `Solvent`            = attr(xpmt_data(), "exp_info")$solvent,
+                                           xpmt_conds <- data.frame(`Frequency (MHz)`    = ifelse(is.null(attr(xpmt_data(), "exp_info")$instrument_strength),
+                                                                                                  NA, attr(xpmt_data(), "exp_info")$instrument_strength),
+                                                                    `pH`                 = ifelse(is.null(attr(xpmt_data(), "exp_info")$ph),
+                                                                                                  NA, attr(xpmt_data(), "exp_info")$ph),
+                                                                    `Concentration (mM)` = ifelse(is.null(attr(xpmt_data(), "exp_info")$concentration),
+                                                                                                  NA, attr(xpmt_data(), "exp_info")$concentration),
+                                                                    `Temperature (K)`    = ifelse(is.null(attr(xpmt_data(), "exp_info")$temperature),
+                                                                                                  NA, attr(xpmt_data(), "exp_info")$temperature),
+                                                                    `Solvent`            = ifelse(is.null(attr(xpmt_data(), "exp_info")$solvent),
+                                                                                                  NA, attr(xpmt_data(), "exp_info")$solvent),
                                                                     check.names = FALSE)
                                            xpmt_conds <- xpmt_conds[, colSums(is.na(xpmt_conds)) == 0]
                                            cols_to_match <- colnames(xpmt_conds)
@@ -612,7 +620,7 @@ ref_data_uploadServer <- function(id, xpmt_data, ref_db, connec){
                                              temp$Matchsum <- matchsum
 
                                              bestmatches[[unq_metabs[i]]] <- temp %>% dplyr::group_by(.data$`Quantification Signal`) %>%
-                                               dplyr::arrange(desc(.data$`Matchsum`)) %>%
+                                               dplyr::arrange(dplyr::desc(.data$`Matchsum`)) %>%
                                                dplyr::slice_head()
 
                                              rm(temp, matchvec, matchsum)

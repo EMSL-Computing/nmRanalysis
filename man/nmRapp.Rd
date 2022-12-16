@@ -7,6 +7,8 @@
 nmRapp(launch.browser = FALSE, ...)
 }
 \arguments{
+\item{launch.browser}{logical indicating whether the app should be launched in a browser window.}
+
 \item{...}{additional arguments to be passed to shinyApp().}
 }
 \description{

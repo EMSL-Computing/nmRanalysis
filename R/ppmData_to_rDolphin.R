@@ -110,7 +110,7 @@ ppmData_to_rDolphin <- function(ppmData, metabs,
     # Extract all of the default global fitting parameters from rDolphin
     prog_par_path <- file.path(system.file(package = "rDolphin"),"extdata","fitting_variables.csv")
 
-    temp <- read.csv(prog_par_path, stringsAsFactors = F)
+    temp <- utils::read.csv(prog_par_path, stringsAsFactors = F)
     program_parameters <- as.list(suppressWarnings(as.numeric(temp$Value)))
     names(program_parameters) <- temp$Varaible
     program_parameters$automatic_removal <- "Y" # Default

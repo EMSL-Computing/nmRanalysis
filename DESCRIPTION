@@ -57,6 +57,12 @@ Imports:
     tibble,
     DBI,
     RPostgres
+    speaq,
+    htmltools,
+    minpack.lm,
+    reshape2,
+    rlist,
+    shinyBS
 Suggests:
     knitr,
     rmarkdown,

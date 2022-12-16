@@ -1,3 +1,6 @@
+YEAR: 2022
+COPYRIGHT HOLDER: Battelle Memorial Institute
+
 GNU General Public License
 ==========================
 

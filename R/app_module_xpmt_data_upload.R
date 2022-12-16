@@ -242,8 +242,8 @@ xpmt_data_uploadServer <- function(id){
 
                                           xpmt_temp <- as.numeric(input$temperature)
                                           xpmt_freq <- as.numeric(input$instrument_strength)
-                                          xpmt_ph   <- NA
-                                          xpmt_conc <- NA
+                                          xpmt_ph   <- NULL
+                                          xpmt_conc <- NULL
 
                                           if(input$pH != ""){
                                             shinyFeedback::feedbackDanger("pH",
@@ -274,7 +274,7 @@ xpmt_data_uploadServer <- function(id){
 
                                             shinyWidgets::show_alert(
                                               title = "Experimental metadata not provided.",
-                                              text = "Default metadata will be automatically generated.",
+                                              text = "A default set of metadata will be automatically generated using the specified experimental conditions.",
                                               type = "warning"
                                             )
 
@@ -376,6 +376,25 @@ xpmt_data_uploadServer <- function(id){
 
                                           }
 
+                                          if(input$align_spectra){
+
+                                            shinyWidgets::sendSweetAlert(
+                                              session = getDefaultReactiveDomain(),
+                                              title = "Aligning spectra...",
+                                              text = "This may take several minutes. Do not refresh the page or re-process uploaded data. This alert will close when alignment is complete.",
+                                              type = NULL,
+                                              btn_labels = NULL,
+                                              btn_colors = NULL,
+                                              html = FALSE,
+                                              closeOnClickOutside = FALSE,
+                                              showCloseButton = FALSE,
+                                              width = NULL,
+                                              showConfirmButton = FALSE,
+                                              closeOnEscapeKey = FALSE
+                                            )
+
+                                          }
+
                                           # Feed above into nmRanalysis function to create ppmData object
                                           user.data <- as.ppmData(e_data              = xpmt.e_data,
                                                                   f_data              = xpmt.f_data,
@@ -387,6 +406,12 @@ xpmt_data_uploadServer <- function(id){
                                                                   temperature         = xpmt_temp,
                                                                   concentration       = xpmt_conc,
                                                                   align               = input$align_spectra)
+
+                                          if(input$align_spectra){
+
+                                            shinyWidgets::closeSweetAlert()
+                                          }
+
                                           return(user.data)
                                         })
   })

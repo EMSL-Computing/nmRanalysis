@@ -343,10 +343,9 @@ profilingServer <- function(id, xpmt_data, ref_data, connec){
       req(input$ROI_to_plot_quantdat)
 
 
-
       temp <- ref_data()$quantdata %>%
         dplyr::mutate(ROI = paste0("(", .data$`ROI right edge (ppm)`, ", ", .data$`ROI left edge (ppm)`, ")")) %>%
-        dplyr::filter(ROI %in% input$ROI_to_plot_quantdat)
+        dplyr::filter(.data$ROI %in% input$ROI_to_plot_quantdat)
       temp2 <- ref_data()$user_edited_refdata %>% dplyr::ungroup() %>%
         dplyr::filter(.data$`Chemical shift(ppm)` %in% temp$`Chemical shift(ppm)`) %>%
         dplyr::mutate(Signal = paste0(.data$Metabolite, " [", .data$`Quantification Signal`, "]")) %>%
@@ -451,7 +450,7 @@ profilingServer <- function(id, xpmt_data, ref_data, connec){
       # Update shapes/annotations
       temp <- ref_data()$quantdata %>%
         dplyr::mutate(ROI = paste0("(", .data$`ROI right edge (ppm)`, ", ", .data$`ROI left edge (ppm)`, ")")) %>%
-        dplyr::filter(ROI %in% input$ROI_to_plot_quantdat)
+        dplyr::filter(.data$ROI %in% input$ROI_to_plot_quantdat)
       temp2 <- ref_data()$user_edited_refdata %>% dplyr::filter(.data$`Chemical shift(ppm)` %in% temp$`Chemical shift(ppm)`)
 
       ROI_lines <- ROI_line_gen(data = temp[!duplicated(temp$`ROI left edge (ppm)`),,drop = FALSE])
@@ -470,11 +469,9 @@ profilingServer <- function(id, xpmt_data, ref_data, connec){
                    req(ref_data())
                    req(xpmt_data())
 
-
-
                    temp <- ref_data()$quantdata %>%
                      dplyr::mutate(ROI = paste0("(", .data$`ROI right edge (ppm)`, ", ", .data$`ROI left edge (ppm)`, ")")) %>%
-                     dplyr::filter(ROI %in% input$ROI_to_plot_quantdat)
+                     dplyr::filter(.data$ROI %in% input$ROI_to_plot_quantdat)
                    temp2 <- ref_data()$user_edited_refdata %>% dplyr::filter(.data$`Chemical shift(ppm)` %in% temp$`Chemical shift(ppm)`)
 
                    ROI_lines <- ROI_line_gen(data = temp[!duplicated(temp$`ROI left edge (ppm)`),,drop = FALSE])
@@ -988,37 +985,37 @@ profilingServer <- function(id, xpmt_data, ref_data, connec){
         dplyr::mutate(SigName = make.names(paste0(.data$Metabolite, "_", .data$`Quantification Signal`)),
                       Signal = paste0(.data$Metabolite, " [", .data$`Quantification Signal`, "]")) %>%
         dplyr::ungroup() %>%
-        dplyr::select(SigName, Signal)
+        dplyr::select(.data$SigName, .data$Signal)
 
       # Quantification data
       temp_quantdat <- data.frame(Sample = rownames(profiling_data$final_output$quantification), profiling_data$final_output$quantification) %>%
         tidyr::pivot_longer(-.data$Sample, names_to = "SigName", values_to = "Quantification") %>%
-        dplyr::left_join(tempdat, by = "SigName") %>% dplyr::select(-SigName)
+        dplyr::left_join(tempdat, by = "SigName") %>% dplyr::select(-.data$SigName)
 
       # Signal to Area Ratio
       temp_sardat <- data.frame(Sample = rownames(profiling_data$final_output$signal_area_ratio), profiling_data$final_output$signal_area_ratio) %>%
         tidyr::pivot_longer(-.data$Sample, names_to = "SigName", values_to = "Signal to Area Ratio") %>%
-        dplyr::left_join(tempdat, by = "SigName") %>% dplyr::select(-SigName)
+        dplyr::left_join(tempdat, by = "SigName") %>% dplyr::select(-.data$SigName)
 
       # Fitting Error
       temp_fedat <- data.frame(Sample = rownames(profiling_data$final_output$fitting_error), profiling_data$final_output$fitting_error) %>%
         tidyr::pivot_longer(-.data$Sample, names_to = "SigName", values_to = "Fitting Error") %>%
-        dplyr::left_join(tempdat, by = "SigName") %>% dplyr::select(-SigName)
+        dplyr::left_join(tempdat, by = "SigName") %>% dplyr::select(-.data$SigName)
 
       # Chemical Shift
       temp_csdat <- data.frame(Sample = rownames(profiling_data$final_output$chemical_shift), profiling_data$final_output$chemical_shift) %>%
         tidyr::pivot_longer(-.data$Sample, names_to = "SigName", values_to = "Chemical Shift") %>%
-        dplyr::left_join(tempdat, by = "SigName") %>% dplyr::select(-SigName)
+        dplyr::left_join(tempdat, by = "SigName") %>% dplyr::select(-.data$SigName)
 
       # Intensity
       temp_intdat <- data.frame(Sample = rownames(profiling_data$final_output$intensity), profiling_data$final_output$intensity) %>%
         tidyr::pivot_longer(-.data$Sample, names_to = "SigName", values_to = "Intensity") %>%
-        dplyr::left_join(tempdat, by = "SigName") %>% dplyr::select(-SigName)
+        dplyr::left_join(tempdat, by = "SigName") %>% dplyr::select(-.data$SigName)
 
       # Half bandwidth
       temp_hwdat <- data.frame(Sample = rownames(profiling_data$final_output$half_bandwidth), profiling_data$final_output$half_bandwidth) %>%
         tidyr::pivot_longer(-.data$Sample, names_to = "SigName", values_to = "Half Bandwidth") %>%
-        dplyr::left_join(tempdat, by = "SigName") %>% dplyr::select(-SigName)
+        dplyr::left_join(tempdat, by = "SigName") %>% dplyr::select(-.data$SigName)
 
 
       # Add Quantification, Signal to Area Ratio, Fitting Error, Chemical Shift, Intensity, Half Bandwidth
@@ -1042,9 +1039,10 @@ profilingServer <- function(id, xpmt_data, ref_data, connec){
           Intensity = purrr::map_dbl(.data$data, ~ unique(.$Intensity)),
           Half_Bandwidth = purrr::map_dbl(.data$data, ~ unique(.$`Half Bandwidth`)),
           panel = trelliscopejs::map_plot(.data$data, function(x){
-            ggplot2::ggplot(data = subset(x, variable != "Quantified Signal"), ggplot2::aes(x = Xdata, y = value, color = variable))+
+            tempdat <- x %>% dplyr::filter(.data$variable != "Quantified Signal")
+            ggplot2::ggplot(data = tempdat, ggplot2::aes(x = Xdata, y = .data$value, color = .data$variable))+
               ggplot2::geom_line() +
-              ggplot2::geom_line(data = subset(x, variable == "Quantified Signal"), ggplot2::aes(x = Xdata, y = value, color=variable), alpha = 0.5)+
+              ggplot2::geom_line(data = tempdat, ggplot2::aes(x = Xdata, y = .data$value, color= .data$variable), alpha = 0.5)+
               ggplot2::xlab('PPM') + ggplot2::ylab('Intensity') + ggplot2::theme_bw() #+ ggplot2::theme(legend.position = "none")
           })
         ) %>%
@@ -1098,11 +1096,11 @@ profilingServer <- function(id, xpmt_data, ref_data, connec){
                             values_to = "Fitted Half Bandwidth (Hz)",
                             -.data$Sample)
 
-      tempdat <- dplyr::left_join(tempdat_quant, tempdat_err)
-      tempdat <- dplyr::left_join(tempdat, tempdat_sar)
-      tempdat <- dplyr::left_join(tempdat, tempdat_cs)
-      tempdat <- dplyr::left_join(tempdat, tempdat_int)
-      tempdat <- dplyr::left_join(tempdat, tempdat_hbw)
+      tempdat <- dplyr::left_join(tempdat_quant, tempdat_err, by = c("Sample", "Metabolite"))
+      tempdat <- dplyr::left_join(tempdat, tempdat_sar, by = c("Sample", "Metabolite"))
+      tempdat <- dplyr::left_join(tempdat, tempdat_cs, by = c("Sample", "Metabolite"))
+      tempdat <- dplyr::left_join(tempdat, tempdat_int, by = c("Sample", "Metabolite"))
+      tempdat <- dplyr::left_join(tempdat, tempdat_hbw, by = c("Sample", "Metabolite"))
 
 
       quant_refdata <- ref_data()$user_edited_refdata %>% dplyr::filter(.data$Quantify == 1)
@@ -1110,8 +1108,8 @@ profilingServer <- function(id, xpmt_data, ref_data, connec){
       qmet_signums <- sub(".*_", "", tempdat$Metabolite)
 
       for(name in qmetnames){
-        signums <- qmet_signums[which(grepl(make.names(name), tempdat$Metabolite))]
-        tempdat$Metabolite[which(grepl(make.names(name), tempdat$Metabolite))] <- paste0(name, " [", signums, "]")
+        signums <- qmet_signums[grepl(make.names(name), tempdat$Metabolite)]
+        tempdat$Metabolite[grepl(make.names(name), tempdat$Metabolite)] <- paste0(name, " [", signums, "]")
       }
 
       refdat_info <- ref_data()$user_edited_refdata %>% dplyr::ungroup() %>%
@@ -1119,9 +1117,9 @@ profilingServer <- function(id, xpmt_data, ref_data, connec){
         dplyr::select(.data$`SigName`, .data$`ROI left edge (ppm)`, .data$`ROI right edge (ppm)`, .data$`Chemical shift(ppm)`,
                       .data$`Chemical shift tolerance (ppm)`, .data$`Half bandwidth (Hz)`, .data$`Multiplicity`,
                       .data$`J coupling (Hz)`, .data$`J coupling 2 (Hz)`, .data$`Roof effect`, .data$`Roof effect 2`) %>%
-        dplyr::rename(Metabolite = SigName)
+        dplyr::rename(Metabolite = .data$SigName)
 
-      tempdat <- dplyr::left_join(tempdat, refdat_info)
+      tempdat <- dplyr::left_join(tempdat, refdat_info, by = "Metabolite")
 
       tempdat %>% dplyr::select(.data$Sample, .data$Metabolite, .data$`Fitted Chemical Shift (ppm)`, .data$`Fitted Intensity`,
                                 .data$`Fitted Half Bandwidth (Hz)`, .data$`Quantity`, .data$`Fitting Error`,
@@ -1535,7 +1533,7 @@ profilingServer <- function(id, xpmt_data, ref_data, connec){
 
             selmet_inds2 <- which(selmet_names %in% tempdat$SigName)
 
-            ROI_plots2 <- ROI_plots %>% dplyr::filter(ROI %in% selmet_inds2)
+            ROI_plots2 <- ROI_plots %>% dplyr::filter(.data$ROI %in% selmet_inds2)
 
 
             ROI_plots2 %>% dplyr::group_by(.data$ROI) %>%

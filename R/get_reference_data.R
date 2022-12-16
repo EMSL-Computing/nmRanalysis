@@ -17,10 +17,10 @@
 #'  51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
 #'
 #'@param casno_list list of CAS registry numbers written as characters
-#'@param return_metabs string, must be one of "exact_match" or "all". Defaults to "all". If "exact_match", returns metabolites that exactly match specified experimental conditions (solvent type, pH, and instrument strength). If "all", returns all entries corresponding to supplied CAS numbers, experimental conditions ignored.
+#'@param return_metabs string, must be one of "exact_match" or "all". Defaults to "all". If "exact_match", returns metabolites that exactly match specified experimental conditions (solvent type, temperature, and instrument strength). If "all", returns all entries corresponding to supplied CAS numbers, experimental conditions ignored.
 #'@param solvent_type choose from available solvents 'D2O', 'H2O', ...
 #'@param ph numeric value specifying pH of experimental conditions
-#'@param instrument_strength numeric value specifying experimental instrument strength
+#'@param instrument_strength numeric value specifying spectrometer frequency
 #'@param temperature numeric value specifying the temperature
 #'@param concentration numeric value specifying the concentration
 #'
@@ -51,8 +51,8 @@ as.bmseList <- function(casno_list,
     stop('return_metabs must be one of "exact_match" or "all"')
   }
 
-  if(return_metabs == "exact_match" & (is.null(solvent_type) | is.null(ph) | is.null(instrument_strength))){
-    stop('Solvent type, ph, and spectrometer frequency must be specified if return_metabs = "exact_match"')
+  if(return_metabs == "exact_match" & (is.null(solvent_type) | is.null(temperature) | is.null(instrument_strength))){
+    stop('Solvent type, temperature, and instrument strength must be specified if return_metabs = "exact_match"')
   }
 
   # if(return_metabs == "nearest_match" & (is.null(solvent_type) | is.null(ph))){
@@ -92,13 +92,14 @@ as.bmseList <- function(casno_list,
     for (i in 1:length(casno_list)){
       subset <- bmseassociations %>% dplyr::filter(.data$CASno == casno_list[[i]],
                                                     .data$Solvent == solvent_type,
-                                                    .data$Temperature == temperature)
+                                                    .data$Temperature == temperature,
+                                                    .data$Field_strength == instrument_strength)
 
-      if(!is.na(ph)){
+      if(!is.null(ph)){
         subset <- subset %>% dplyr::filter(.data$pH == ph)
       }
 
-      if(!is.na(concentration)){
+      if(!is.null(concentration)){
         subset <- subset %>% dplyr::filter(.data$Concentration == concentration)
       }
 
@@ -141,7 +142,7 @@ as.bmseList <- function(casno_list,
 #'@param return_metabs string, must be one of "exact_match" or "all". Defaults to "all". If "exact_match", returns metabolites that exactly match specified experimental conditions (solvent type, pH, and instrument strength). If "all", returns all entries corresponding to supplied CAS numbers, experimental conditions ignored.
 #'@param solvent_type choose from available solvents 'D2O', 'H2O', ...
 #'@param ph numerical value specifying pH of the experimental conditions
-#'@param instrument_strength numeric value specifying experimental instrument strength
+#'@param instrument_strength numeric value specifying spectrometer frequency
 #'@param temperature numeric value specifying the temperature
 #'@param concentration numeric value specifying the concentration
 #'
@@ -155,7 +156,7 @@ as.bmseListFromName <- function(name_list,
                                 return_metabs = "all",
                                 solvent_type = NULL,
                                 ph = NULL,
-                                instrument_strength,
+                                instrument_strength = NULL,
                                 temperature         = NULL,
                                 concentration       = NULL,
                                 connec){
@@ -172,8 +173,8 @@ as.bmseListFromName <- function(name_list,
     stop('return_metabs must be either "exact_match" or "all"')
   }
 
-  if(return_metabs == "exact_match" & (is.null(solvent_type) | is.null(ph) | is.null(instrument_strength))){
-    stop('Solvent type, ph, and spectrometer frequency must be specified if return_metabs = "exact_match"')
+  if(return_metabs == "exact_match" & (is.null(solvent_type) | is.null(temperature) | is.null(instrument_strength))){
+    stop('Solvent type, temperature, and instrument strength must be specified if return_metabs = "exact_match"')
   }
 
   # fail check if one metabolite name is not in the db
@@ -206,13 +207,14 @@ as.bmseListFromName <- function(name_list,
     for (i in 1:length(name_list)){
       subset <- bmseassociations %>% dplyr::filter(.data$Solute == name_list[[i]],
                                                     .data$Solvent == solvent_type,
-                                                    .data$Temperature == temperature)
+                                                    .data$Temperature == temperature,
+                                                    .data$Field_strength == instrument_strength)
 
-      if(!is.na(ph)){
+      if(!is.null(ph)){
         subset <- subset %>% dplyr::filter(.data$pH == ph)
       }
 
-      if(!is.na(concentration)){
+      if(!is.null(concentration)){
         subset <- subset %>% dplyr::filter(.data$Concentration == concentration)
       }
 
@@ -466,7 +468,8 @@ get_spectra_data <- function(ID_list){
           return(length(peak_groups) == nrow(spectra_data_subset))
         })
 
-        tol              <- max(tol_candidates[tempind]) #ppm
+        tol              <- suppressWarnings(max(tol_candidates[tempind])) #ppm
+        if (tol == -Inf) {tol <- 0.1}
         x                <- as.numeric(peaksdata$Chem_shift_val)
         split_idxs       <- which(abs(diff(x)) > tol) + 1
         peak_groups      <- split(x, cumsum(seq_along(x) %in% split_idxs))
@@ -675,7 +678,7 @@ export_roi_file <- function(spectra_df,
 #' @param solvent_type the experimental solvent, choose from available solvents 'D2O', 'H2O', ...
 #' @param half_bandwidth This will be set to 1.4 unless otherwise specified
 #' @param roi_tol The chemical shift tolerance, tolerance for the location of the peak center. Default is 0.005.
-#' @param instrument_strength the field strength of the instrument used to collect the data
+#' @param instrument_strength the spectrometer frequency of the instrument used to collect the data
 #' @param temperature numeric value specifying the temperature
 #' @param concentration numeric value specifying the concentration
 #'
@@ -751,40 +754,38 @@ roi_ref_export <- function(name_list           = NULL,
 #'
 #' @param roi_df data.frame, output of \code{roi_ref_export} with parameter \code{return_all = TRUE}
 #' @param temperature single numeric value specifying experimental temperature (K)
-#' @param instrument_strength single numeric value specifying experimental instrument strength
+#' @param instrument_strength numeric value specifying the spectrometer frequency of the instrument used to collect the data
 #' @return data.frame
 #' @export
-nearest_match_metabs <- function(roi_df, temperature, instrument_strength) {
-
-
-
-  # use HMDB code as unique ID for specific solute/pH/field strength combination
-  metab_id <- roi_df$HMDB_code
-
-  # get experimental parameters associated w/each metab_id
-  metab_temp <- vector()
-  metab_FS <- vector()
-  dist <- vector()
-  for (i in 1:length(metab_id)) {
-    metab_temp[i] <- bmse_associations %>%
-      dplyr::filter(.data$Entry_ID == metab_id[i]) %>%
-      dplyr::pull(Temperature) %>%
-      unique() %>%
-      as.numeric()
-
-    metab_FS[i] <- bmse_associations %>%
-      dplyr::filter(.data$Entry_ID == metab_id[i]) %>%
-      dplyr::pull(.data$Field_strength) %>%
-      unique() %>%
-      as.numeric()
-
-    # calculate Euclidean distance
-    dist[i] <- sqrt((temperature - metab_temp[i])^2 + (instrument_strength - metab_FS[i])^2)
-  }
-
-  metabs <- as.data.frame(cbind(metab_id, metab_temp, metab_FS, as.numeric(dist))) %>%
-    dplyr::arrange(dist)
-
-  return(metabs)
-}
+# nearest_match_metabs <- function(roi_df, temperature, instrument_strength) {
+#
+#   # use HMDB code as unique ID for specific solute/pH/field strength combination
+#   metab_id <- roi_df$HMDB_code
+#
+#   # get experimental parameters associated w/each metab_id
+#   metab_temp <- vector()
+#   metab_FS <- vector()
+#   dist <- vector()
+#   for (i in 1:length(metab_id)) {
+#     metab_temp[i] <- bmse_associations %>%
+#       dplyr::filter(.data$Entry_ID == metab_id[i]) %>%
+#       dplyr::pull(Temperature) %>%
+#       unique() %>%
+#       as.numeric()
+#
+#     metab_FS[i] <- bmse_associations %>%
+#       dplyr::filter(.data$Entry_ID == metab_id[i]) %>%
+#       dplyr::pull(.data$Field_strength) %>%
+#       unique() %>%
+#       as.numeric()
+#
+#     # calculate Euclidean distance
+#     dist[i] <- sqrt((temperature - metab_temp[i])^2 + (instrument_strength - metab_FS[i])^2)
+#   }
+#
+#   metabs <- as.data.frame(cbind(metab_id, metab_temp, metab_FS, as.numeric(dist))) %>%
+#     dplyr::arrange(dist)
+#
+#   return(metabs)
+# }
 

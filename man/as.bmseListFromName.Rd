@@ -9,7 +9,7 @@ as.bmseListFromName(
   return_metabs = "all",
   solvent_type = NULL,
   ph = NULL,
-  instrument_strength,
+  instrument_strength = NULL,
   temperature = NULL,
   concentration = NULL
 )
@@ -23,7 +23,7 @@ as.bmseListFromName(
 
 \item{ph}{numerical value specifying pH of the experimental conditions}
 
-\item{instrument_strength}{numeric value specifying experimental instrument strength}
+\item{instrument_strength}{numeric value specifying spectrometer frequency}
 
 \item{temperature}{numeric value specifying the temperature}
 

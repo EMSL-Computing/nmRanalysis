@@ -7,21 +7,23 @@
 signal_fitting(parS, Xdata, multiplicities, roof_effect, roof_effect2, freq)
 }
 \arguments{
-\item{parS}{}
+\item{parS}{vector of signal fitting parameters}
 
-\item{Xdata}{}
+\item{Xdata}{Dataframe of sample chemical shift (ppm) values.}
 
-\item{multiplicities}{}
+\item{multiplicities}{vector of signal multiplicity values}
 
-\item{roof_effect}{}
+\item{roof_effect}{vector of signal roof effect values}
 
-\item{freq}{}
+\item{roof_effect2}{vector of signal roof effect 2 values. Applicable only if one or more signals is of non-first-order multiplicity.}
+
+\item{freq}{spectrometer frequency}
 }
 \description{
 rDolphin: signal_fitting
 }
 \details{
-This function was forked directly from rDolphin (https://github.com/danielcanueto/rDolphin/tree/master/R). This is the function
+This function is based on code that was forked directly from rDolphin (https://github.com/danielcanueto/rDolphin/tree/master/R). This is the function
 that fits the lineshape patterns according to the specified fitting parameters. Modifications have been made to the original function to allow for
 the fitting of double-doublets. Generally speaking, this involves the addition of new fields (a second J-coupling field and second
 roof effect field) containing parameters necessary to fit this new pattern and new fitting equations that make use of these additional

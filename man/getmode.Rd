@@ -8,6 +8,8 @@ getmode(x, ...)
 }
 \arguments{
 \item{x}{A vector}
+
+\item{...}{Additional arguments to pass to \code{table()}}
 }
 \value{
 A character-valued scalar.

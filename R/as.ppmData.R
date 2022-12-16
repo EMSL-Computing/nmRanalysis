@@ -24,11 +24,13 @@
 #' @param edata_cname character string specifying the name of the column containing the ppm identifiers in \code{e_data} and \code{e_meta} (if applicable).
 #' @param fdata_cname character string specifying the name of the column containing the sample identifiers in \code{f_data}.
 #'
-#' @param aign logical, defaults to FALSE. If TRUE, aligns e_data using the CluPA spectrum alignment algorithm from the `speaq` R package
+#' @param align logical, defaults to FALSE. If TRUE, aligns e_data using the CluPA spectrum alignment algorithm from the `speaq` R package
 #'
 #' @param instrument_strength numeric value specifying the strength (in MHz) of the NMR instrument samples were run on.
 #' @param ph numeric value specifying the pH samples were run at.
 #' @param solvent character string defining solvent used. Possible solvents are 'h2o' and 'd2o'.
+#' @param temperature numeric value specifying the temperature (in K) of the experiment
+#' @param concentration numeric value specifying the concentration (in mM) of the standard (e.g. DSS) used in the experiment
 #'
 #' @param ... further arguments
 #'
@@ -49,13 +51,13 @@
 #' @author Allison Thompson
 #'
 #' @export
-as.ppmData <- function(e_data, f_data, edata_cname, fdata_cname, align = FALSE, instrument_strength, ph = NA, solvent, temperature, concentration = NA, ...){
+as.ppmData <- function(e_data, f_data, edata_cname, fdata_cname, align = FALSE, instrument_strength, ph = NULL, solvent, temperature, concentration = NULL, ...){
   .as.ppmData(e_data, f_data, edata_cname, fdata_cname, align, instrument_strength, ph = ph, solvent, temperature, concentration = concentration, ...)
 }
 
 ## ppm data ##
 .as.ppmData <- function(e_data, f_data, edata_cname, fdata_cname, align,
-                        instrument_strength, ph = NA, solvent, temperature, concentration = NA,
+                        instrument_strength, ph = NULL, solvent, temperature, concentration = NULL,
                         check.names = TRUE){
 
   # initial checks #
@@ -124,14 +126,14 @@ as.ppmData <- function(e_data, f_data, edata_cname, fdata_cname, align = FALSE, 
     stop("temperature must be a numeric value indicating the temperature of the sample")
   }
 
-  if(!is.na(ph)){
+  if(!is.null(ph)){
     # check that ph is numeric #
     if(class(ph) != "numeric"){
       stop("ph must be a numeric value indicating the pH of the sample")
     }
   }
 
-  if(!is.na(concentration)){
+  if(!is.null(concentration)){
     # check that concentration is numeric #
     if(class(concentration) != "numeric"){
       stop("concentration must be a numeric value indicating the sample concentration")
@@ -220,6 +222,10 @@ as.ppmData <- function(e_data, f_data, edata_cname, fdata_cname, align = FALSE, 
 #' @description This function takes the data.frame `e_data` and runs the CluPA spectrum alignment algorithm from the `speaq` R package
 #' @return a data.frame containing aligned spectra with same format as `e_data`
 #' @author Natalie Winans
+#'
+#' @importFrom magrittr %>%
+#' @importFrom rlang .data
+#'
 #' @export
 peak_alignment <- function(e_data, max_shift = NULL) {
   data <- as.matrix(t(e_data[,-1]))
@@ -244,11 +250,11 @@ peak_alignment <- function(e_data, max_shift = NULL) {
   res <- as.data.frame(Y) %>%
     `rownames<-`(X$label) %>%
     tibble::rownames_to_column() %>%
-    tidyr::pivot_longer(-rowname) %>%
-    tidyr::pivot_wider(names_from = rowname, values_from = value) %>%
+    tidyr::pivot_longer(-.data$rowname) %>%
+    tidyr::pivot_wider(names_from = .data$rowname, values_from = .data$value) %>%
     dplyr::mutate(PPM = e_data$PPM) %>%
-    dplyr::select(-name) %>%
-    dplyr::select(PPM, everything())
+    dplyr::select(-.data$name) %>%
+    dplyr::select(.data$PPM, tidyselect::everything())
 
   return(res)
 }
