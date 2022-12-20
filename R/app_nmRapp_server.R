@@ -126,6 +126,7 @@ nmRapp_server <- function(input, output, session) {
   # The code for the ref_data_uploadServer() module is found in ./R/ref_data_upload.R
   ref_data <- ref_data_uploadServer(id        = "ref_data_init",
                                     xpmt_data = mod_xpmt_data,
+                                    metids    = metid_list,
                                     ref_db    = bmse_associations)
 
   # Output a warning if any of uploaded reference metabolites not contained within database

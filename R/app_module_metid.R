@@ -1053,5 +1053,22 @@ metid_Server <- function(id, xpmt_data){
                    plotly::plotlyProxyInvoke(metid_e_data_plot_proxy, "relayout",
                                              list(shapes = list(query_line)))
                  })
+
+
+    # -------------------------------------------------------------------------
+    # Module output
+
+    # observeEvent(c(input$metid_add, input$metid_remove), {
+    #   browser()
+    #   rv$metids
+    # })
+
+    reactive({
+      rv$metids
+    })
+    # eventReactive(c(input$metid_add, input$metid_remove),
+    #               {
+    #                 browser()
+    #               })
   })
 }

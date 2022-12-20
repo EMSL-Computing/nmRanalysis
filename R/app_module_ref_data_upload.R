@@ -103,13 +103,28 @@ ref_data_uploadUI <- function(id, ref_db){
 #' @importFrom magrittr %>%
 #' @importFrom rlang .data
 #'
-ref_data_uploadServer <- function(id, xpmt_data, ref_db){
+ref_data_uploadServer <- function(id, xpmt_data, metids, ref_db){
   stopifnot(!is.reactive(ref_db))
   stopifnot(is.reactive(xpmt_data))
+  stopifnot(is.reactive(metids))
   moduleServer(id, function(input, output, session){
 
     # Initialize reactiveValues needed by this module
     rv <- reactiveValues(casno_not_in_db = NULL)
+
+    observe({
+      req(xpmt_data())
+      browser()
+      if(length(metids()) > 0){
+        updateSelectInput(inputId = "ref_upload_method", selected = "list")
+        updateTabsetPanel(inputId = "refmet_upload", selected = "list")
+        updateSelectizeInput(inputId = "user_refmets", selected = metids())
+      } else{
+        updateSelectInput(inputId = "ref_upload_method", selected = "file")
+        updateTabsetPanel(inputId = "refmet_upload", selected = "file")
+        updateSelectizeInput(inputId = "user_refmets", selected = NULL)
+      }
+    })
 
     # Observer to control which set of options for refmet upload are displayed: file upload or manual specification
     observeEvent(c(input$ref_upload_method),
