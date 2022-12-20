@@ -601,11 +601,22 @@ metid_Server <- function(id, xpmt_data){
 
       if(!is.null(rv$spectra_peaks)){
         ppm     <- as.numeric(xpmt_data()$e_data[, 1, drop = TRUE])
-        peak_ppms <- lapply(rv$spectra_peaks, function(x, ppm){ppm[x]}, ppm = ppm)
+
+        ppm_allfeats     <- lapply(rv$spectra_peaks, function(x, ppm, group_dist){
+
+          ppm_peaks         <- ppm[x]
+          ppm_peak_diffs    <- abs(diff(ppm_peaks))
+          split_idxs        <- which(ppm_peak_diffs > group_dist) + 1
+          peak_groups       <- split(ppm_peaks, cumsum(seq_along(ppm_peaks) %in% split_idxs))
+          feature_locations <- Reduce("c", lapply(peak_groups, mean))
+          return(feature_locations)
+        }, ppm = ppm, group_dist = input$peak_group_dist)
+
+        # peak_ppms <- lapply(rv$spectra_peaks, function(x, ppm){ppm[x]}, ppm = ppm)
 
         proximity_info <- vector("list", length = nrow(other_peaks))
         for(i in 1:nrow(other_peaks)){
-          proximity_check <- lapply(peak_ppms, function(x, loc, tol){
+          proximity_check <- lapply(ppm_allfeats, function(x, loc, tol){ # change ppm_allfeats to peak_ppms if you want peak locs not feature locs
             close_features <- x[x >= (loc - tol) & x <= (loc + tol)]
             return(ifelse(length(close_features) > 0, 1, 0))
           }, loc = other_peaks$`Peak Location`[i], tol = input$metid_querytol)
@@ -614,7 +625,7 @@ metid_Server <- function(id, xpmt_data){
         }
         other_peaks_counts <- Reduce("c", rlist::list.ungroup(rlist::list.select(proximity_info, count)))
         other_peaks_locs <- paste0(other_peaks$`Peak Location`, " (", other_peaks_counts, "/",
-                                   ncol(xpmt_data()$e_data)-1, " samples with detected peaks within ", input$metid_querytol, " ppm)")
+                                   ncol(xpmt_data()$e_data)-1, " samples with detected features within ", input$metid_querytol, " ppm)")
         other_peaks_locs <- paste0(other_peaks_locs, collapse = "<br> &emsp; ")
 
         htmltools::HTML(paste0("<b>Selected metabolite:</b> ", rv$entry_info$Metabolite, "<br>",
@@ -623,8 +634,15 @@ metid_Server <- function(id, xpmt_data){
                                "<b>All metabolite peak locations:</b>", "<br>",
                                "&emsp; ", other_peaks_locs))
       } else{
+        ppm     <- as.numeric(xpmt_data()$e_data[, 1, drop = TRUE])
+
+        other_peaks_locs <- paste0(other_peaks$`Peak Location`, collapse = "<br> &emsp; ")
+
         htmltools::HTML(paste0("<b>Selected metabolite:</b> ", rv$entry_info$Metabolite, "<br>",
-                               "<b>Included in current identification list?</b> ", isinlist))
+                               "<b>Included in current identification list?</b> ", isinlist, "<br>",
+                               "<br>",
+                               "<b>All metabolite peak locations:</b>", "<br>",
+                               "&emsp; ", other_peaks_locs))
       }
 
     })
@@ -1058,17 +1076,9 @@ metid_Server <- function(id, xpmt_data){
     # -------------------------------------------------------------------------
     # Module output
 
-    # observeEvent(c(input$metid_add, input$metid_remove), {
-    #   browser()
-    #   rv$metids
-    # })
-
     reactive({
       rv$metids
     })
-    # eventReactive(c(input$metid_add, input$metid_remove),
-    #               {
-    #                 browser()
-    #               })
+
   })
 }

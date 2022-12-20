@@ -114,7 +114,7 @@ ref_data_uploadServer <- function(id, xpmt_data, metids, ref_db){
 
     observe({
       req(xpmt_data())
-      browser()
+
       if(length(metids()) > 0){
         updateSelectInput(inputId = "ref_upload_method", selected = "list")
         updateTabsetPanel(inputId = "refmet_upload", selected = "list")
