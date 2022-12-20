@@ -7,7 +7,7 @@ stages:
 - build
 
 variables:
-  CONTAINER_VERSION: 0.0.91
+  CONTAINER_VERSION: 0.0.92
   CONTAINER_TAG: $CI_COMMIT_BRANCH-$CONTAINER_VERSION
 
 #Check to see if the image already exists and blocks overwriting an existing image. (New image = new tag, never overwrite, is a best practice.)
@@ -23,6 +23,8 @@ verify-new-image:
 build-image:
   extends: .pnnllib-gitlab-build-container-image
   stage: build
+  only:
+    - database@emslc60117/nmRanalysisApp
   tags:
     - k8s
     - rzr
