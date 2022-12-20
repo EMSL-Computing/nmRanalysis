@@ -34,30 +34,11 @@ ref_data_uploadUI <- function(id, ref_db){
   ns <- NS(id)
   tagList(
     h4("Reference Metabolite Data"),
-    #Toggle
-      shinyWidgets::prettySwitch(
-        inputId = ns("tog_prevornew"),
-        label = "Use previous session",
-        value = FALSE,
-        status = "success",
-        fill = TRUE
-      ),
-    tabsetPanel(
-      id = ns("prevornot"),
-      type = "hidden",
-      tabPanelBody(
-        value = "New",
-        selectInput(ns("ref_upload_method"), "Select an import method for reference metabolite(s):",
-                    c("Upload a file" = "file",
-                      "Specify from list" = "list"))
-      ),
-      tabPanelBody(
-        value = "Previous",
-        # Toggle goes here
-        h4("")
-      )
-    )
-    ,
+
+    selectInput(ns("ref_upload_method"), "Select an import method for reference metabolite(s):",
+                c("Upload a file" = "file",
+                  "Specify from list" = "list",
+                  "Load data from a previous session" = "prevsesh")),
     tabsetPanel(
       id = ns("refmet_upload"),
       type = "hidden",
@@ -75,36 +56,71 @@ ref_data_uploadUI <- function(id, ref_db){
                        choices = unique(ref_db$Solute), multiple = TRUE)
       ),
       tabPanelBody(
-        value = "Previous",
+        value = "prevsesh",
         # query user profiling parameter table to get options
         selectizeInput(ns("user_timestamps"), label = "Choose a timestamp from a previous session:",
                        choices = NULL, multiple = TRUE)
       )
     ),
-    tabsetPanel(
-      id = ns("mixsource_tabs"),
-      type = "hidden",
-      tabPanelBody(
-        value = "Mix",
-        shinyWidgets::prettySwitch(
-          inputId = ns("tog_mix"),
-          label = "Include query from curated metabolites",
-          value = FALSE,
-          status = "success",
-          fill = TRUE
-        ),
+    # tabsetPanel(
+    #   id = ns("mixsource_tabs"),
+    #   type = "hidden",
+    #   tabPanelBody(
+    #     value = "Mix",
+    #     shinyWidgets::awesomeCheckbox(
+    #       inputId = ns("tog_mix"),
+    #       label = "Include user-curated metabolite data in query",
+    #       value = FALSE,
+    #       status = "primary"
+    #     )
+    #
+    #     # shinyWidgets::prettySwitch(
+    #     #   inputId = ns("tog_mix"),
+    #     #   label = "Include query from curated metabolites",
+    #     #   value = FALSE,
+    #     #   status = "success",
+    #     #   fill = TRUE
+    #     # ),
+    #   ),
+    #   tabPanelBody(
+    #     value = "Nomix",
+    #     h4("")
+    #   )
+    # ),
+    fluidRow(
+      column(
+        width = 5,
+        uiOutput(ns("process_ref_inputs"))
       ),
-      tabPanelBody(
-        value = "Nomix",
-        h4("")
+      column(
+        width = 7,
+        tabsetPanel(
+          id = ns("mixsource_tabs"),
+          type = "hidden",
+          tabPanelBody(
+            value = "Mix",
+            shinyWidgets::awesomeCheckbox(
+              inputId = ns("tog_mix"),
+              label = "Include user-curated metabolite data in query",
+              value = FALSE,
+              status = "primary"
+            )
+
+            # shinyWidgets::prettySwitch(
+            #   inputId = ns("tog_mix"),
+            #   label = "Include query from curated metabolites",
+            #   value = FALSE,
+            #   status = "success",
+            #   fill = TRUE
+            # ),
+          ),
+          tabPanelBody(
+            value = "Nomix",
+            h4("")
+          )
+        )
       )
-    ),
-    # clickable button
-    shinyWidgets::actionBttn(inputId = ns("process_ref_inputs"),
-                             label = "Query Reference Database",
-                             style = "unite",
-                             color = "primary",
-                             size = "sm")
+    )
   )
 }
 
@@ -158,32 +174,40 @@ ref_data_uploadServer <- function(id, xpmt_data, ref_db, connec){
     # Initialize reactiveValues needed by this module
     rv <- reactiveValues(casno_not_in_db = NULL)
 
-    observe({
-      req(xpmt_data())
-
-      if(input$tog_prevornew == TRUE){
-        updateTabsetPanel(inputId = "prevornot", selected =  "Previous")
-        updateTabsetPanel(inputId = "refmet_upload", selected =  "Previous")
-        updateTabsetPanel(inputId = "mixsource_tabs", selected =  "Nomix")
-      }
-
-      if(input$tog_prevornew == FALSE){
-        updateTabsetPanel(inputId = "prevornew", selected =  "New")
-        updateTabsetPanel(inputId = "refmet_upload", selected =  input$ref_upload_method)
-        updateTabsetPanel(inputId = "mixsource_tabs", selected =  "Mix")
+    output$process_ref_inputs <- renderUI({
+      if(input$ref_upload_method == "prevsesh"){
+        shinyWidgets::actionBttn(inputId = NS(id, "process_ref_inputs"),
+                                 label = "Load Session Data",
+                                 style = "unite",
+                                 color = "primary",
+                                 size = "sm")
+      } else{
+        shinyWidgets::actionBttn(inputId = NS(id, "process_ref_inputs"),
+                                 label = "Query Reference Database",
+                                 style = "unite",
+                                 color = "primary",
+                                 size = "sm")
       }
     })
+
     # Observer to control which set of options for refmet upload are displayed: file upload or manual specification
     observeEvent(c(input$ref_upload_method),
                  {
                    req(xpmt_data())
 
                    updateTabsetPanel(inputId = "refmet_upload", selected = input$ref_upload_method)
+
+                   if(input$ref_upload_method == "prevsesh"){
+                     updateTabsetPanel(inputId = "mixsource_tabs", selected =  "Nomix")
+                   } else{
+                     updateTabsetPanel(inputId = "mixsource_tabs", selected =  "Mix")
+                   }
+
                  })
 
     #observer to check for timestamp and query of user ref db
     observe({
-      req(input$tog_prevornew == TRUE)
+      req(input$ref_upload_method == "prevsesh")
       req(connec())
 
       conn <- connec()
@@ -192,8 +216,6 @@ ref_data_uploadServer <- function(id, xpmt_data, ref_db, connec){
       user_query <- subset(query, username = user)
       time.chr <- lapply(user_query$session, as.character)
       updateSelectizeInput(inputId = "user_timestamps", choices = unique(time.chr))
-
-
     })
 
 
@@ -249,8 +271,6 @@ ref_data_uploadServer <- function(id, xpmt_data, ref_db, connec){
       req(input$ref_upload_method == 'file')
       req(refmet_file())
 
-      input$tog_prevornew
-
       metab_names_table           <- refmet_file()
       vars                        <- names(metab_names_table)
       isCASinvars <- "CAS Registry" %in% vars
@@ -273,9 +293,9 @@ ref_data_uploadServer <- function(id, xpmt_data, ref_db, connec){
 
                                        {
                                          req(xpmt_data())
+                                         browser()
 
-                                         #if (isTRUE(input$user_timestamps)) {
-                                         if (input$tog_prevornew) {
+                                         if (input$ref_upload_method == 'prevsesh') {
 
                                            saved.time <- input$user_timestamps
                                            conn <- connec()
@@ -410,12 +430,13 @@ ref_data_uploadServer <- function(id, xpmt_data, ref_db, connec){
                                                                       table = data.frame(metab_names_table[metab_names_table[[input$columns]] %ni% ref_db$CASno, ,drop = FALSE]))
 
                                            # Feeds in above to nmRanalysis function that generates formatted dataframe of reference metabolite info
-                                           user_reference_data <- suppressMessages(roi_ref_export(cas_list            = user.refchoices,
-                                                                                                  solvent_type        = attr(xpmt_data(), "exp_info")$solvent,
-                                                                                                  ph                  = attr(xpmt_data(), "exp_info")$ph,
-                                                                                                  instrument_strength = attr(xpmt_data(), "exp_info")$instrument_strength,
-                                                                                                  temperature         = attr(xpmt_data(), "exp_info")$temperature,
-                                                                                                  concentration       = attr(xpmt_data(), "exp_info")$concentration))
+                                           user_reference_data <- roi_ref_export(cas_list            = user.refchoices,
+                                                                                 solvent_type        = attr(xpmt_data(), "exp_info")$solvent,
+                                                                                 ph                  = attr(xpmt_data(), "exp_info")$ph,
+                                                                                 instrument_strength = attr(xpmt_data(), "exp_info")$instrument_strength,
+                                                                                 temperature         = attr(xpmt_data(), "exp_info")$temperature,
+                                                                                 concentration       = attr(xpmt_data(), "exp_info")$concentration,
+                                                                                 connec = connec())
 
                                            shinyFeedback::feedbackDanger("uploaded_refmet_file",
                                                                          nrow(user_reference_data) == 0,
@@ -424,16 +445,11 @@ ref_data_uploadServer <- function(id, xpmt_data, ref_db, connec){
                                            req(nrow(user_reference_data) > 0)
 
                                            # Filter to get exact or best match
-                                           xpmt_conds <- data.frame(`Frequency (MHz)`    = ifelse(is.null(attr(xpmt_data(), "exp_info")$instrument_strength),
-                                                                                                  NA, attr(xpmt_data(), "exp_info")$instrument_strength),
-                                                                    `pH`                 = ifelse(is.null(attr(xpmt_data(), "exp_info")$ph),
-                                                                                                  NA, attr(xpmt_data(), "exp_info")$ph),
-                                                                    `Concentration (mM)` = ifelse(is.null(attr(xpmt_data(), "exp_info")$concentration),
-                                                                                                  NA, attr(xpmt_data(), "exp_info")$concentration),
-                                                                    `Temperature (K)`    = ifelse(is.null(attr(xpmt_data(), "exp_info")$temperature),
-                                                                                                  NA, attr(xpmt_data(), "exp_info")$temperature),
-                                                                    `Solvent`            = ifelse(is.null(attr(xpmt_data(), "exp_info")$solvent),
-                                                                                                  NA, attr(xpmt_data(), "exp_info")$solvent),
+                                           xpmt_conds <- data.frame(`Frequency (MHz)`    = attr(xpmt_data(), "exp_info")$instrument_strength,
+                                                                    `pH`                 = attr(xpmt_data(), "exp_info")$ph,
+                                                                    `Concentration (mM)` = attr(xpmt_data(), "exp_info")$concentration,
+                                                                    `Temperature (K)`    = attr(xpmt_data(), "exp_info")$temperature,
+                                                                    `Solvent`            = attr(xpmt_data(), "exp_info")$solvent,
                                                                     check.names = FALSE)
                                            xpmt_conds <- xpmt_conds[, colSums(is.na(xpmt_conds)) == 0]
                                            cols_to_match <- colnames(xpmt_conds)
@@ -474,7 +490,7 @@ ref_data_uploadServer <- function(id, xpmt_data, ref_db, connec){
                                              temp$Matchsum <- matchsum
 
                                              bestmatches[[unq_metabs[i]]] <- temp %>% dplyr::group_by(.data$`Quantification Signal`) %>%
-                                               dplyr::arrange(dplyr::desc(.data$`Matchsum`)) %>%
+                                               dplyr::arrange(desc(.data$`Matchsum`)) %>%
                                                dplyr::slice_head()
 
                                              rm(temp, matchvec, matchsum)
@@ -526,12 +542,13 @@ ref_data_uploadServer <- function(id, xpmt_data, ref_db, connec){
                                            rv$casno_not_in_db <- NULL
 
                                            # create an ROI reference object using nmRanalysis to be rendered as a table in the UI
-                                           user_reference_data <- suppressMessages(roi_ref_export(name_list           = user.refchoices,
-                                                                                                  solvent_type        = attr(xpmt_data(), "exp_info")$solvent,
-                                                                                                  ph                  = attr(xpmt_data(), "exp_info")$ph,
-                                                                                                  instrument_strength = attr(xpmt_data(), "exp_info")$instrument_strength,
-                                                                                                  temperature         = attr(xpmt_data(), "exp_info")$temperature,
-                                                                                                  concentration       = attr(xpmt_data(), "exp_info")$concentration))
+                                           user_reference_data <- roi_ref_export(name_list           = user.refchoices,
+                                                                                 solvent_type        = attr(xpmt_data(), "exp_info")$solvent,
+                                                                                 ph                  = attr(xpmt_data(), "exp_info")$ph,
+                                                                                 instrument_strength = attr(xpmt_data(), "exp_info")$instrument_strength,
+                                                                                 temperature         = attr(xpmt_data(), "exp_info")$temperature,
+                                                                                 concentration       = attr(xpmt_data(), "exp_info")$concentration,
+                                                                                 connec = connec())
 
                                            shinyFeedback::feedbackDanger("user_refmets",
                                                                          nrow(user_reference_data) == 0,
@@ -554,33 +571,29 @@ ref_data_uploadServer <- function(id, xpmt_data, ref_db, connec){
 
                                            }
 
-                                            user_reference_data <- user_reference_data %>%
-                                              dplyr::group_by(.data$`Quantification Mode`, .data$`Metabolite`, .data$`Quantification Signal`, .data$`Frequency (MHz)`,
-                                                              .data$`pH`, .data$`Concentration (mM)`, .data$`Temperature (K)`, .data$`Solvent`) %>%
-                                              dplyr::summarise(dplyr::across(dplyr::all_of(c('ROI left edge (ppm)', 'ROI right edge (ppm)', 'Chemical shift(ppm)',	'Chemical shift tolerance (ppm)',
-                                                                                             'Half bandwidth (Hz)', 'J coupling (Hz)',	'Roof effect', 'J coupling 2 (Hz)',
-                                                                                             'Roof effect 2')), mean, na.rm = TRUE),
-                                                               dplyr::across(dplyr::all_of(c('Multiplicity')), getmode, useNA = "no")) %>%
-                                              dplyr::select(.data$`ROI left edge (ppm)`, .data$`ROI right edge (ppm)`, .data$`Quantification Mode`,
-                                                            .data$`Metabolite`,	.data$`Quantification Signal`, .data$`Chemical shift(ppm)`,
-                                                            .data$`Chemical shift tolerance (ppm)`, .data$`Half bandwidth (Hz)`, .data$`Multiplicity`,
-                                                            .data$`J coupling (Hz)`,	.data$`Roof effect`, .data$`J coupling 2 (Hz)`, .data$`Roof effect 2`,
-                                                            .data$`Frequency (MHz)`, .data$`pH`, .data$`Concentration (mM)`, .data$`Temperature (K)`, .data$`Solvent`) %>%
-                                              dplyr::arrange(.data$`ROI left edge (ppm)`)
+                                           user_reference_data <- user_reference_data %>%
+                                             dplyr::group_by(.data$`Quantification Mode`, .data$`Metabolite`, .data$`Quantification Signal`, .data$`Frequency (MHz)`,
+                                                             .data$`pH`, .data$`Concentration (mM)`, .data$`Temperature (K)`, .data$`Solvent`) %>%
+                                             dplyr::summarise(dplyr::across(dplyr::all_of(c('ROI left edge (ppm)', 'ROI right edge (ppm)', 'Chemical shift(ppm)',	'Chemical shift tolerance (ppm)',
+                                                                                            'Half bandwidth (Hz)', 'J coupling (Hz)',	'Roof effect', 'J coupling 2 (Hz)',
+                                                                                            'Roof effect 2')), mean, na.rm = TRUE),
+                                                              dplyr::across(dplyr::all_of(c('Multiplicity')), getmode, useNA = "no")) %>%
+                                             dplyr::select(.data$`ROI left edge (ppm)`, .data$`ROI right edge (ppm)`, .data$`Quantification Mode`,
+                                                           .data$`Metabolite`,	.data$`Quantification Signal`, .data$`Chemical shift(ppm)`,
+                                                           .data$`Chemical shift tolerance (ppm)`, .data$`Half bandwidth (Hz)`, .data$`Multiplicity`,
+                                                           .data$`J coupling (Hz)`,	.data$`Roof effect`, .data$`J coupling 2 (Hz)`, .data$`Roof effect 2`,
+                                                           .data$`Frequency (MHz)`, .data$`pH`, .data$`Concentration (mM)`, .data$`Temperature (K)`, .data$`Solvent`) %>%
+                                             dplyr::arrange(.data$`ROI left edge (ppm)`)
 
 
                                            # Filter to get exact or best match
-                                           xpmt_conds <- data.frame(`Frequency (MHz)`    = ifelse(is.null(attr(xpmt_data(), "exp_info")$instrument_strength),
-                                                                                                  NA, attr(xpmt_data(), "exp_info")$instrument_strength),
-                                                                    `pH`                 = ifelse(is.null(attr(xpmt_data(), "exp_info")$ph),
-                                                                                                  NA, attr(xpmt_data(), "exp_info")$ph),
-                                                                    `Concentration (mM)` = ifelse(is.null(attr(xpmt_data(), "exp_info")$concentration),
-                                                                                                  NA, attr(xpmt_data(), "exp_info")$concentration),
-                                                                    `Temperature (K)`    = ifelse(is.null(attr(xpmt_data(), "exp_info")$temperature),
-                                                                                                  NA, attr(xpmt_data(), "exp_info")$temperature),
-                                                                    `Solvent`            = ifelse(is.null(attr(xpmt_data(), "exp_info")$solvent),
-                                                                                                  NA, attr(xpmt_data(), "exp_info")$solvent),
+                                           xpmt_conds <- data.frame(`Frequency (MHz)`    = attr(xpmt_data(), "exp_info")$instrument_strength,
+                                                                    `pH`                 = attr(xpmt_data(), "exp_info")$ph,
+                                                                    `Concentration (mM)` = attr(xpmt_data(), "exp_info")$concentration,
+                                                                    `Temperature (K)`    = attr(xpmt_data(), "exp_info")$temperature,
+                                                                    `Solvent`            = attr(xpmt_data(), "exp_info")$solvent,
                                                                     check.names = FALSE)
+
                                            xpmt_conds <- xpmt_conds[, colSums(is.na(xpmt_conds)) == 0]
                                            cols_to_match <- colnames(xpmt_conds)
 
@@ -620,7 +633,7 @@ ref_data_uploadServer <- function(id, xpmt_data, ref_db, connec){
                                              temp$Matchsum <- matchsum
 
                                              bestmatches[[unq_metabs[i]]] <- temp %>% dplyr::group_by(.data$`Quantification Signal`) %>%
-                                               dplyr::arrange(dplyr::desc(.data$`Matchsum`)) %>%
+                                               dplyr::arrange(desc(.data$`Matchsum`)) %>%
                                                dplyr::slice_head()
 
                                              rm(temp, matchvec, matchsum)
