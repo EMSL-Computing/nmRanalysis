@@ -165,8 +165,7 @@ metid_mainUI <- function(id){
           column(width = 3,
                  selectInput(inputId = ns("metid_queryset"),
                              label   = "Query from:",
-                             choices = c("Detected Feature Set" = "det",
-                                         "Custom Feature Set" = "cust"),
+                             choices = c("Custom Feature Set" = "cust"),
                              selected = c("cust"))
                  ),
           column(width = 4,
@@ -960,6 +959,11 @@ metid_Server <- function(id, xpmt_data){
                    rv$spectra_peaks <- spectra_peaks
 
                    shinyWidgets::closeSweetAlert()
+
+                   updateSelectInput(inputId = "metid_queryset",
+                                     choices = c("Detected Feature Set" = "det",
+                                                 "Custom Feature Set" = "cust"),
+                                     selected = "cust")
                  })
 
     observeEvent(c(rv$spectra_peaks, input$sample_to_plot, input$peak_group_dist, input$show_annotations),
