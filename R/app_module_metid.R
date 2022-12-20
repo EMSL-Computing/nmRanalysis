@@ -195,6 +195,7 @@ metid_mainUI <- function(id){
           )
         ),
         htmlOutput(ns("common_peaks_text")),
+        h4(""),
         fluidRow(
           column(width = 6,
                  DT::dataTableOutput(ns("metid_query_table"))
@@ -700,7 +701,7 @@ metid_Server <- function(id, xpmt_data){
           plotly::config(edits = list(annotationTail     = TRUE,
                                       annotationText     = FALSE,
                                       annotationPosition = FALSE,
-                                      shapePosition      = TRUE))
+                                      shapePosition      = FALSE))
       })
 
     })
@@ -1013,5 +1014,40 @@ metid_Server <- function(id, xpmt_data){
 
                  })
 
+    observeEvent(c(input$metid_queryset, input$metid_det, input$metid_cust, input$metid_querytol),
+                 {
+                   req(xpmt_data())
+
+                   if(input$metid_queryset == "det"){
+                     query_line <- list(
+                       type = "line",
+                       line = list(color = "red",
+                                   width = 4),
+                       xref = "x",
+                       yref = "y",
+                       x0   = as.numeric(input$metid_det) - input$metid_querytol,
+                       x1   = as.numeric(input$metid_det) + input$metid_querytol,
+                       y0   = 0,
+                       y1   = 0
+                     )
+                     plotly::plotlyProxyInvoke(metid_e_data_plot_proxy, "relayout",
+                                               list(shapes = query_line))
+                   } else if(input$metid_queryset == "cust"){
+                     query_line <- list(
+                       type = "line",
+                       line = list(color = "red",
+                                   size = 4),
+                       xref = "x",
+                       yref = "y",
+                       x0   = input$metid_cust - input$metid_querytol,
+                       x1   = input$metid_cust + input$metid_querytol,
+                       y0   = 0,
+                       y1   = 0
+                     )
+                   }
+
+                   plotly::plotlyProxyInvoke(metid_e_data_plot_proxy, "relayout",
+                                             list(shapes = list(query_line)))
+                 })
   })
 }
