@@ -252,7 +252,8 @@ ref_data_editingServer <- function(id, xpmt_data, ref_data, ref_db, connec){
                                                                              ph                  = attr(xpmt_data(), "exp_info")$ph,
                                                                              instrument_strength = attr(xpmt_data(), "exp_info")$instrument_strength,
                                                                              temperature         = attr(xpmt_data(), "exp_info")$temperature,
-                                                                             concentration       = attr(xpmt_data(), "exp_info")$concentration))
+                                                                             concentration       = attr(xpmt_data(), "exp_info")$concentration,
+                                                                             connec = conn))
 
                      if(is.null(added_reference_data)){
                        shinyFeedback::feedbackDanger("refmet_toadd",

@@ -293,7 +293,7 @@ ref_data_uploadServer <- function(id, xpmt_data, ref_db, connec){
 
                                        {
                                          req(xpmt_data())
-                                         browser()
+                                         conn <- connec()
 
                                          if (input$ref_upload_method == 'prevsesh') {
 
@@ -308,11 +308,16 @@ ref_data_uploadServer <- function(id, xpmt_data, ref_db, connec){
 
                                            #################
                                            # Filter to get exact or best match
-                                           xpmt_conds <- data.frame(`Frequency (MHz)`    = attr(xpmt_data(), "exp_info")$instrument_strength,
-                                                                    `pH`                 = attr(xpmt_data(), "exp_info")$ph,
-                                                                    `Concentration (mM)` = attr(xpmt_data(), "exp_info")$concentration,
-                                                                    `Temperature (K)`    = attr(xpmt_data(), "exp_info")$temperature,
-                                                                    `Solvent`            = attr(xpmt_data(), "exp_info")$solvent,
+                                           xpmt_conds <- data.frame(`Frequency (MHz)`    = ifelse(is.null(attr(xpmt_data(), "exp_info")$instrument_strength),
+                                                                                                  NA, attr(xpmt_data(), "exp_info")$instrument_strength),
+                                                                    `pH`                 = ifelse(is.null(attr(xpmt_data(), "exp_info")$ph),
+                                                                                                  NA, attr(xpmt_data(), "exp_info")$ph),
+                                                                    `Concentration (mM)` = ifelse(is.null(attr(xpmt_data(), "exp_info")$concentration),
+                                                                                                  NA, attr(xpmt_data(), "exp_info")$concentration),
+                                                                    `Temperature (K)`    = ifelse(is.null(attr(xpmt_data(), "exp_info")$temperature),
+                                                                                                  NA, attr(xpmt_data(), "exp_info")$temperature),
+                                                                    `Solvent`            = ifelse(is.null(attr(xpmt_data(), "exp_info")$solvent),
+                                                                                                  NA, attr(xpmt_data(), "exp_info")$solvent),
                                                                     check.names = FALSE)
                                            xpmt_conds <- xpmt_conds[, colSums(is.na(xpmt_conds)) == 0]
                                            cols_to_match <- colnames(xpmt_conds)
@@ -445,12 +450,17 @@ ref_data_uploadServer <- function(id, xpmt_data, ref_db, connec){
                                            req(nrow(user_reference_data) > 0)
 
                                            # Filter to get exact or best match
-                                           xpmt_conds <- data.frame(`Frequency (MHz)`    = attr(xpmt_data(), "exp_info")$instrument_strength,
-                                                                    `pH`                 = attr(xpmt_data(), "exp_info")$ph,
-                                                                    `Concentration (mM)` = attr(xpmt_data(), "exp_info")$concentration,
-                                                                    `Temperature (K)`    = attr(xpmt_data(), "exp_info")$temperature,
-                                                                    `Solvent`            = attr(xpmt_data(), "exp_info")$solvent,
-                                                                    check.names = FALSE)
+                                           xpmt_conds <- data.frame(`Frequency (MHz)`    = ifelse(is.null(attr(xpmt_data(), "exp_info")$instrument_strength),
+                                                                                                   NA, attr(xpmt_data(), "exp_info")$instrument_strength),
+                                                                     `pH`                 = ifelse(is.null(attr(xpmt_data(), "exp_info")$ph),
+                                                                                                   NA, attr(xpmt_data(), "exp_info")$ph),
+                                                                     `Concentration (mM)` = ifelse(is.null(attr(xpmt_data(), "exp_info")$concentration),
+                                                                                                   NA, attr(xpmt_data(), "exp_info")$concentration),
+                                                                     `Temperature (K)`    = ifelse(is.null(attr(xpmt_data(), "exp_info")$temperature),
+                                                                                                   NA, attr(xpmt_data(), "exp_info")$temperature),
+                                                                     `Solvent`            = ifelse(is.null(attr(xpmt_data(), "exp_info")$solvent),
+                                                                                                   NA, attr(xpmt_data(), "exp_info")$solvent),
+                                                                     check.names = FALSE)
                                            xpmt_conds <- xpmt_conds[, colSums(is.na(xpmt_conds)) == 0]
                                            cols_to_match <- colnames(xpmt_conds)
 
@@ -587,11 +597,16 @@ ref_data_uploadServer <- function(id, xpmt_data, ref_db, connec){
 
 
                                            # Filter to get exact or best match
-                                           xpmt_conds <- data.frame(`Frequency (MHz)`    = attr(xpmt_data(), "exp_info")$instrument_strength,
-                                                                    `pH`                 = attr(xpmt_data(), "exp_info")$ph,
-                                                                    `Concentration (mM)` = attr(xpmt_data(), "exp_info")$concentration,
-                                                                    `Temperature (K)`    = attr(xpmt_data(), "exp_info")$temperature,
-                                                                    `Solvent`            = attr(xpmt_data(), "exp_info")$solvent,
+                                           xpmt_conds <- data.frame(`Frequency (MHz)`    = ifelse(is.null(attr(xpmt_data(), "exp_info")$instrument_strength),
+                                                                                                  NA, attr(xpmt_data(), "exp_info")$instrument_strength),
+                                                                    `pH`                 = ifelse(is.null(attr(xpmt_data(), "exp_info")$ph),
+                                                                                                  NA, attr(xpmt_data(), "exp_info")$ph),
+                                                                    `Concentration (mM)` = ifelse(is.null(attr(xpmt_data(), "exp_info")$concentration),
+                                                                                                  NA, attr(xpmt_data(), "exp_info")$concentration),
+                                                                    `Temperature (K)`    = ifelse(is.null(attr(xpmt_data(), "exp_info")$temperature),
+                                                                                                  NA, attr(xpmt_data(), "exp_info")$temperature),
+                                                                    `Solvent`            = ifelse(is.null(attr(xpmt_data(), "exp_info")$solvent),
+                                                                                                  NA, attr(xpmt_data(), "exp_info")$solvent),
                                                                     check.names = FALSE)
 
                                            xpmt_conds <- xpmt_conds[, colSums(is.na(xpmt_conds)) == 0]
