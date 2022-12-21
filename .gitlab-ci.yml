@@ -7,9 +7,9 @@ stages:
 - build
 
 variables:
-  CONTAINER_VERSION: 0.0.93
+  CONTAINER_VERSION: 0.0.94
   CONTAINER_TAG: $CI_COMMIT_BRANCH-$CONTAINER_VERSION
-  KANIKO_EXTRA_ARGS: --git $CI_COMMIT_BRANCH
+  KANIKO_EXTRA_ARGS: --git branch=$CI_COMMIT_BRANCH
 
 #Check to see if the image already exists and blocks overwriting an existing image. (New image = new tag, never overwrite, is a best practice.)
 verify-new-image:
