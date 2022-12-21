@@ -165,7 +165,7 @@ metid_mainUI <- function(id){
           column(width = 3,
                  selectInput(inputId = ns("metid_queryset"),
                              label   = "Query from:",
-                             choices = c("Custom Feature Set" = "cust"),
+                             choices = c("Custom" = "cust"),
                              selected = c("cust"))
                  ),
           column(width = 4,
@@ -176,13 +176,13 @@ metid_mainUI <- function(id){
                    tabPanelBody(
                      value = "det",
                      selectInput(inputId = ns("metid_det"),
-                                 label   = "Select a detected feature location:",
+                                 label   = "Select a location:",
                                  choices = c(""))
                    ),
                    tabPanelBody(
                      value = "cust",
                      numericInput(inputId = ns("metid_cust"),
-                                  label   = "Specify a feature location:",
+                                  label   = "Specify a location:",
                                   value   = 0)
                    )
                  )
@@ -537,7 +537,7 @@ metid_Server <- function(id, xpmt_data){
 
         sampcount <- sum(intfeat_samps > 0)
 
-        htmltools::HTML(paste0("Detected features within ", query_tol, " ppm of the specified location (",
+        htmltools::HTML(paste0("Detected peak groups within ", query_tol, " ppm of the specified location (",
                                feature_loc, " ppm) are found in ", sampcount, " out of ", ncol(xpmt_data)-1, " sample spectra."))
 
       } else if(input$metid_queryset == "det"){
@@ -560,7 +560,7 @@ metid_Server <- function(id, xpmt_data){
 
         sampcount <- sum(intfeat_samps > 0)
 
-        htmltools::HTML(paste0("Detected features within ", query_tol, " ppm of the specified location (",
+        htmltools::HTML(paste0("Detected peak groups within ", query_tol, " ppm of the specified location (",
                                feature_loc, " ppm) are found in ", sampcount, " out of ", ncol(xpmt_data)-1, " sample spectra."))
       }
     })
@@ -625,7 +625,7 @@ metid_Server <- function(id, xpmt_data){
         }
         other_peaks_counts <- Reduce("c", rlist::list.ungroup(rlist::list.select(proximity_info, count)))
         other_peaks_locs <- paste0(other_peaks$`Peak Location`, " (", other_peaks_counts, "/",
-                                   ncol(xpmt_data()$e_data)-1, " samples with detected features within ", input$metid_querytol, " ppm)")
+                                   ncol(xpmt_data()$e_data)-1, " samples with detected peak groups within ", input$metid_querytol, " ppm)")
         other_peaks_locs <- paste0(other_peaks_locs, collapse = "<br> &emsp; ")
 
         htmltools::HTML(paste0("<b>Selected metabolite:</b> ", rv$entry_info$Metabolite, "<br>",
@@ -670,7 +670,7 @@ metid_Server <- function(id, xpmt_data){
 
         # Toggle for display of annotations
         shinyWidgets::materialSwitch(inputId = NS(id, "show_annotations"),
-                                     label   = "Show detected feature annotations",
+                                     label   = "Show detected peak annotations",
                                      value   = TRUE,
                                      status  = "primary",
                                      right   = TRUE),
@@ -686,7 +686,7 @@ metid_Server <- function(id, xpmt_data){
     output$metid_groupthresh_ui <- renderUI({
       req(xpmt_data())
       numericInput(inputId = NS(id, "peak_group_dist"),
-                   label   = "Peak Grouping Threshold",
+                   label   = "Peak Grouping Threshold:",
                    value   = max(0,round(mean(diff(xpmt_data()$e_data$PPM)), 5)),
                    min     = max(0, min(diff(xpmt_data()$e_data$PPM))))
     })
@@ -979,8 +979,8 @@ metid_Server <- function(id, xpmt_data){
                    shinyWidgets::closeSweetAlert()
 
                    updateSelectInput(inputId = "metid_queryset",
-                                     choices = c("Detected Feature Set" = "det",
-                                                 "Custom Feature Set" = "cust"),
+                                     choices = c("Detected Peak Group Locations" = "det",
+                                                 "Custom" = "cust"),
                                      selected = "cust")
                  })
 
