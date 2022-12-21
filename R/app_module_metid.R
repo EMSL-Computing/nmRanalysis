@@ -324,8 +324,6 @@ metid_Server <- function(id, xpmt_data){
         plotly::plotlyProxyInvoke(metid_e_data_plot_proxy, "deleteTraces", list(as.integer(1)))
       }
 
-
-
     })
 
     observeEvent(input$metid_add,{
@@ -351,6 +349,15 @@ metid_Server <- function(id, xpmt_data){
         feature_loc <- as.numeric(input$metid_cust)
         querymets <- refmets_full %>% dplyr::filter(.data$`Chemical shift(ppm)` >= (feature_loc - query_tol) &
                                                       .data$`Chemical shift(ppm)` <= (feature_loc + query_tol))
+        querymets <- querymets %>%
+          dplyr::group_by(.data$`Metabolite`, .data$`Quantification Signal`, .data$`Frequency (MHz)`,
+                          .data$`pH`, .data$`Concentration (mM)`, .data$`Temperature (K)`, .data$`Solvent`) %>%
+          dplyr::summarise(dplyr::across(dplyr::all_of(c('Chemical shift(ppm)')), mean, na.rm = TRUE),
+                           dplyr::across(dplyr::all_of(c('Multiplicity')), getmode, useNA = "no")) %>%
+          dplyr::ungroup() %>%
+          dplyr::select(.data$Metabolite, .data$`Chemical shift(ppm)`, .data$Multiplicity, .data$`Frequency (MHz)`,
+                        .data$pH, .data$`Concentration (mM)`, .data$`Temperature (K)`, .data$Solvent)
+
         querymets %>%
           dplyr::rename(`Peak Location` = `Chemical shift(ppm)`) %>%
           DT::datatable(rownames = FALSE,
@@ -368,6 +375,15 @@ metid_Server <- function(id, xpmt_data){
         feature_loc <- as.numeric(input$metid_det)
         querymets <- refmets_full %>% dplyr::filter(.data$`Chemical shift(ppm)` >= (feature_loc - query_tol) &
                                                       .data$`Chemical shift(ppm)` <= (feature_loc + query_tol))
+        querymets <- querymets %>%
+          dplyr::group_by(.data$`Metabolite`, .data$`Quantification Signal`, .data$`Frequency (MHz)`,
+                          .data$`pH`, .data$`Concentration (mM)`, .data$`Temperature (K)`, .data$`Solvent`) %>%
+          dplyr::summarise(dplyr::across(dplyr::all_of(c('Chemical shift(ppm)')), mean, na.rm = TRUE),
+                           dplyr::across(dplyr::all_of(c('Multiplicity')), getmode, useNA = "no")) %>%
+          dplyr::ungroup() %>%
+          dplyr::select(.data$Metabolite, .data$`Chemical shift(ppm)`, .data$Multiplicity, .data$`Frequency (MHz)`,
+                        .data$pH, .data$`Concentration (mM)`, .data$`Temperature (K)`, .data$Solvent)
+
         querymets %>%
           dplyr::rename(`Peak Location` = `Chemical shift(ppm)`) %>%
           DT::datatable(rownames = FALSE,
@@ -401,6 +417,15 @@ metid_Server <- function(id, xpmt_data){
 
       querymets <- refmets_full %>% dplyr::filter(.data$`Chemical shift(ppm)` >= (feature_loc - query_tol) &
                                                     .data$`Chemical shift(ppm)` <= (feature_loc + query_tol))
+      querymets <- querymets %>%
+        dplyr::group_by(.data$`Metabolite`, .data$`Quantification Signal`, .data$`Frequency (MHz)`,
+                        .data$`pH`, .data$`Concentration (mM)`, .data$`Temperature (K)`, .data$`Solvent`) %>%
+        dplyr::summarise(dplyr::across(dplyr::all_of(c('Chemical shift(ppm)')), mean, na.rm = TRUE),
+                         dplyr::across(dplyr::all_of(c('Multiplicity')), getmode, useNA = "no")) %>%
+        dplyr::ungroup() %>%
+        dplyr::select(.data$Metabolite, .data$`Chemical shift(ppm)`, .data$Multiplicity, .data$`Frequency (MHz)`,
+                      .data$pH, .data$`Concentration (mM)`, .data$`Temperature (K)`, .data$Solvent)
+
       tab <- querymets %>%
         dplyr::rename(`Peak Location` = `Chemical shift(ppm)`)
 
@@ -412,6 +437,14 @@ metid_Server <- function(id, xpmt_data){
         updateTabsetPanel(inputId = "metid_more_query_info", selected = "query_info")
 
         tempdat <-  refmets_full %>% dplyr::filter(.data$Metabolite == rv$entry_info$Metabolite)
+        tempdat <- tempdat %>%
+          dplyr::group_by(.data$`Metabolite`, .data$`Quantification Signal`, .data$`Frequency (MHz)`,
+                          .data$`pH`, .data$`Concentration (mM)`, .data$`Temperature (K)`, .data$`Solvent`) %>%
+          dplyr::summarise(dplyr::across(dplyr::all_of(c('Chemical shift(ppm)')), mean, na.rm = TRUE),
+                           dplyr::across(dplyr::all_of(c('Multiplicity')), getmode, useNA = "no")) %>%
+          dplyr::ungroup() %>%
+          dplyr::select(.data$Metabolite, .data$`Chemical shift(ppm)`, .data$Multiplicity, .data$`Frequency (MHz)`,
+                        .data$pH, .data$`Concentration (mM)`, .data$`Temperature (K)`, .data$Solvent)
 
         if(!is.na(rv$entry_info$`Frequency (MHz)`)){
           tempdat <- tempdat %>% dplyr::filter(.data$`Frequency (MHz)` == rv$entry_info$`Frequency (MHz)`)
@@ -432,6 +465,7 @@ metid_Server <- function(id, xpmt_data){
         if(!is.na(rv$entry_info$Solvent)){
           tempdat <- tempdat %>% dplyr::filter(.data$Solvent == rv$entry_info$Solvent)
         }
+
 
         # Create default annot object to add as annotation to plot
         ROI_annot <- list(
@@ -462,8 +496,6 @@ metid_Server <- function(id, xpmt_data){
 
         plotly::plotlyProxyInvoke(metid_e_data_plot_proxy, "relayout",
                                   list(annotations = c(rv$feat_annots, rv$candidate_annots)))
-
-
 
       } else{
         rv$entry_info <- NULL
@@ -575,8 +607,16 @@ metid_Server <- function(id, xpmt_data){
       isinlist <- ifelse(rv$entry_info$Metabolite %in% rv$metids, "Yes", "No")
       currpeak <- rv$entry_info$`Peak Location`
       other_peaks <- refmets_full %>%
-        dplyr::filter(.data$`Metabolite` == rv$entry_info$Metabolite) %>%
-        dplyr::rename(`Peak Location` = `Chemical shift(ppm)`)
+        dplyr::filter(.data$`Metabolite` == rv$entry_info$Metabolite)
+      other_peaks <- other_peaks %>%
+        dplyr::group_by(.data$`Metabolite`, .data$`Quantification Signal`, .data$`Frequency (MHz)`,
+                        .data$`pH`, .data$`Concentration (mM)`, .data$`Temperature (K)`, .data$`Solvent`) %>%
+        dplyr::summarise(dplyr::across(dplyr::all_of(c('Chemical shift(ppm)')), mean, na.rm = TRUE),
+                         dplyr::across(dplyr::all_of(c('Multiplicity')), getmode, useNA = "no")) %>%
+        dplyr::ungroup() %>%
+        dplyr::select(.data$Metabolite, .data$`Chemical shift(ppm)`, .data$Multiplicity, .data$`Frequency (MHz)`,
+                      .data$pH, .data$`Concentration (mM)`, .data$`Temperature (K)`, .data$Solvent)
+      other_peaks <- other_peaks %>% dplyr::rename(`Peak Location` = `Chemical shift(ppm)`)
 
       if(!is.na(rv$entry_info$`Frequency (MHz)`)){
         other_peaks <- other_peaks %>% dplyr::filter(.data$`Frequency (MHz)` == rv$entry_info$`Frequency (MHz)`)
