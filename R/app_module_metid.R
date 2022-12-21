@@ -20,7 +20,6 @@
 #'
 #' @details
 #'
-#'
 #' @import shiny
 #' @importFrom magrittr %>%
 #'
