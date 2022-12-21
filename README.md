@@ -1,7 +1,7 @@
 # nmRanalysis
 ## Current Version
   
-###  `0.0.91`
+###  `0.0.95`
 
 ### Services:
 
