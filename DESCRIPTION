@@ -55,6 +55,8 @@ Imports:
     dbscan,
     data.table,
     tibble,
+    DBI,
+    RPostgres,
     speaq,
     htmltools,
     minpack.lm,

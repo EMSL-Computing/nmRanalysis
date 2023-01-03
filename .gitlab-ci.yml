@@ -1,0 +1,41 @@
+#Include our standard library
+include:
+  - remote: 'https://raw.githubusercontent.com/pnnl-miscscripts/gitlab-lib/v1/gitlab-lib.yaml'
+
+stages:
+- check
+- build
+
+variables:
+  CONTAINER_VERSION: 0.0.96
+  CONTAINER_TAG: $CI_COMMIT_BRANCH-$CONTAINER_VERSION
+  KANIKO_EXTRA_ARGS: --git branch=$CI_COMMIT_BRANCH
+
+#Check to see if the image already exists and blocks overwriting an existing image. (New image = new tag, never overwrite, is a best practice.)
+verify-new-image:
+  extends: .pnnllib-gitlab-verify-new-image
+  stage: check
+  tags:
+    - k8s
+    - rzr
+    - codebuilds
+
+#Build and push the container.
+build-image:
+  extends: .pnnllib-gitlab-build-container-image
+  stage: build
+  only:
+    - database@emslc60117/nmRanalysisApp
+  tags:
+    - k8s
+    - rzr
+    - codebuilds
+
+#Load a secret into the Kubernetes cluster.
+deply-token-to-cluster:
+  extends: .pnnllib-gitlab-load-deploy-token
+  stage: build
+  tags:
+    - k8s
+    - rzr
+    - nmranalysis

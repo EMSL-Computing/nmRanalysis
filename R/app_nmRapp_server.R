@@ -49,6 +49,19 @@ nmRapp_server <- function(input, output, session) {
   # Stores the returned reactive value from the uploadServer module. The returned reactive
   # value is the output of as.ppmData() given the user specified experimental
   # conditions
+
+  #get your user name based on 'Sys.getenv' (static object)
+  #user.name <- paste0("Logged in as: ",Sys.getenv(c("SHINYPROXY_USERNAME")))
+  user.name <- paste0("Logged in as: ",Sys.getenv(c("USERNAME")))
+  #test user.name easy by printing on console
+  print(user.name)
+
+  connec <- reactive({
+
+    connect_db()
+
+  })
+
   xpmt_data       <- xpmt_data_uploadServer(id = "xpmt")
 
   observe({
@@ -92,7 +105,8 @@ nmRapp_server <- function(input, output, session) {
   # The code for the ref_data_uploadServer() module is found in ./R/ref_data_upload.R
   ref_data <- ref_data_uploadServer(id        = "ref_data_init",
                                     xpmt_data = mod_xpmt_data,
-                                    ref_db    = bmse_associations)
+                                    ref_db    = bmse_associations,
+                                    connec = connec)
 
   # Output a warning if any of uploaded reference metabolites not contained within database
   observe({
@@ -134,7 +148,8 @@ nmRapp_server <- function(input, output, session) {
   mod_ref_data <- ref_data_editingServer(id        = "ref_data_edits",
                                          xpmt_data = mod_xpmt_data,
                                          ref_data  = ref_data,
-                                         ref_db    = bmse_associations)
+                                         ref_db    = bmse_associations,
+                                         connec = connec)
 
   # Wizard buttons to navigate from reference data editing page to experimental data upload page OR from
   # reference data editing page to profiling page
@@ -169,7 +184,8 @@ nmRapp_server <- function(input, output, session) {
 
   profiling_results <- profilingServer(id = "profiling",
                                        xpmt_data = mod_xpmt_data,
-                                       ref_data = mod_ref_data)
+                                       ref_data = mod_ref_data,
+                                       connec = connec)
 
   observeEvent(input$wizard_proftoref, {
     req(input$wizard_proftoref > 0)

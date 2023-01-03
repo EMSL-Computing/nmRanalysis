@@ -39,7 +39,8 @@ as.bmseList <- function(casno_list,
                         ph = NULL,
                         instrument_strength = NULL,
                         temperature         = NULL,
-                        concentration       = NULL){
+                        concentration       = NULL,
+                        connec){
 
   # Initial Checks
   if(!inherits(casno_list, "list")){
@@ -54,9 +55,16 @@ as.bmseList <- function(casno_list,
     stop('Solvent type, temperature, and instrument strength must be specified if return_metabs = "exact_match"')
   }
 
+  # if(return_metabs == "nearest_match" & (is.null(solvent_type) | is.null(ph))){
+  #   stop('Solvent type and ph must be specified if return_metabs = "nearest_match"')
+  # }
+
+  # connect to db table
+  #connec <- connect_db()
+  bmseassociations <- query_table(connec, bmse_associations)
   # warn if one casno isn't in the db
   for (item in casno_list){
-    if (!(item %in% bmse_associations$CASno)){
+    if (!(item %in% bmseassociations$CASno)){
       warning(sprintf("%s is not a recognized CAS registry number", item))
     }
   }
@@ -66,7 +74,7 @@ as.bmseList <- function(casno_list,
     #create list without filtering by exp conditions
     bmse_list <- list()
     for (i in 1:length(casno_list)){
-      subset    <- bmse_associations[bmse_associations$CASno == casno_list[[i]], ]
+      subset    <- bmseassociations[bmseassociations$CASno == casno_list[[i]], ]
       bmse_val  <- subset$Entry_ID
       bmse_list <- append(bmse_list, bmse_val)
       misscheck[i] <- ifelse(length(bmse_val) > 0, 0, 1)
@@ -82,7 +90,7 @@ as.bmseList <- function(casno_list,
     #create list filtered by solvent type and pH
     bmse_list <- list()
     for (i in 1:length(casno_list)){
-      subset <- bmse_associations %>% dplyr::filter(.data$CASno == casno_list[[i]],
+      subset <- bmseassociations %>% dplyr::filter(.data$CASno == casno_list[[i]],
                                                     .data$Solvent == solvent_type,
                                                     .data$Temperature == temperature,
                                                     .data$Field_strength == instrument_strength)
@@ -150,8 +158,12 @@ as.bmseListFromName <- function(name_list,
                                 ph = NULL,
                                 instrument_strength = NULL,
                                 temperature         = NULL,
-                                concentration       = NULL){
+                                concentration       = NULL,
+                                connec){
 
+  # connect to db table
+  #connec <- connect_db()
+  bmseassociations <- query_table(connec, bmse_associations)
   # Initial Checks
   if(!inherits(name_list, "list")){
     stop("List of metabolite names must be of the class 'list'.")
@@ -167,7 +179,7 @@ as.bmseListFromName <- function(name_list,
 
   # fail check if one metabolite name is not in the db
   for (item in name_list){
-    if (!(item %in% bmse_associations$Solute)){
+    if (!(item %in% bmseassociations$Solute)){
       warning(sprintf("%s is not a recognized metabolite name", item))
     }
   }
@@ -178,7 +190,7 @@ as.bmseListFromName <- function(name_list,
     bmse_list <- list()
 
     for (i in 1:length(name_list)){
-      subset    <- bmse_associations[bmse_associations$Solute == name_list[[i]], ]
+      subset    <- bmseassociations[bmseassociations$Solute == name_list[[i]], ]
       bmse_val  <- subset$Entry_ID
       bmse_list <- append(bmse_list, bmse_val)
       misscheck[i] <- ifelse(length(bmse_val) > 0, 0, 1)
@@ -193,7 +205,7 @@ as.bmseListFromName <- function(name_list,
     #create list
     bmse_list <- list()
     for (i in 1:length(name_list)){
-      subset <- bmse_associations %>% dplyr::filter(.data$Solute == name_list[[i]],
+      subset <- bmseassociations %>% dplyr::filter(.data$Solute == name_list[[i]],
                                                     .data$Solvent == solvent_type,
                                                     .data$Temperature == temperature,
                                                     .data$Field_strength == instrument_strength)
@@ -560,7 +572,8 @@ get_spectra_data <- function(ID_list){
 #' @export export_roi_file
 export_roi_file <- function(spectra_df,
                             half_bandwidth = 1.4,
-                            roi_tol        = 0.005){
+                            roi_tol        = 0.005,
+                            connec){
 
   # (Note that HMDB_code is removed and NOT returned)
 
@@ -570,9 +583,12 @@ export_roi_file <- function(spectra_df,
               'Half bandwidth (Hz)', 'Multiplicity', 'J coupling (Hz)',	'Roof effect', 'J coupling 2 (Hz)',
               'Roof effect 2', 'Frequency (MHz)', 'pH', 'Concentration (mM)', 'Temperature (K)', 'Solvent')
 
+  # connect to db table
+  #connec <- connect_db()
+  bmseassociations <- query_table(connec, bmse_associations)
 
   # reference the entry ID to the bmse metadata
-  metab_name <- unique(merge(x = spectra_df, y = bmse_associations[, c("Entry_ID", "Solute", "Solvent", "pH", "Temperature", "Concentration")], by="Entry_ID", all.x=TRUE))
+  metab_name <- unique(merge(x = spectra_df, y = bmseassociations[, c("Entry_ID", "Solute", "Solvent", "pH", "Temperature", "Concentration")], by="Entry_ID", all.x=TRUE))
 
   #set default constants for columns (quantification mode, roof effect, and tolerance)
   q_mode       <- rep("Baseline Fitting", nrow(metab_name))
@@ -677,7 +693,8 @@ roi_ref_export <- function(name_list           = NULL,
                            roi_tol             = 0.005,
                            instrument_strength = NULL,
                            temperature         = NULL,
-                           concentration       = NULL){
+                           concentration       = NULL,
+                           connec){
 
   # set ID list object
   id_list <- NULL
@@ -688,7 +705,8 @@ roi_ref_export <- function(name_list           = NULL,
                                    ph                  = ph,
                                    instrument_strength = instrument_strength,
                                    temperature         = temperature,
-                                   concentration       = concentration)
+                                   concentration       = concentration,
+                                   connec = connec)
   } else{
     id_list <- as.bmseList(casno_list          = cas_list,
                            return_metabs       = return_metabs,
@@ -696,7 +714,8 @@ roi_ref_export <- function(name_list           = NULL,
                            ph                  = ph,
                            instrument_strength = instrument_strength,
                            temperature         = temperature,
-                           concentration       = concentration)
+                           concentration       = concentration,
+                           connec = connec)
   }
 
   # get spectra data
@@ -708,7 +727,8 @@ roi_ref_export <- function(name_list           = NULL,
     # return the ROI file formatted object and export CSV
     roi_df <- export_roi_file(spectra_df          = saveframe,
                               half_bandwidth      = half_bandwidth,
-                              roi_tol             = roi_tol)
+                              roi_tol             = roi_tol,
+                              connec = connec)
 
     return(roi_df)
   }
