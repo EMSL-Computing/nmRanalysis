@@ -1,7 +1,7 @@
 # nmRanalysis
 ## Current Version
   
-###  `0.0.96`
+###  `0.0.97`
 
 ### Services:
 
@@ -14,9 +14,9 @@
 
 2. If you don't have docker installed, the easiest way is to [install docker for desktop](https://docs.docker.com/engine/install/)
 
-3. Open a bash terminal and clone into the nmRanalysis repository by copying the HTTPS link available in the dropdown menu of the green 'Code' button.
+3. Open a bash terminal and clone into the **LOCAL branch** of the nmRanalysis repository by copying the HTTPS link available in the dropdown menu of the green 'Code' button.
     ```bash
-    git clone https://github.com/EMSL-Computing/nmRanalysis.git
+    git clone -b local https://github.com/EMSL-Computing/nmRanalysis.git
 
     ```
 
