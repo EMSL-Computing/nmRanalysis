@@ -1608,6 +1608,7 @@ profilingServer <- function(id, xpmt_data, ref_data, connec){
 
     observeEvent(input$upload_ref_data_db, {
 
+      browser()
       req(input$upload_ref_data_db>0)
       user.name <- Sys.getenv(c("USERNAME"))
       timestamp <- Sys.time()
@@ -1615,6 +1616,13 @@ profilingServer <- function(id, xpmt_data, ref_data, connec){
       df <- ref_data()$user_edited_refdata
       df['user'] <- user.name
       df['session'] <- timestamp
+
+      df['proposal_number'] <- input$proposal_num
+      df['PI_name'] <- input$PI_name
+      df['project_name'] <- input$project_name
+
+      #append the project information (PI name, project num, project name)
+
 
       # connect to db table
       #create_new_table(connec(), "profiling_parameters", df)
