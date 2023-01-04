@@ -1073,7 +1073,7 @@ ref_data_editingServer <- function(id, xpmt_data, ref_data, ref_db){
                          )
                        }
 
-                       req(as.numeric(v) - input$gpp_widthtolerance > 0)
+                       req(round(as.numeric(v) - input$gpp_widthtolerance, 5) > 0)
                      }
 
                      if(edtd_colname %in% c("Chemical shift tolerance (ppm)")){
@@ -1144,7 +1144,7 @@ ref_data_editingServer <- function(id, xpmt_data, ref_data, ref_db){
                              )
                            }
 
-                           req(as.numeric(v) - input$gpp_j_coupling_variation >= 0)
+                           req(round(as.numeric(v) - input$gpp_j_coupling_variation, 5) >= 0)
                          }
 
                        }
@@ -1405,16 +1405,16 @@ ref_data_editingServer <- function(id, xpmt_data, ref_data, ref_db){
       }
       req(temp$`ROI left edge (ppm)` > temp$`ROI right edge (ppm)`)
 
-      if(temp$`Chemical shift tolerance (ppm)` > round(abs(temp$`ROI right edge (ppm)` - temp$`Chemical shift(ppm)`), 3) |
-         temp$`Chemical shift tolerance (ppm)` > round(abs(temp$`ROI left edge (ppm)` - temp$`Chemical shift(ppm)`), 3)){
+      if(temp$`Chemical shift tolerance (ppm)` > round(abs(temp$`ROI right edge (ppm)` - temp$`Chemical shift(ppm)`), 5) |
+         temp$`Chemical shift tolerance (ppm)` > round(abs(temp$`ROI left edge (ppm)` - temp$`Chemical shift(ppm)`), 5)){
         shinyWidgets::show_alert(
           title = "Fitting parameter error.",
           text = "The chemical shift tolerance is larger than half the specified width of the signal region.",
           type = "error"
         )
       }
-      req(temp$`Chemical shift tolerance (ppm)` <= round(abs(temp$`ROI right edge (ppm)` - temp$`Chemical shift(ppm)`), 3) &
-            temp$`Chemical shift tolerance (ppm)` <= round(abs(temp$`ROI left edge (ppm)` - temp$`Chemical shift(ppm)`), 3))
+      req(temp$`Chemical shift tolerance (ppm)` <= round(abs(temp$`ROI right edge (ppm)` - temp$`Chemical shift(ppm)`), 5) &
+            temp$`Chemical shift tolerance (ppm)` <= round(abs(temp$`ROI left edge (ppm)` - temp$`Chemical shift(ppm)`), 5))
 
       if((temp$`Half bandwidth (Hz)` - input$gpp_widthtolerance) <= 0){
         shinyWidgets::show_alert(
@@ -1423,7 +1423,7 @@ ref_data_editingServer <- function(id, xpmt_data, ref_data, ref_db){
           type = "error"
         )
       }
-      req((temp$`Half bandwidth (Hz)` - input$gpp_widthtolerance) > 0)
+      req(round((temp$`Half bandwidth (Hz)` - input$gpp_widthtolerance), 5) > 0)
 
       if(temp$`Multiplicity` %ni% c("1", "2", "3", "4", "s", "d", "t", "q", "dd")){
         shinyWidgets::show_alert(
@@ -1442,7 +1442,7 @@ ref_data_editingServer <- function(id, xpmt_data, ref_data, ref_db){
             type = "error"
           )
         }
-        req((temp$`J coupling (Hz)` - input$gpp_j_coupling_variation) > 0)
+        req(round((temp$`J coupling (Hz)` - input$gpp_j_coupling_variation), 5) > 0)
 
         if(temp$`J coupling 2 (Hz)` != 0){
           if((temp$`J coupling 2 (Hz)` - input$gpp_j_coupling_variation) <= 0){
@@ -1452,7 +1452,7 @@ ref_data_editingServer <- function(id, xpmt_data, ref_data, ref_db){
               type = "error"
             )
           }
-          req((temp$`J coupling 2 (Hz)` - input$gpp_j_coupling_variation) > 0)
+          req(round((temp$`J coupling 2 (Hz)` - input$gpp_j_coupling_variation), 5) > 0)
 
           if((temp$`J coupling 2 (Hz)` - temp$`J coupling (Hz)`) > 0){
             shinyWidgets::show_alert(
@@ -1461,7 +1461,7 @@ ref_data_editingServer <- function(id, xpmt_data, ref_data, ref_db){
               type = "error"
             )
           }
-          req((temp$`J coupling 2 (Hz)` - temp$`J coupling (Hz)`) <= 0)
+          req(round((temp$`J coupling 2 (Hz)` - temp$`J coupling (Hz)`), 5) <= 0)
         }
       } else if(temp$`Multiplicity` %in% c("1", "s")){
         if(temp$`J coupling (Hz)` != 0 | temp$`J coupling 2 (Hz)` != 0){
@@ -1718,18 +1718,18 @@ ref_data_editingServer <- function(id, xpmt_data, ref_data, ref_db){
 
         req(temp$`ROI left edge (ppm)` > temp$`ROI right edge (ppm)`)
 
-        req(temp$`Chemical shift tolerance (ppm)` <= abs(temp$`ROI right edge (ppm)` - temp$`Chemical shift(ppm)`) &
-              temp$`Chemical shift tolerance (ppm)` <= abs(temp$`ROI left edge (ppm)` - temp$`Chemical shift(ppm)`))
+        req(temp$`Chemical shift tolerance (ppm)` <= round(abs(temp$`ROI right edge (ppm)` - temp$`Chemical shift(ppm)`), 5) &
+              temp$`Chemical shift tolerance (ppm)` <= round(abs(temp$`ROI left edge (ppm)` - temp$`Chemical shift(ppm)`), 5))
 
         req((temp$`Half bandwidth (Hz)` - input$gpp_widthtolerance > 0))
 
         req(temp$`Multiplicity` %in% c("1", "2", "3", "4", "s", "d", "t", "q", "dd"))
 
         if(temp$`Multiplicity` %ni% c("1", "s")){
-          req((temp$`J coupling (Hz)` - input$gpp_j_coupling_variation) > 0)
+          req(round((temp$`J coupling (Hz)` - input$gpp_j_coupling_variation), 5) > 0)
 
           if(temp$`J coupling 2 (Hz)` != 0){
-            req((temp$`J coupling 2 (Hz)` - input$gpp_j_coupling_variation) > 0)
+            req(round((temp$`J coupling 2 (Hz)` - input$gpp_j_coupling_variation), 5) > 0)
           }
         } else if(temp$`Multiplicity` %in% c("1", "s")){
           req(temp$`J coupling (Hz)` == 0 & temp$`J coupling 2 (Hz)` == 0)
@@ -1913,18 +1913,18 @@ ref_data_editingServer <- function(id, xpmt_data, ref_data, ref_db){
 
         req(temp$`ROI left edge (ppm)` > temp$`ROI right edge (ppm)`)
 
-        req(temp$`Chemical shift tolerance (ppm)` <= abs(temp$`ROI right edge (ppm)` - temp$`Chemical shift(ppm)`) &
-              temp$`Chemical shift tolerance (ppm)` <= abs(temp$`ROI left edge (ppm)` - temp$`Chemical shift(ppm)`))
+        req(temp$`Chemical shift tolerance (ppm)` <= round(abs(temp$`ROI right edge (ppm)` - temp$`Chemical shift(ppm)`), 5) &
+              temp$`Chemical shift tolerance (ppm)` <= round(abs(temp$`ROI left edge (ppm)` - temp$`Chemical shift(ppm)`), 5))
 
-        req((temp$`Half bandwidth (Hz)` - input$gpp_widthtolerance > 0))
+        req(round((temp$`Half bandwidth (Hz)` - input$gpp_widthtolerance), 5) > 0)
 
         req(temp$`Multiplicity` %in% c("1", "2", "3", "4", "s", "d", "t", "q", "dd"))
 
         if(temp$`Multiplicity` %ni% c("1", "s")){
-          req((temp$`J coupling (Hz)` - input$gpp_j_coupling_variation) > 0)
+          req(round((temp$`J coupling (Hz)` - input$gpp_j_coupling_variation), 5) > 0)
 
           if(temp$`J coupling 2 (Hz)` != 0){
-            req((temp$`J coupling 2 (Hz)` - input$gpp_j_coupling_variation) > 0)
+            req(round((temp$`J coupling 2 (Hz)` - input$gpp_j_coupling_variation), 5) > 0)
           }
         } else if(temp$`Multiplicity` %in% c("1", "s")){
           req(temp$`J coupling (Hz)` == 0 & temp$`J coupling 2 (Hz)` == 0)
