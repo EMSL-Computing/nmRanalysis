@@ -50,10 +50,14 @@ RUN addgroup --system app \
 COPY * /srv/shiny/
 
 RUN chmod -R 755 /srv/shiny/
+
+#uncomment next line for local build
+#RUN export GIT_SSL_NO_VERIFY=1
+
 RUN R -e "remotes::install_github('EMSL-Computing/nmRanalysis')"
 
 # Make the ShinyApp available at port 3838
 EXPOSE 3838
 
 # run app
-CMD ["R", "-e", "options('shiny.port' = 3838,shiny.host='0.0.0.0');nmRanalysis::nmRapp()"]
+CMD ["R", "-e", "options('shiny.port' = 3838,shiny.host='0.0.0.0', launch.browser = FALSE);nmRanalysis::nmRapp()"]

@@ -69,7 +69,8 @@ profiling_prequantUI <- function(id){
     uiOutput(ns("vizoptions_quantdata_ui")),
     shinycssloaders::withSpinner(plotly::plotlyOutput(ns('quantdata_plot'))),
     DT::dataTableOutput(ns("refmet_quant_table")),
-    uiOutput(ns("tempsoln"))
+    uiOutput(ns("tempsoln")),
+    uiOutput(ns("ui_upload_ref_data_db"))
   )
 }
 
@@ -156,6 +157,8 @@ profiling_detailedviewUI <- function(id){
   )
 }
 
+
+
 #' Module: Server functions specific to metabolite profiling and profiling result generation
 #'
 #' @description Copyright (C) 2022 Battelle Memorial Institute
@@ -200,9 +203,10 @@ profiling_detailedviewUI <- function(id){
 #' @importFrom rlang .data
 #' @importFrom plyr .
 #'
-profilingServer <- function(id, xpmt_data, ref_data){
+profilingServer <- function(id, xpmt_data, ref_data, connec){
   stopifnot(is.reactive(xpmt_data))
   stopifnot(is.reactive(ref_data))
+  stopifnot(is.reactive(connec))
   moduleServer(id, function(input, output, session){
 
     rv <- reactiveValues(subplot_dat = NULL)
@@ -523,6 +527,20 @@ profilingServer <- function(id, xpmt_data, ref_data){
       # clickable button
       shinyWidgets::actionBttn(inputId = NS(id, "auto_profile"),
                                label = "Profile",
+                               style = "unite",
+                               color = "primary",
+                               size = "sm")
+    })
+
+    # Dynamic action button to automatically append to the profiling parameters
+    # database table containing user modified metabolite entries
+
+    output$ui_upload_ref_data_db <- renderUI({
+      req(ref_data())
+
+      # clickable button
+      shinyWidgets::actionBttn(inputId = NS(id, "upload_ref_data_db"),
+                               label = "Upload Profiling Parameters ",
                                style = "unite",
                                color = "primary",
                                size = "sm")
@@ -1583,6 +1601,45 @@ profilingServer <- function(id, xpmt_data, ref_data){
       })
 
     })
+
+
+    # Respond to the upload button being pressed and append the user defined
+    # reference data to the db
+
+    observeEvent(input$upload_ref_data_db, {
+
+      browser()
+      req(input$upload_ref_data_db>0)
+      user.name <- Sys.getenv(c("USERNAME"))
+      timestamp <- Sys.time()
+
+      df <- ref_data()$user_edited_refdata
+      df['user'] <- user.name
+      df['session'] <- timestamp
+
+      df['proposal_number'] <- input$proposal_num
+      df['PI_name'] <- input$PI_name
+      df['project_name'] <- input$project_name
+
+      #append the project information (PI name, project num, project name)
+
+
+      # connect to db table
+      #create_new_table(connec(), "profiling_parameters", df)
+      append_table(db_connection= connec(), table_name="profiling_parameters", df_object=df)
+
+      # add pop up to let the user know the entry has been added to the database
+      removeModal()
+      showModal(
+        modalDialog(
+          title = "Profiling parameters have been added to the database server.",
+          size = "xl",
+          easyClose = TRUE,
+          fade = FALSE
+        ))
+    })
+
+
 
     # Observer to control pop-up (i.e. modal) containing the subplot of spectral data at a selected region.
     # Note: This works fine, but the only thing that I would like to change is

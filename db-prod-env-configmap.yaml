@@ -1,0 +1,11 @@
+apiVersion: v1
+data:
+  POSTGRES_DB: nmRanalysis
+  POSTGRES_PASSWORD: developer
+  POSTGRES_USER: developer
+kind: ConfigMap
+metadata:
+  creationTimestamp: null
+  labels:
+    io.kompose.service: postgresdb-db-prod-env
+  name: db-prod-env

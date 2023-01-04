@@ -97,7 +97,28 @@ xpmt_data_uploadUI <- function(id, ref_db){
                                                  style = "primary"
                         )),
 
+    # Note that tooltips are not working for some unknown reason.
+    shinyBS::bsCollapse(id = ns("experiment_metadata"), open = "Experiment Metadata",
+                        shinyBS::bsCollapsePanel(title = "Experiment Metadata",
 
+                                                 fluidRow(
+                                                   column(width = 6,
+                                                          textInput(inputId     = ns("proposal_num"),
+                                                                    label       = "Proposal Number",
+                                                                    value       = "")),
+
+                                                   column(width = 6,
+                                                          textInput(inputId     = ns("PI_name"),
+                                                                    label       = "PI Name",
+                                                                    value       = "")),
+                                                   column(width = 6,
+                                                          textInput(inputId     = ns("project_name"),
+                                                                    label       = "Project Name",
+                                                                    value       = ""))
+
+                                                 ),
+                                                 style = "primary"
+                        )),
     # clickable button
     shinyWidgets::actionBttn(inputId = ns("process_exp_inputs"),
                              label = "Process Data",

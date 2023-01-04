@@ -1,8 +1,7 @@
 # nmRanalysis
 ## LOCAL Version
   
-###  `0.0.1`
-This branch serves to provide a locally accessible version of the application. The database connections need to be established before reference data may be used.
+###  `0.0.96`
 
 ### Services:
 
