@@ -433,6 +433,12 @@ xpmt_data_uploadServer <- function(id){
                                             shinyWidgets::closeSweetAlert()
                                           }
 
+                                          # Add session metadata as an attribute so that it may be accessed on
+                                          # when restoring previous session saves.
+                                          attr(user.data, "session_info") <- list(proposal_num = input$proposal_num,
+                                                                                  PI_name = input$PI_name,
+                                                                                  project_name = input$project_name)
+
                                           return(user.data)
                                         })
   })
