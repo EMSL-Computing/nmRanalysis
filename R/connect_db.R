@@ -25,10 +25,10 @@
 #'
 connect_db <- function(){
     # Set environmental variables
-    
+
     #dsn_hostname = "localhost"
-    # dsn_uid = "developer"
-    # dsn_pwd = "developer"
+    #dsn_uid = "developer"
+    #dsn_pwd = "developer"
     dsn_database = "nmRanalysis"
     dsn_hostname = "postgres-postgresql"
     dsn_port = "5432"
