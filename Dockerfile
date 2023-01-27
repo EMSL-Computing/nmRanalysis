@@ -34,7 +34,8 @@ RUN R -e "remotes::install_github('rstudio/renv@${RENV_VERSION}')"
 
 # Install R packages from renv
 WORKDIR /srv/shiny/
-COPY renv.lock renv.lock
+
+COPY renv.lock renv.lock 
 RUN R -e 'renv::restore()'
 
 # set Rprofile in dir
@@ -47,7 +48,7 @@ RUN addgroup --system app \
 # nmrApp IMAGE  --end of base--
 # copy the app directory into the image
 
-COPY * /srv/shiny/
+#COPY * /srv/shiny/
 
 RUN chmod -R 755 /srv/shiny/
 
