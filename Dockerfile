@@ -48,7 +48,7 @@ RUN addgroup --system app \
 # nmrApp IMAGE  --end of base--
 # copy the app directory into the image
 
-#COPY * /srv/shiny/
+COPY * /srv/shiny/
 
 RUN chmod -R 755 /srv/shiny/
 
