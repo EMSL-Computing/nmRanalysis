@@ -49,14 +49,18 @@ RUN addgroup --system app \
 # nmrApp IMAGE  --end of base--
 # copy the app directory into the image
 
-COPY * /srv/shiny/
+COPY . /srv/shiny/nmRanalysis/
 
-RUN chmod -R 755 /srv/shiny/
+RUN \
+  chmod -R 755 /srv/shiny/ \
+  R -e "install.packages(c('DBI', 'RPostgres'))" \
+  R -e "install.packages('/srv/shiny/nmRanalysis', repos = NULL, type='source')" \
+  rm -rf /srv/shiny/nmRanalysis
 
 #uncomment next line for local build
 #RUN export GIT_SSL_NO_VERIFY=1
 
-RUN R -e "remotes::install_github('EMSL-Computing/nmRanalysis')"
+# RUN R -e "remotes::install_github('EMSL-Computing/nmRanalysis')"
 
 # Make the ShinyApp available at port 3838
 EXPOSE 3838
