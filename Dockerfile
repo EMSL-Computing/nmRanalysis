@@ -21,6 +21,7 @@ RUN apt-get update && apt-get install -y --no-install-recommends \
     r-cran-xml \
     libxml2-dev \
     xdg-utils \
+    libpq5 \
     && rm -rf /var/lib/apt/lists/*
 
 
