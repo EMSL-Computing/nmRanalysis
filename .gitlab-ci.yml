@@ -7,7 +7,7 @@ stages:
 - build
 
 variables:
-  CONTAINER_VERSION: 0.0.993
+  CONTAINER_VERSION: 0.0.994
   CONTAINER_TAG: $CI_COMMIT_BRANCH-$CONTAINER_VERSION
   KANIKO_EXTRA_ARGS: --git branch=$CI_COMMIT_BRANCH
 
@@ -24,8 +24,6 @@ verify-new-image:
 build-image:
   extends: .pnnllib-gitlab-build-container-image
   stage: build
-  only:
-    - database@emslc60117/nmRanalysisApp
   tags:
     - k8s
     - rzr
@@ -35,6 +33,8 @@ build-image:
 deply-token-to-cluster:
   extends: .pnnllib-gitlab-load-deploy-token
   stage: build
+  only:
+    - master@emslc60117/nmRanalysisApp
   tags:
     - k8s
     - rzr
