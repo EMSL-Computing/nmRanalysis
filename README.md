@@ -1,7 +1,7 @@
 # nmRanalysis
 ## LOCAL Version
   
-###  `0.0.993`
+###  `0.0.995`
 
 ### Services:
 
