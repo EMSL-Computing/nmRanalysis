@@ -293,13 +293,12 @@ ref_data_uploadServer <- function(id, xpmt_data, ref_db, connec){
 
                                        {
                                          req(xpmt_data())
-                                         conn <- connec()
 
                                          if (input$ref_upload_method == 'prevsesh') {
 
                                            saved.time <- input$user_timestamps
                                            conn <- connec()
-                                           user <- Sys.getenv(c('SHINYPROXY_USERNAME'))
+                                           user <- Sys.getenv(c('USERNAME'))
                                            query <- query_table(conn, profiling_parameters)
                                            user_query <- subset(query, username = user)
                                            user_time_query <- subset(user_query, session = saved.time)
@@ -451,16 +450,16 @@ ref_data_uploadServer <- function(id, xpmt_data, ref_db, connec){
 
                                            # Filter to get exact or best match
                                            xpmt_conds <- data.frame(`Frequency (MHz)`    = ifelse(is.null(attr(xpmt_data(), "exp_info")$instrument_strength),
-                                                                                                   NA, attr(xpmt_data(), "exp_info")$instrument_strength),
-                                                                     `pH`                 = ifelse(is.null(attr(xpmt_data(), "exp_info")$ph),
-                                                                                                   NA, attr(xpmt_data(), "exp_info")$ph),
-                                                                     `Concentration (mM)` = ifelse(is.null(attr(xpmt_data(), "exp_info")$concentration),
-                                                                                                   NA, attr(xpmt_data(), "exp_info")$concentration),
-                                                                     `Temperature (K)`    = ifelse(is.null(attr(xpmt_data(), "exp_info")$temperature),
-                                                                                                   NA, attr(xpmt_data(), "exp_info")$temperature),
-                                                                     `Solvent`            = ifelse(is.null(attr(xpmt_data(), "exp_info")$solvent),
-                                                                                                   NA, attr(xpmt_data(), "exp_info")$solvent),
-                                                                     check.names = FALSE)
+                                                                                                  NA, attr(xpmt_data(), "exp_info")$instrument_strength),
+                                                                    `pH`                 = ifelse(is.null(attr(xpmt_data(), "exp_info")$ph),
+                                                                                                  NA, attr(xpmt_data(), "exp_info")$ph),
+                                                                    `Concentration (mM)` = ifelse(is.null(attr(xpmt_data(), "exp_info")$concentration),
+                                                                                                  NA, attr(xpmt_data(), "exp_info")$concentration),
+                                                                    `Temperature (K)`    = ifelse(is.null(attr(xpmt_data(), "exp_info")$temperature),
+                                                                                                  NA, attr(xpmt_data(), "exp_info")$temperature),
+                                                                    `Solvent`            = ifelse(is.null(attr(xpmt_data(), "exp_info")$solvent),
+                                                                                                  NA, attr(xpmt_data(), "exp_info")$solvent),
+                                                                    check.names = FALSE)
                                            xpmt_conds <- xpmt_conds[, colSums(is.na(xpmt_conds)) == 0]
                                            cols_to_match <- colnames(xpmt_conds)
 
@@ -581,24 +580,24 @@ ref_data_uploadServer <- function(id, xpmt_data, ref_db, connec){
 
                                            }
 
-                                           user_reference_data <- user_reference_data %>%
-                                             dplyr::group_by(.data$`Quantification Mode`, .data$`Metabolite`, .data$`Quantification Signal`, .data$`Frequency (MHz)`,
-                                                             .data$`pH`, .data$`Concentration (mM)`, .data$`Temperature (K)`, .data$`Solvent`) %>%
-                                             dplyr::summarise(dplyr::across(dplyr::all_of(c('ROI left edge (ppm)', 'ROI right edge (ppm)', 'Chemical shift(ppm)',	'Chemical shift tolerance (ppm)',
-                                                                                            'Half bandwidth (Hz)', 'J coupling (Hz)',	'Roof effect', 'J coupling 2 (Hz)',
-                                                                                            'Roof effect 2')), mean, na.rm = TRUE),
-                                                              dplyr::across(dplyr::all_of(c('Multiplicity')), getmode, useNA = "no")) %>%
-                                             dplyr::select(.data$`ROI left edge (ppm)`, .data$`ROI right edge (ppm)`, .data$`Quantification Mode`,
-                                                           .data$`Metabolite`,	.data$`Quantification Signal`, .data$`Chemical shift(ppm)`,
-                                                           .data$`Chemical shift tolerance (ppm)`, .data$`Half bandwidth (Hz)`, .data$`Multiplicity`,
-                                                           .data$`J coupling (Hz)`,	.data$`Roof effect`, .data$`J coupling 2 (Hz)`, .data$`Roof effect 2`,
-                                                           .data$`Frequency (MHz)`, .data$`pH`, .data$`Concentration (mM)`, .data$`Temperature (K)`, .data$`Solvent`) %>%
-                                             dplyr::arrange(.data$`ROI left edge (ppm)`)
+                                            user_reference_data <- user_reference_data %>%
+                                              dplyr::group_by(.data$`Quantification Mode`, .data$`Metabolite`, .data$`Quantification Signal`, .data$`Frequency (MHz)`,
+                                                              .data$`pH`, .data$`Concentration (mM)`, .data$`Temperature (K)`, .data$`Solvent`) %>%
+                                              dplyr::summarise(dplyr::across(dplyr::all_of(c('ROI left edge (ppm)', 'ROI right edge (ppm)', 'Chemical shift(ppm)',	'Chemical shift tolerance (ppm)',
+                                                                                             'Half bandwidth (Hz)', 'J coupling (Hz)',	'Roof effect', 'J coupling 2 (Hz)',
+                                                                                             'Roof effect 2')), mean, na.rm = TRUE),
+                                                               dplyr::across(dplyr::all_of(c('Multiplicity')), getmode, useNA = "no")) %>%
+                                              dplyr::select(.data$`ROI left edge (ppm)`, .data$`ROI right edge (ppm)`, .data$`Quantification Mode`,
+                                                            .data$`Metabolite`,	.data$`Quantification Signal`, .data$`Chemical shift(ppm)`,
+                                                            .data$`Chemical shift tolerance (ppm)`, .data$`Half bandwidth (Hz)`, .data$`Multiplicity`,
+                                                            .data$`J coupling (Hz)`,	.data$`Roof effect`, .data$`J coupling 2 (Hz)`, .data$`Roof effect 2`,
+                                                            .data$`Frequency (MHz)`, .data$`pH`, .data$`Concentration (mM)`, .data$`Temperature (K)`, .data$`Solvent`) %>%
+                                              dplyr::arrange(.data$`ROI left edge (ppm)`)
 
 
                                            # Filter to get exact or best match
                                            xpmt_conds <- data.frame(`Frequency (MHz)`    = ifelse(is.null(attr(xpmt_data(), "exp_info")$instrument_strength),
-                                                                                                  NA, attr(xpmt_data(), "exp_info")$instrument_strength),
+                                                                                            NA, attr(xpmt_data(), "exp_info")$instrument_strength),
                                                                     `pH`                 = ifelse(is.null(attr(xpmt_data(), "exp_info")$ph),
                                                                                                   NA, attr(xpmt_data(), "exp_info")$ph),
                                                                     `Concentration (mM)` = ifelse(is.null(attr(xpmt_data(), "exp_info")$concentration),
@@ -608,7 +607,6 @@ ref_data_uploadServer <- function(id, xpmt_data, ref_db, connec){
                                                                     `Solvent`            = ifelse(is.null(attr(xpmt_data(), "exp_info")$solvent),
                                                                                                   NA, attr(xpmt_data(), "exp_info")$solvent),
                                                                     check.names = FALSE)
-
                                            xpmt_conds <- xpmt_conds[, colSums(is.na(xpmt_conds)) == 0]
                                            cols_to_match <- colnames(xpmt_conds)
 
