@@ -31,7 +31,7 @@ metid_peakfinderUI <- function(id){
                                                  fluidRow(
                                                    column(width = 6,
                                                           numericInput(inputId  = ns("nDivRange"),
-                                                                       label    = "Spectral Segment Length (ppm):",
+                                                                       label    = "Spectral Segment Length:",
                                                                        value    = 128)
                                                           ),
                                                    column(width = 6,
