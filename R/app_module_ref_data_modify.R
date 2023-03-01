@@ -2470,19 +2470,47 @@ ref_data_editingServer <- function(id, xpmt_data, ref_data, ref_db, connec){
         }
         attr(rv$user_reference_data, "edit_history") <- allres
 
+        user_edited_refdata <- rv$user_reference_data %>%
+          dplyr::mutate(`Frequency (MHz)`    = ifelse(is.null(attr(xpmt_data(), "exp_info")$instrument_strength),
+                                                      NA, attr(xpmt_data(), "exp_info")$instrument_strength),
+                        pH                   = ifelse(is.null(attr(xpmt_data(), "exp_info")$ph),
+                                                      NA, attr(xpmt_data(), "exp_info")$ph),
+                        `Concentration (mM)` = ifelse(is.null(attr(xpmt_data(), "exp_info")$concentration),
+                                                      NA, attr(xpmt_data(), "exp_info")$concentration),
+                        `Temperature (K)`    = ifelse(is.null(attr(xpmt_data(), "exp_info")$temperature),
+                                                      NA, attr(xpmt_data(), "exp_info")$temperature),
+                        Solvent              = ifelse(is.null(attr(xpmt_data(), "exp_info")$solvent),
+                                                      NA, attr(xpmt_data(), "exp_info")$solvent))
+
+        #!!!!!!!!!!!!!! CODE TO UPLOAD USER FITTING DATA TO DATABASE !!!!!!!!!!!!!!!!!#
+
+        user.name <- Sys.getenv(c("USERNAME"))
+        timestamp <- Sys.time()
+
+        df <- user_edited_refdata
+        df['user'] <- user.name
+        df['session'] <- timestamp
+
+        df['proposal_number'] <- attr(xpmt_data(), "session_info")$proposal_num
+        df['PI_name'] <- attr(xpmt_data(), "session_info")$PI_name
+        df['project_name'] <- attr(xpmt_data(), "session_info")$project_name
+
+        #append the project information (PI name, project num, project name)
+
+        # IMPORTANT!!!!
+        # Write code to remove existing user entry for the specific combination of proposal_number, PI_name, and project_name
+        # Only after all data for is removed for that combination should you append new data as indicated below
+
+        # connect to db table
+        #create_new_table(connec(), "profiling_parameters", df)
+        append_table(db_connection= connec(), table_name="profiling_parameters", df_object=df)
+
+        #!!!!!!!!!!!!!! END OF CODE TO UPLOAD USER FITTING DATA TO DATABASE !!!!!!!!!!!!!!!!!#
+
+
         # Change experimental conditions of final quantification data to reflect that of the current experimental sample
         # This is already done for quantdat when it is created
-        list(user_edited_refdata = rv$user_reference_data %>%
-               dplyr::mutate(`Frequency (MHz)`    = ifelse(is.null(attr(xpmt_data(), "exp_info")$instrument_strength),
-                                                           NA, attr(xpmt_data(), "exp_info")$instrument_strength),
-                             pH                   = ifelse(is.null(attr(xpmt_data(), "exp_info")$ph),
-                                                           NA, attr(xpmt_data(), "exp_info")$ph),
-                             `Concentration (mM)` = ifelse(is.null(attr(xpmt_data(), "exp_info")$concentration),
-                                                           NA, attr(xpmt_data(), "exp_info")$concentration),
-                             `Temperature (K)`    = ifelse(is.null(attr(xpmt_data(), "exp_info")$temperature),
-                                                           NA, attr(xpmt_data(), "exp_info")$temperature),
-                             Solvent              = ifelse(is.null(attr(xpmt_data(), "exp_info")$solvent),
-                                                           NA, attr(xpmt_data(), "exp_info")$solvent)),
+        list(user_edited_refdata = user_edited_refdata,
              quantdata           = rv$quantdat,
              global_parameters   = gpps)
         })
