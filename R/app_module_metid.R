@@ -31,23 +31,30 @@ metid_peakfinderUI <- function(id){
                                                  fluidRow(
                                                    column(width = 6,
                                                           numericInput(inputId  = ns("nDivRange"),
-                                                                       label    = "Spectral Segment Length:",
+                                                                       label    = "Spectral Segment Length (ppm):",
                                                                        value    = 128)
                                                           ),
+                                                   column(width = 6,
+                                                          htmlOutput(ns("segment_conversion"))
+                                                   )
+
+                                                   ),
+                                                 fluidRow(
                                                    column(width = 6,
                                                           shinyWidgets::numericRangeInput(inputId  = ns("CWTscale"),
                                                                                           label    = "CWT scale factor range:",
                                                                                           value    = c(1, 16),
                                                                                           min      = 1,
                                                                                           max      = 64)
-                                                          )
                                                    ),
-                                                 fluidRow(
                                                    column(width = 6,
                                                           numericInput(inputId  = ns("CWTscale_step"),
                                                                        label    = "CWT scale factor step size:",
                                                                        value    = 2)
-                                                   ),
+                                                   )
+                                                 ),
+                                                 fluidRow(
+
                                                    column(width = 6,
                                                           numericInput(inputId  = ns("snrThresh"),
                                                                        label    = "Signal-to-Noise Threshold:",
@@ -304,6 +311,14 @@ metid_Server <- function(id, xpmt_data){
 
     rv <- reactiveValues(obs_show_subplot_suspend = TRUE,
                          subplot_dat = NULL)
+
+    output$segment_conversion <- renderUI({
+      req(xpmt_data())
+      req(input$nDivRange)
+      browser
+      temp <- round(median(abs(diff(xpmt_data()$e_data$PPM)))*input$nDivRange, 5)
+      htmltools::HTML(paste0("The specified segment length is equivalent to ", temp, " ppm."))
+    })
 
     observeEvent(c(input$baseline_show, input$baselineThresh), {
       req(input$baselineThresh)
