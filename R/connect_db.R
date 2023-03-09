@@ -26,17 +26,17 @@
 connect_db <- function(){
     # Set environmental variables
 
-    # dsn_database = "nmRanalysis"
-    # dsn_port = "5432"
-    # dsn_hostname = "localhost"
-    # dsn_uid = "developer"
-    # dsn_pwd = "developer"
+    dsn_database = "nmRanalysis"
+    dsn_port = "5432"
+    dsn_hostname = "localhost"
+    dsn_uid = "developer"
+    dsn_pwd = "developer"
 
-    dsn_database = Sys.getenv(c("DATABASE_NAME"))
-    dsn_hostname = Sys.getenv(c("DATABASE_HOST"))
-    dsn_port = Sys.getenv(c("DATABASE_PORT"))
-    dsn_uid = Sys.getenv(c("DATABASE_USER"))
-    dsn_pwd = Sys.getenv(c("DATABASE_PASSWORD"))
+    # dsn_database = Sys.getenv(c("DATABASE_NAME"))
+    # dsn_hostname = Sys.getenv(c("DATABASE_HOST"))
+    # dsn_port = Sys.getenv(c("DATABASE_PORT"))
+    # dsn_uid = Sys.getenv(c("DATABASE_USER"))
+    # dsn_pwd = Sys.getenv(c("DATABASE_PASSWORD"))
 
     # Connect to Database
     tryCatch({
