@@ -2506,8 +2506,7 @@ ref_data_editingServer <- function(id, xpmt_data, ref_data, ref_db, connec){
                                                                   # AND (profiling_parameters.proposal_number'", df['proposal_number'], "');")
 
         query <- query_table(connec(), "profiling_parameters")
-        print(query)
-        dbExecute(connec(), delete_queries)
+        DBI::dbExecute(connec(), delete_queries)
 
         # connect to db table
         #create_new_table(connec(), "profiling_parameters", df)
