@@ -191,7 +191,7 @@ xpmt_data_uploadServer <- function(id, connec){
                                           shinyFeedback::feedbackDanger("project_name",
                                                                         any(input$project_name == full_query['project_name']),
                                                                         text = "Please provide a unique project name.")
-                                          req(!(any(input$project_name == full_query['project_name'])))
+                                          #req(!(any(input$project_name == full_query['project_name'])))
 
 
                                           shinyFeedback::feedbackDanger("uploaded_nmR_edata",
