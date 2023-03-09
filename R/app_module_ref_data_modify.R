@@ -253,7 +253,7 @@ ref_data_editingServer <- function(id, xpmt_data, ref_data, ref_db, connec){
                                                                              instrument_strength = attr(xpmt_data(), "exp_info")$instrument_strength,
                                                                              temperature         = attr(xpmt_data(), "exp_info")$temperature,
                                                                              concentration       = attr(xpmt_data(), "exp_info")$concentration,
-                                                                             connec = conn))
+                                                                             connec = connec()))
 
                      if(is.null(added_reference_data)){
                        shinyFeedback::feedbackDanger("refmet_toadd",
@@ -2504,8 +2504,8 @@ ref_data_editingServer <- function(id, xpmt_data, ref_data, ref_db, connec){
         delete_queries = paste0("DELETE FROM profiling_parameters WHERE (project_name = '", select_project_name, "');")
                                                                   # AND (profiling_parameters.PI_name = '", df['PI_name'], "')
                                                                   # AND (profiling_parameters.proposal_number'", df['proposal_number'], "');")
-        browser()
-        query <- query_table(conn, "profiling_parameters")
+
+        query <- query_table(connec(), "profiling_parameters")
         print(query)
         dbExecute(connec(), delete_queries)
 

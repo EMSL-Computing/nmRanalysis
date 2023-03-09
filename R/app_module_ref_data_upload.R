@@ -303,7 +303,7 @@ ref_data_uploadServer <- function(id, xpmt_data, ref_db, connec){
 
                                            saved.time <- input$user_timestamps
                                            conn <- connec()
-                                           user <- Sys.getenv(c('USERNAME'))
+                                           user <- Sys.getenv(c('USERNAME_SHINYPROXY'))
                                            query <- query_table(conn, profiling_parameters)
                                            user_query <- subset(query, username = user)
                                            user_time_query <- subset(user_query, session = saved.time)
