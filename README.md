@@ -1,6 +1,6 @@
 # nmRanalysis
   
-###  `0.0.997`
+###  `0.0.998`
 
 ### Services:
 

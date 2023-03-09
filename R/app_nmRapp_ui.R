@@ -53,7 +53,7 @@ nmRapp_ui <- function(request){
         sidebarLayout(
           # Specify the elements contained in the sidebarPanel
           sidebarPanel(
-            xpmt_data_uploadUI(id = "xpmt", ref_db = bmse_associations),
+            xpmt_data_uploadUI(id = "xpmt"),
             uiOutput("wizard_exptoref_ui")
           ),
 
@@ -82,7 +82,7 @@ nmRapp_ui <- function(request){
         value = "RefMetTab",
         sidebarLayout(
           sidebarPanel(
-            ref_data_uploadUI(id = "ref_data_init", ref_db = bmse_associations),
+            ref_data_uploadUI(id = "ref_data_init"),
             h4(""),
             fluidRow(
               column(6,
