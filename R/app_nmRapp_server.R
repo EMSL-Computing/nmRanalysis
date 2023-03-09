@@ -61,8 +61,12 @@ nmRapp_server <- function(input, output, session) {
     connect_db()
 
   })
+  ref_db_table <- reactive({
+    query_table(db_connection=connec(), table_name="bmse_associations")
+  })
 
-  xpmt_data       <- xpmt_data_uploadServer(id = "xpmt")
+  xpmt_data       <- xpmt_data_uploadServer(id = "xpmt",
+                                            connec = connec)
 
   observe({
     req(xpmt_data())
@@ -105,7 +109,7 @@ nmRapp_server <- function(input, output, session) {
   # The code for the ref_data_uploadServer() module is found in ./R/ref_data_upload.R
   ref_data <- ref_data_uploadServer(id        = "ref_data_init",
                                     xpmt_data = mod_xpmt_data,
-                                    ref_db    = bmse_associations,
+                                    ref_db    = ref_db_table,
                                     connec = connec)
 
   # Output a warning if any of uploaded reference metabolites not contained within database
@@ -148,7 +152,7 @@ nmRapp_server <- function(input, output, session) {
   mod_ref_data <- ref_data_editingServer(id        = "ref_data_edits",
                                          xpmt_data = mod_xpmt_data,
                                          ref_data  = ref_data,
-                                         ref_db    = bmse_associations,
+                                         ref_db    = ref_db_table,
                                          connec = connec)
 
   # Wizard buttons to navigate from reference data editing page to experimental data upload page OR from

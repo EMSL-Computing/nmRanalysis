@@ -30,7 +30,7 @@
 #'
 #' @import shiny
 #'
-ref_data_uploadUI <- function(id, ref_db){
+ref_data_uploadUI <- function(id){
   ns <- NS(id)
   tagList(
     h4("Reference Metabolite Data"),
@@ -53,7 +53,7 @@ ref_data_uploadUI <- function(id, ref_db){
         # Note: may want to later update to make choices only the set of metabolites that we
         # have data for at the supplied experimental conditions.
         selectizeInput(ns("user_refmets"), label = "List reference metabolite(s) of interest:",
-                       choices = unique(ref_db$Solute), multiple = TRUE)
+                       choices = NULL, multiple = TRUE)
       ),
       tabPanelBody(
         value = "prevsesh",
@@ -165,7 +165,7 @@ ref_data_uploadUI <- function(id, ref_db){
 #' @importFrom rlang .data
 #'
 ref_data_uploadServer <- function(id, xpmt_data, ref_db, connec){
-  stopifnot(!is.reactive(ref_db))
+  stopifnot(is.reactive(ref_db))
   stopifnot(is.reactive(xpmt_data))
   stopifnot(is.reactive(connec))
 
@@ -173,6 +173,11 @@ ref_data_uploadServer <- function(id, xpmt_data, ref_db, connec){
 
     # Initialize reactiveValues needed by this module
     rv <- reactiveValues(casno_not_in_db = NULL)
+    observe({
+      ref_db <- ref_db()
+      updateSelectizeInput(inputId = "user_refmets",
+                           choices = unique(ref_db$Solute))
+    })
 
     output$process_ref_inputs <- renderUI({
       if(input$ref_upload_method == "prevsesh"){
@@ -430,8 +435,8 @@ ref_data_uploadServer <- function(id, xpmt_data, ref_db, connec){
 
                                            # Checks whether all metabolites in list are contained in app database
                                            # If there are, saves appropriate reactive value.
-                                           rv$casno_not_in_db <- list(CASno = metab_names_table[[input$columns]][metab_names_table[[input$columns]] %ni% ref_db$CASno],
-                                                                      table = data.frame(metab_names_table[metab_names_table[[input$columns]] %ni% ref_db$CASno, ,drop = FALSE]))
+                                           rv$casno_not_in_db <- list(CASno = metab_names_table[[input$columns]][metab_names_table[[input$columns]] %ni% ref_db()$CASno],
+                                                                      table = data.frame(metab_names_table[metab_names_table[[input$columns]] %ni% ref_db()$CASno, ,drop = FALSE]))
 
                                            # Feeds in above to nmRanalysis function that generates formatted dataframe of reference metabolite info
                                            user_reference_data <- roi_ref_export(cas_list            = user.refchoices,
@@ -540,10 +545,10 @@ ref_data_uploadServer <- function(id, xpmt_data, ref_db, connec){
                                            # When using req() within an observer, does not halt computations beyond those in
                                            # the observer it is used.
                                            shinyFeedback::feedbackDanger("user_refmets",
-                                                                         !all(input$user_refmets %in% ref_db$Solute),
+                                                                         !all(input$user_refmets %in% ref_db()$Solute),
                                                                          "Invalid choice(s).")
 
-                                           req(all(input$user_refmets %in% ref_db$Solute))
+                                           req(all(input$user_refmets %in% ref_db()$Solute))
 
                                            # specify list object on the user provided metabolite names
                                            user.refchoices <- as.list(input$user_refmets)

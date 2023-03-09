@@ -17,7 +17,6 @@
 #'  51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
 #'
 #' @param id A string denoting the namespace id.
-#' @param ref_db Dataframe of internal database of reference metabolite data.
 #'
 #' @details This is the UI component for the module created to handle the uploading of experimental data.
 #' The value provided for 'id' should be identical across xpmt_data_uploadUI() and xpmt_data_uploadServer().
@@ -32,7 +31,7 @@
 #'
 #' @import shiny
 #'
-xpmt_data_uploadUI <- function(id, ref_db){
+xpmt_data_uploadUI <- function(id){
   ns <- NS(id)
   tagList(
     shinyBS::bsCollapse(id = ns("experimental_data"), open = "Experimental Data",
@@ -158,8 +157,18 @@ xpmt_data_uploadUI <- function(id, ref_db){
 #'
 #' @import shiny
 #'
-xpmt_data_uploadServer <- function(id){
+xpmt_data_uploadServer <- function(id, connec){
+  stopifnot(is.reactive(connec))
   moduleServer(id, function(input, output, session){
+
+    # observe({
+    #   req(input$project_name)
+    #   full_query <- query_database(connec(), "profiling_parameters")
+    #   shinyFeedback::feedbackDanger("project_name",
+    #                                 input$project_name %in% full_query['project_name'],
+    #                                 text = "Please provide a unique project name.")
+    #   req(!(input$project_name %in% full_query['project_name']))
+    # })
 
     # Output (in HTML format) to display a note about the effect of automatic alignment on processing time.
     output$align_note <- renderUI({
@@ -176,6 +185,14 @@ xpmt_data_uploadServer <- function(id){
     uploaded_xpmt_data <- eventReactive(c(input$process_exp_inputs),
                                         {
                                           req(input$process_exp_inputs > 0)
+
+                                          req(input$project_name)
+                                          full_query <- query_table(connec(), "profiling_parameters")
+                                          shinyFeedback::feedbackDanger("project_name",
+                                                                        any(input$project_name == full_query['project_name']),
+                                                                        text = "Please provide a unique project name.")
+                                          #req(!(any(input$project_name == full_query['project_name'])))
+
 
                                           shinyFeedback::feedbackDanger("uploaded_nmR_edata",
                                                                         is.null(input$uploaded_nmR_edata$datapath),

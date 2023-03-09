@@ -1606,38 +1606,37 @@ profilingServer <- function(id, xpmt_data, ref_data, connec){
     # Respond to the upload button being pressed and append the user defined
     # reference data to the db
 
-    observeEvent(input$upload_ref_data_db, {
-
-      browser()
-      req(input$upload_ref_data_db>0)
-      user.name <- Sys.getenv(c("USERNAME"))
-      timestamp <- Sys.time()
-
-      df <- ref_data()$user_edited_refdata
-      df['user'] <- user.name
-      df['session'] <- timestamp
-
-      df['proposal_number'] <- input$proposal_num
-      df['PI_name'] <- input$PI_name
-      df['project_name'] <- input$project_name
-
-      #append the project information (PI name, project num, project name)
-
-
-      # connect to db table
-      #create_new_table(connec(), "profiling_parameters", df)
-      append_table(db_connection= connec(), table_name="profiling_parameters", df_object=df)
-
-      # add pop up to let the user know the entry has been added to the database
-      removeModal()
-      showModal(
-        modalDialog(
-          title = "Profiling parameters have been added to the database server.",
-          size = "xl",
-          easyClose = TRUE,
-          fade = FALSE
-        ))
-    })
+    # observeEvent(input$upload_ref_data_db, {
+    #
+    #   req(input$upload_ref_data_db>0)
+    #   user.name <- Sys.getenv(c("USERNAME"))
+    #   timestamp <- Sys.time()
+    #
+    #   df <- ref_data()$user_edited_refdata
+    #   df['user'] <- user.name
+    #   df['session'] <- timestamp
+    #
+    #   df['proposal_number'] <- attr(xpmt_data(), "session_info")$proposal_num
+    #   df['PI_name'] <- attr(xpmt_data(), "session_info")$proposal_num
+    #   df['project_name'] <- attr(xpmt_data(), "session_info")$proposal_num
+    #
+    #   #append the project information (PI name, project num, project name)
+    #
+    #
+    #   # connect to db table
+    #   #create_new_table(connec(), "profiling_parameters", df)
+    #   append_table(db_connection= connec(), table_name="profiling_parameters", df_object=df)
+    #
+    #   # add pop up to let the user know the entry has been added to the database
+    #   removeModal()
+    #   showModal(
+    #     modalDialog(
+    #       title = "Profiling parameters have been added to the database server.",
+    #       size = "xl",
+    #       easyClose = TRUE,
+    #       fade = FALSE
+    #     ))
+    # })
 
 
 
