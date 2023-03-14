@@ -69,8 +69,7 @@ profiling_prequantUI <- function(id){
     uiOutput(ns("vizoptions_quantdata_ui")),
     shinycssloaders::withSpinner(plotly::plotlyOutput(ns('quantdata_plot'))),
     DT::dataTableOutput(ns("refmet_quant_table")),
-    uiOutput(ns("tempsoln")),
-    uiOutput(ns("ui_upload_ref_data_db"))
+    uiOutput(ns("tempsoln"))
   )
 }
 
@@ -204,6 +203,7 @@ profiling_detailedviewUI <- function(id){
 #' @importFrom plyr .
 #'
 profilingServer <- function(id, xpmt_data, ref_data, connec){
+
   stopifnot(is.reactive(xpmt_data))
   stopifnot(is.reactive(ref_data))
   stopifnot(is.reactive(connec))
@@ -218,7 +218,7 @@ profilingServer <- function(id, xpmt_data, ref_data, connec){
                    req(input$auto_profile > 0)
                    ###
 
-                   temp <- ref_data()$quantdat %>%
+                   temp <- ref_data()$quantdata %>%
                      dplyr::mutate(SigName = paste0(.data$Metabolite, " [", .data$`Quantification Signal`, "]"))
 
                    if(any(temp$`ROI left edge (ppm)` < temp$`ROI right edge (ppm)`)){
@@ -341,7 +341,7 @@ profilingServer <- function(id, xpmt_data, ref_data, connec){
 
       req(ref_data())
       req(input$ROI_to_plot_quantdat)
-
+      #browser()
 
       temp <- ref_data()$quantdata %>%
         dplyr::mutate(ROI = paste0("(", .data$`ROI right edge (ppm)`, ", ", .data$`ROI left edge (ppm)`, ")")) %>%
@@ -368,7 +368,7 @@ profilingServer <- function(id, xpmt_data, ref_data, connec){
 
     # Output (in HTML format) to display the filters that are currently applied to the data.
     output$applied_filters_text2 <- renderUI({
-
+      #browser()
       if(length(attr(xpmt_data(), "filters")) == 0){
         htmltools::HTML("<strong>Currently applied filters:</strong><br/>None")
 
@@ -390,7 +390,7 @@ profilingServer <- function(id, xpmt_data, ref_data, connec){
     output$quantdata_plot <- plotly::renderPlotly({
 
       req(isolate({ref_data()}))
-
+      #browser()
 
       plotly::plot_ly(source = "id_quantdata_plot", type = "scatter", mode = "lines") %>%
         plotly::config(displaylogo = FALSE,
@@ -422,6 +422,7 @@ profilingServer <- function(id, xpmt_data, ref_data, connec){
       req(input$sample_to_plot_quantdat %in% names(xpmt_data()$e_data))
       req(input$ROI_to_plot_quantdat)
       req(ref_data())
+      #browser()
 
       xpmt_data_sample <- xpmt_data()$e_data %>% dplyr::select(.data$PPM, .data[[input$sample_to_plot_quantdat]])
       df_long <- xpmt_data_sample %>%
@@ -468,6 +469,7 @@ profilingServer <- function(id, xpmt_data, ref_data, connec){
                  {
                    req(ref_data())
                    req(xpmt_data())
+                   #browser()
 
                    temp <- ref_data()$quantdata %>%
                      dplyr::mutate(ROI = paste0("(", .data$`ROI right edge (ppm)`, ", ", .data$`ROI left edge (ppm)`, ")")) %>%
@@ -488,7 +490,7 @@ profilingServer <- function(id, xpmt_data, ref_data, connec){
 
       req(xpmt_data())
       req(ref_data())
-
+      #browser()
       ROIvec <- unique(paste0("(", ref_data()$quantdata$`ROI right edge (ppm)`, ", ", ref_data()$quantdata$`ROI left edge (ppm)`, ")"))
 
       shinyWidgets::dropdownButton(
@@ -523,7 +525,7 @@ profilingServer <- function(id, xpmt_data, ref_data, connec){
     # reference metabolite data are uploaded.
     output$ui_auto_profile <- renderUI({
       req(ref_data())
-
+      #browser()
       # clickable button
       shinyWidgets::actionBttn(inputId = NS(id, "auto_profile"),
                                label = "Profile",
@@ -532,24 +534,10 @@ profilingServer <- function(id, xpmt_data, ref_data, connec){
                                size = "sm")
     })
 
-    # Dynamic action button to automatically append to the profiling parameters
-    # database table containing user modified metabolite entries
-
-    output$ui_upload_ref_data_db <- renderUI({
-      req(ref_data())
-
-      # clickable button
-      shinyWidgets::actionBttn(inputId = NS(id, "upload_ref_data_db"),
-                               label = "Upload Profiling Parameters ",
-                               style = "unite",
-                               color = "primary",
-                               size = "sm")
-    })
 
     output$ui_global_profiling_parameters <- renderUI({
       req(ref_data())
-
-
+      #browser()
       if(any(Reduce("c", lapply(ref_data()$global_parameters, is.null)))){
         shinyBS::bsCollapse(id = NS(id, "global_fitting_params"),
                             shinyBS::bsCollapsePanel(title = "Global Profiling Parameters",
@@ -890,7 +878,7 @@ profilingServer <- function(id, xpmt_data, ref_data, connec){
       # Create a new directory in the temp directory for each new instance of this trelliscope.
       treldir <- file.path(tempdir(), paste0("Result_", format(Sys.time(), format = "%H-%m-%s", tz = "UTC")))
       dir.create(treldir)
-
+      #browser()
       user_profiling <- user_profiling()
       profiling_data = user_profiling
       signals_to_plot = NULL
@@ -1057,7 +1045,7 @@ profilingServer <- function(id, xpmt_data, ref_data, connec){
     output$complete_profres_tab <- DT::renderDataTable(server = FALSE, {
 
       req(user_profiling())
-
+      #browser()
       user_profiling <- user_profiling()
 
       tempdat_quant <- as.data.frame(user_profiling$final_output$quantification) %>%
@@ -1182,6 +1170,7 @@ profilingServer <- function(id, xpmt_data, ref_data, connec){
 
       req(xpmt_data())
       req(ref_data())
+      #browser()
 
       quant_refdata <- ref_data()$user_edited_refdata %>% dplyr::filter(.data$Quantify == 1)
       qmetnames <- unique(quant_refdata$Metabolite)
@@ -1219,7 +1208,7 @@ profilingServer <- function(id, xpmt_data, ref_data, connec){
 
     # Output (in HTML format) to display the filters that are currently applied to the data.
     output$applied_filters_text <- renderUI({
-
+      #browser()
       if(length(attr(xpmt_data(), "filters")) == 0){
         htmltools::HTML("<strong>Currently applied filters:</strong><br/>None")
 
@@ -1237,7 +1226,7 @@ profilingServer <- function(id, xpmt_data, ref_data, connec){
 
       req(xpmt_data())
       req(ref_data())
-
+      #browser()
       input$view_detailed
 
       if(rv$new_profiling){
@@ -1400,7 +1389,7 @@ profilingServer <- function(id, xpmt_data, ref_data, connec){
 
       req(input$show_subplot)
       req(user_profiling())
-
+      #browser()
       isolate({
         req(xpmt_data())
         req(ref_data())
@@ -1410,7 +1399,7 @@ profilingServer <- function(id, xpmt_data, ref_data, connec){
       })
 
       brushedData <- plotly::event_data("plotly_brushed", source = "id_prof_refmet_view_plot")
-
+      #browser()
       if(is.null(brushedData)){
         return(NULL)
       }
@@ -1670,6 +1659,7 @@ profilingServer <- function(id, xpmt_data, ref_data, connec){
       req(xpmt_data())
       req(ref_data())
       req(input$profile_confirm)
+      #browser()
 
       shinyWidgets::progressSweetAlert(
         session = shiny::getDefaultReactiveDomain(),

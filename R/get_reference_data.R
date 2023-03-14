@@ -477,7 +477,12 @@ get_spectra_data <- function(ID_list){
       }
 
       multiplicity_values <- lapply(peak_groups, function(x){length(x)})
-
+      if(ID=='EMSL00002'){
+        multiplicity_values <- c("q","q","d","s")
+      }
+      if(ID=='EMSL00001'){
+        multiplicity_values <- c("d","dd","m","m","dd","m","m","m","s")
+      }
       ####### midpoint calc #######
       midpoints <- lapply(peak_groups, mean)
 
