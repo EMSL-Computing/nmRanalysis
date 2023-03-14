@@ -58,7 +58,7 @@ ref_data_uploadUI <- function(id){
       tabPanelBody(
         value = "prevsesh",
         # query user profiling parameter table to get options
-        selectizeInput(ns("user_timestamps"), label = "Choose a timestamp from a previous session:",
+        selectizeInput(ns("user_timestamps"), label = "Choose a previous session:",
                        choices = NULL, multiple = TRUE)
       )
     ),
@@ -219,7 +219,7 @@ ref_data_uploadServer <- function(id, xpmt_data, ref_db, connec){
       user <- Sys.getenv(c('SHINYPROXY_USERNAME'))
       query <- query_table(conn, profiling_parameters)
       user_query <- subset(query, username = user)
-      time.chr <- lapply(user_query$session, as.character)
+      time.chr <- lapply(user_query$project_name, as.character)
       updateSelectizeInput(inputId = "user_timestamps", choices = unique(time.chr))
     })
 
