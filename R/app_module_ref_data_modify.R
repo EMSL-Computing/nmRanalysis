@@ -2482,7 +2482,7 @@ ref_data_editingServer <- function(id, xpmt_data, ref_data, ref_db, connec){
                         Solvent              = ifelse(is.null(attr(xpmt_data(), "exp_info")$solvent),
                                                       NA, attr(xpmt_data(), "exp_info")$solvent))
 
-        user.name <- Sys.getenv(c("USERNAME_SHINYPROXY"))
+        user.name <- Sys.getenv(c("SHINYPROXY_USERNAME"))
         timestamp <- Sys.time()
 
         df <- user_edited_refdata
