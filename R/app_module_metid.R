@@ -223,7 +223,10 @@ metid_mainUI <- function(id){
                               actionButton(ns("metid_add"), htmltools::HTML("<b>Add selection to identifications</b>")))
                      ),
                      h4(""),
-                     htmlOutput(ns("candidate_text"))
+                     htmlOutput(ns("candidate_text")),
+                     h4(""),
+                     uiOutput(ns("modfit_button_ui")),
+                     htmlOutput(ns("predprobs_text"))
                    )
                  )
                  )
@@ -310,12 +313,13 @@ metid_Server <- function(id, xpmt_data){
   moduleServer(id, function(input, output, session){
 
     rv <- reactiveValues(obs_show_subplot_suspend = TRUE,
-                         subplot_dat = NULL)
+                         subplot_dat = NULL,
+                         predprobs = list())
 
     output$segment_conversion <- renderUI({
       req(xpmt_data())
       req(input$nDivRange)
-      browser
+
       temp <- round(median(abs(diff(xpmt_data()$e_data$PPM)))*input$nDivRange, 5)
       htmltools::HTML(paste0("The specified segment length is equivalent to ", temp, " ppm."))
     })
@@ -359,6 +363,10 @@ metid_Server <- function(id, xpmt_data){
 
       query_tol <- input$metid_querytol
 
+      modfits_files <- list.files(path = "C:\\Users\\flor829\\local_projectdir\\NMR\\recommender_modeling\\Results\\model_fits")
+      modfits_nameonly <- gsub("model_", "", modfits_files)
+      modfits_nameonly <- gsub(".rds", "", modfits_nameonly)
+
       if(input$metid_queryset == "cust"){
         feature_loc <- as.numeric(input$metid_cust)
         querymets <- refmets_full %>% dplyr::filter(.data$`Chemical shift(ppm)` >= (feature_loc - query_tol) &
@@ -370,7 +378,11 @@ metid_Server <- function(id, xpmt_data){
                            dplyr::across(dplyr::all_of(c('Multiplicity')), getmode, useNA = "no")) %>%
           dplyr::ungroup() %>%
           dplyr::select(.data$Metabolite, .data$`Chemical shift(ppm)`, .data$Multiplicity, .data$`Frequency (MHz)`,
-                        .data$pH, .data$`Concentration (mM)`, .data$`Temperature (K)`, .data$Solvent)
+                        .data$pH, .data$`Concentration (mM)`, .data$`Temperature (K)`, .data$Solvent) %>%
+          dplyr::mutate(tempnames = tolower(make.names(Metabolite)),
+                        `Probability Available` = ifelse(tempnames %in% modfits_nameonly, "Yes", "No")) %>%
+          dplyr::select(-tempnames) %>%
+          dplyr::relocate(`Probability Available`, `Metabolite`)
 
         querymets %>%
           dplyr::rename(`Peak Location` = `Chemical shift(ppm)`) %>%
@@ -396,7 +408,11 @@ metid_Server <- function(id, xpmt_data){
                            dplyr::across(dplyr::all_of(c('Multiplicity')), getmode, useNA = "no")) %>%
           dplyr::ungroup() %>%
           dplyr::select(.data$Metabolite, .data$`Chemical shift(ppm)`, .data$Multiplicity, .data$`Frequency (MHz)`,
-                        .data$pH, .data$`Concentration (mM)`, .data$`Temperature (K)`, .data$Solvent)
+                        .data$pH, .data$`Concentration (mM)`, .data$`Temperature (K)`, .data$Solvent) %>%
+          dplyr::mutate(tempnames = tolower(make.names(Metabolite)),
+                        `Probability Available` = ifelse(tempnames %in% modfits_nameonly, "Yes", "No")) %>%
+          dplyr::select(-tempnames) %>%
+          dplyr::relocate(`Probability Available`, `Metabolite`)
 
         querymets %>%
           dplyr::rename(`Peak Location` = `Chemical shift(ppm)`) %>%
@@ -460,6 +476,21 @@ metid_Server <- function(id, xpmt_data){
           dplyr::select(.data$Metabolite, .data$`Chemical shift(ppm)`, .data$Multiplicity, .data$`Frequency (MHz)`,
                         .data$pH, .data$`Concentration (mM)`, .data$`Temperature (K)`, .data$Solvent)
 
+        # (6/6/23) check modfits files for metabolite
+        modfits_files <- list.files(path = "C:\\Users\\flor829\\local_projectdir\\NMR\\recommender_modeling\\Results\\model_fits")
+        modfits_nameonly <- gsub("model_", "", modfits_files)
+        modfits_nameonly <- gsub(".rds", "", modfits_nameonly)
+
+        fmat_selmet <- tolower(make.names(unique(tempdat$Metabolite)))
+        modind <- which(modfits_nameonly == fmat_selmet)
+        if(length(modind) > 0){
+          rv$modfit_selmod_file <- modfits_files[modind]
+        } else{
+          rv$modfit_selmod_file <- NULL
+        }
+        # modfit_selmod <- readRDS(paste0("C:\\Users\\flor829\\local_projectdir\\NMR\\recommender_modeling\\Results\\model_fits", modfit_selmod_file))
+
+
         if(!is.na(rv$entry_info$`Frequency (MHz)`)){
           tempdat <- tempdat %>% dplyr::filter(.data$`Frequency (MHz)` == rv$entry_info$`Frequency (MHz)`)
         }
@@ -514,6 +545,8 @@ metid_Server <- function(id, xpmt_data){
       } else{
         rv$entry_info <- NULL
         updateTabsetPanel(inputId = "metid_more_query_info", selected = "none")
+
+        rv$modfit_selmod_file <- NULL
 
         rv$candidate_annots <- NULL
 
@@ -698,6 +731,54 @@ metid_Server <- function(id, xpmt_data){
                                "<b>All metabolite peak locations:</b>", "<br>",
                                "&emsp; ", other_peaks_locs))
       }
+
+    })
+
+    output$predprobs_text <- renderUI({
+
+      req(xpmt_data())
+      req(input$metid_query_table_rows_selected)
+      req(rv$entry_info)
+      req(rv$modfit_selmod_file)
+      req(rv$predprobs[[rv$modfit_selmod_file]])
+
+      predprobs <- rv$predprobs[[rv$modfit_selmod_file]]$prob_present
+      modperf_train <- rv$predprobs[[rv$modfit_selmod_file]]$modinfo_train %>%
+        dplyr::mutate(modelname = dplyr::case_when(
+          model == "rand_forest" ~ "Random Forest",
+          model == "logistic_reg" ~ "Penalized Logistic Regression",
+          model == "mlp" ~ "Neural Network",
+          model == "svm_linear" ~ "SVM: Linear Basis Function",
+          model == "svm_poly" ~ "SVM: Polynomial Basis Function",
+          model == "svm_rbf" ~ "SVM: Radial Basis Function"
+        ))
+      modperf_test <- rv$predprobs[[rv$modfit_selmod_file]]$modinfo_test
+
+      htmltools::HTML(paste0("<b>Probability Metabolite is Present in Current Sample:</b> ",
+                             round(predprobs$.pred_Present[predprobs$sampnames == input$sample_to_plot], 4), "<br>",
+                             "<br>",
+                             "<b>Average Probability Across All Samples:</b> ", round(mean(predprobs$.pred_Present),4), "<br>",
+                             "<br>",
+                             "<b>Fitted Model Type:</b> ", modperf_train$modelname, "<br>",
+                             "<br>",
+                             "<b>Model Precision/Recall AUC:</b> ", round(modperf_test$pr_auc, 4), "<br>",
+                             "<br>",
+                             "<b>Model Sensitivity/Specificity AUC:</b> ", round(modperf_test$roc_auc, 4)))
+    })
+
+    output$modfit_button_ui <- renderUI({
+
+      req(xpmt_data())
+      req(input$metid_query_table_rows_selected)
+      req(rv$entry_info)
+      req(rv$modfit_selmod_file)
+      req(is.null(rv$predprobs[[rv$modfit_selmod_file]]))
+
+      shinyWidgets::actionBttn(inputId = NS(id, "modfit_button"),
+                               label = "Generate Predicted Probability",
+                               style = "unite",
+                               color = "primary",
+                               size = "sm")
 
     })
 
@@ -1125,6 +1206,59 @@ metid_Server <- function(id, xpmt_data){
                    plotly::plotlyProxyInvoke(metid_e_data_plot_proxy, "relayout",
                                              list(shapes = list(query_line)))
                  })
+
+    observeEvent(c(input$modfit_button), {
+      req(xpmt_data())
+      req(input$metid_query_table_rows_selected)
+      req(rv$entry_info)
+      req(rv$modfit_selmod_file)
+      req(input$modfit_button > 0)
+
+      modfit_selmod <- readRDS(paste0("C:\\Users\\flor829\\local_projectdir\\NMR\\recommender_modeling\\Results\\model_fits\\", rv$modfit_selmod_file))
+      bw1_bins <- as.numeric(c("9.95", "9.85", "9.75", "9.65", "9.55", "9.45", "9.35", "9.25", "9.15",
+                               "9.05", "8.95", "8.85", "8.75", "8.65", "8.55", "8.45", "8.35", "8.25",
+                               "8.15", "8.05", "7.95", "7.85", "7.75", "7.65", "7.55", "7.45", "7.35",
+                               "7.25", "7.15", "7.05", "6.95", "6.85", "6.75", "6.65", "6.55", "6.45",
+                               "6.35", "6.25", "6.15", "6.05", "5.95", "5.85", "5.75", "5.65", "5.55",
+                               "5.45", "5.35", "5.25", "5.15", "5.05", "4.95", "4.85", "4.75", "4.65",
+                               "4.55", "4.45", "4.35", "4.25", "4.15", "4.05", "3.95", "3.85",
+                               "3.7500000000000004", "3.65", "3.55", "3.45", "3.35", "3.25", "3.15",
+                               "3.05", "2.95", "2.85", "2.75", "2.65", "2.55", "2.45", "2.35", "2.25",
+                               "2.15", "2.05", "1.95", "1.85", "1.75", "1.65", "1.55", "1.45", "1.35",
+                               "1.25", "1.15", "1.05", "0.95", "0.85", "0.75", "0.65", "0.55", "0.45",
+                               "0.35", "0.25", "0.15", "0.05"))
+      bw_cp1 <- c(bw1_bins + 0.1/2, min(bw1_bins - 0.1/2))
+
+      # Format data for prediction
+      edat <- xpmt_data()$e_data %>%
+        dplyr::filter(PPM >= min(bw_cp1) & PPM <= max(bw_cp1)) %>%
+        dplyr::mutate(Bingrp = cut(PPM, bw_cp1),
+                      binnum = 1) %>%
+        dplyr::group_by(Bingrp) %>%
+        dplyr::summarise_all(list(sum)) %>%
+        dplyr::mutate(PPM = PPM/binnum) %>%
+        dplyr::arrange(desc(PPM)) %>%
+        dplyr::select(-binnum, -Bingrp) %>%
+        dplyr::mutate(PPM = round(PPM, 2),
+                      PPM = as.character(PPM),
+                      PPM = ifelse(PPM == "3.75", "3.7500000000000004", PPM)) %>%
+        dplyr::relocate(PPM) %>%
+        as.data.frame()
+      rownames(edat) <- edat$PPM
+      edat <- edat %>%
+        dplyr::select(-PPM) %>%
+        t() %>%
+        data.frame()
+
+      predprob_pres <- parsnip::predict.model_fit(modfit_selmod$mod_fits, edat) %>%
+        dplyr::bind_cols(parsnip::predict.model_fit(modfit_selmod$mod_fits, edat, type = "prob")) %>%
+        dplyr::mutate(sampnames = rownames(edat))
+
+      rv$predprobs[[rv$modfit_selmod_file]] <- list(prob_present  = predprob_pres,
+                                                    modinfo_train = modfit_selmod$train_perf,
+                                                    modinfo_test  = modfit_selmod$test_perf)
+
+    })
 
 
     # -------------------------------------------------------------------------
