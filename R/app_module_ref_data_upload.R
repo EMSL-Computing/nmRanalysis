@@ -210,19 +210,19 @@ ref_data_uploadServer <- function(id, xpmt_data, ref_db, connec){
 
                  })
 
-    #observer to check for timestamp and query of user ref db
+    #observer to check for project name and query of user ref db
     observe({
       req(input$ref_upload_method == "prevsesh")
-      req(connec())
+      req(xpmt_data())
 
-      conn <- connec()
-      user <- Sys.getenv(c('SHINYPROXY_USERNAME'))
-      query <- query_table(conn, profiling_parameters)
-      user_query <- subset(query, username = user)
-      time.chr <- lapply(user_query$project_name, as.character)
-      updateSelectizeInput(inputId = "user_timestamps", choices = unique(time.chr))
+      # username <- as.character(Sys.getenv(c('SHINYPROXY_USERNAME')))
+      # query <- query_table(connec(), "profiling_parameters") # update query string to do on user without need for subset later
+      # user_query <- subset(query, user == username)
+      # time.chr <- lapply(user_query$project_name, as.character)
+      # updateSelectizeInput(inputId = "user_timestamps", choices = unique(time.chr))
+      user.data <- xpmt_data()
+      updateSelectizeInput(inputId = "user_timestamps", choices = attr(user.data, "session_info")$project_name)
     })
-
 
 
     # reactive to read in refmet file (when supplied)
@@ -303,9 +303,9 @@ ref_data_uploadServer <- function(id, xpmt_data, ref_db, connec){
 
                                            saved.time <- input$user_timestamps
                                            conn <- connec()
-                                           user <- Sys.getenv(c('USERNAME_SHINYPROXY'))
+                                           username <- Sys.getenv(c('SHINYPROXY_USERNAME'))
                                            query <- query_table(conn, profiling_parameters)
-                                           user_query <- subset(query, username = user)
+                                           user_query <- subset(query, user == username)
                                            user_time_query <- subset(user_query, session = saved.time)
 
                                            #display metabolites in side panel from user_time_query

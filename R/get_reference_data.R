@@ -363,6 +363,13 @@ get_spectra_data <- function(ID_list){
         dplyr::mutate(Val = as.numeric(.data$Val)) %>%
         dplyr::filter(.data$Val <= 11) #contain only H atoms
 
+      if(nrow(csdata) == 0){
+        # In this case, there are no chemical shifts corresponding to H nmr.
+        message(sprintf("Message: No chemical shifts table found for entry %s", ID))
+        next
+      }
+
+
       #count up the peak counts by grouping unique values (not ideal)
       peak_quant <- csdata %>%
         dplyr::group_by(.data$Val) %>%
@@ -734,6 +741,80 @@ roi_ref_export <- function(name_list           = NULL,
                               half_bandwidth      = half_bandwidth,
                               roi_tol             = roi_tol,
                               connec = connec)
+
+    return(roi_df)
+  }
+}
+
+#' @description Copyright (C) 2022 Battelle Memorial Institute
+#'
+#'  This program is free software; you can redistribute it and/or modify
+#'  it under the terms of the GNU General Public License as published by
+#'  the Free Software Foundation; either version 2 of the License, or
+#'  (at your option) any later version.
+#'
+#'  This program is distributed in the hope that it will be useful,
+#'  but WITHOUT ANY WARRANTY; without even the implied warranty of
+#'  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+#'  GNU General Public License for more details.
+#'
+#'  You should have received a copy of the GNU General Public License along
+#'  with this program; if not, write to the Free Software Foundation, Inc.,
+#'  51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
+#'
+#' @param name_list list of metabolite names if cas numbers are not provided
+#' @param cas_list list of CAS registry numbers written as characters if metabolite names are not provided
+#' @param ph the experimental pH
+#' @param solvent_type the experimental solvent, choose from available solvents 'D2O', 'H2O', ...
+#' @param half_bandwidth This will be set to 1.4 unless otherwise specified
+#' @param roi_tol The chemical shift tolerance, tolerance for the location of the peak center. Default is 0.005.
+#' @param instrument_strength the spectrometer frequency of the instrument used to collect the data
+#' @param temperature numeric value specifying the temperature
+#' @param concentration numeric value specifying the concentration
+#' @param connec database connection
+#'
+#' @return a data frame formatted for rDolphin use to be exported as excel sheet
+#' @export roi_ref_query
+roi_ref_query <- function(name_list           = NULL,
+                           cas_list            = NULL,
+                           solvent_type        = NULL,
+                           ph                  = NULL,
+                           half_bandwidth      = 1.4,
+                           roi_tol             = 0.005,
+                           instrument_strength = NULL,
+                           temperature         = NULL,
+                           concentration       = NULL,
+                           connec){
+
+  #query ref table in database
+  refmets_w_id<- query_table(db_connection = connec, table_name = "refmets_fitting_info")
+  #refmets_w_id <- refmets_w_id
+  # set ID list object
+  saveframe <- NULL
+  if (!(is.null(name_list))) {
+    saveframe <- refmets_w_id[refmets_w_id$CASno %in% cas_list,]
+                # subset(refmets_w_id,
+                        # CASno %in% cas_list) # |
+                        # Solvent == solvent_type |
+                        # pH == ph,
+                        # Frequency..MHz. == instrument_strength |
+                        # Temperature..K. == temperature |
+                        # Concentration..mM. == concentration)
+  } else{
+    saveframe <- refmets_w_id[refmets_w_id$Metabolite %in% name_list,]
+                        # Metabolite %in% name_list) |
+                        # Solvent == solvent_type |
+                        # pH == ph |
+                        # Frequency..MHz. == instrument_strength |
+                        # Temperature..K. == temperature |
+                        # Concentration..mM. == concentration)
+  }
+
+  if(nrow(saveframe) == 0){
+    return(NULL)
+  } else{
+    # return the ROI file formatted object and export CSV
+    roi_df <- saveframe
 
     return(roi_df)
   }

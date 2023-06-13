@@ -29,7 +29,7 @@
 nmRapp <- function(launch.browser = FALSE, ...){
 
   # Option specifies the max datafile size that may be loaded into shiny
-  options(shiny.maxRequestSize=1000*1024^2)
+  options(shiny.maxRequestSize=2000*1024^2)
 
   ui <- nmRapp_ui
   server <- nmRapp_server
