@@ -1,3 +1,14 @@
+# function to query database to update experiment metadata with previous user session
+provide.expt.metadata <- function(input_field){
+
+  conn <- connect_db()
+  username <- as.character(Sys.getenv(c('SHINYPROXY_USERNAME')))
+  query <- query_table(conn, profiling_parameters)
+  user_query <- subset(query, user == username)
+  input_selection <- lapply(user_query[[input_field]], as.character)
+  input_selection
+}
+
 #' Module: UI elements specific to experimental data uploading
 #'
 #' @description Copyright (C) 2022 Battelle Memorial Institute
@@ -96,25 +107,21 @@ xpmt_data_uploadUI <- function(id){
                                                  style = "primary"
                         )),
 
+
     # Note that tooltips are not working for some unknown reason.
     shinyBS::bsCollapse(id = ns("experiment_metadata"), open = "Experiment Metadata",
                         shinyBS::bsCollapsePanel(title = "Experiment Metadata",
 
                                                  fluidRow(
                                                    column(width = 6,
-                                                          textInput(inputId     = ns("proposal_num"),
-                                                                    label       = "Proposal Number",
-                                                                    value       = "")),
-
+                                                          selectizeInput(ns("proposal_num"), label = "Proposal Number",
+                                                                         options=list(create=TRUE),
+                                                                         choices = NULL,
+                                                                         multiple = FALSE)),
                                                    column(width = 6,
-                                                          textInput(inputId     = ns("PI_name"),
-                                                                    label       = "PI Name",
-                                                                    value       = "")),
+                                                          uiOutput(ns("ui_PI_name"))),
                                                    column(width = 6,
-                                                          textInput(inputId     = ns("project_name"),
-                                                                    label       = "Project Name",
-                                                                    value       = ""))
-
+                                                          uiOutput(ns("ui_project_name")))
                                                  ),
                                                  style = "primary"
                         )),
@@ -178,6 +185,44 @@ xpmt_data_uploadServer <- function(id, connec){
       htmltools::HTML("<strong>Note:</strong> Alignment may substantially increase initial processing time.")
     })
 
+    output$ui_PI_name <- renderUI({
+      req(input$proposal_num)
+
+      username <- as.character(Sys.getenv(c('SHINYPROXY_USERNAME')))
+      query <- query_table(connec(), profiling_parameters)
+      user_query <- subset(query, user == username)
+      prop_num_sub <- subset(user_query, proposal_number == input$proposal_num)
+      pi_names <- lapply(prop_num_sub$PI_name, as.character)
+
+      selectizeInput(NS(id, "PI_name"), label = "PI Name",
+                     options=list(create=TRUE),
+                     choices = Reduce("c", pi_names), multiple = FALSE)
+    })
+
+    output$ui_project_name <- renderUI({
+      req(input$proposal_num)
+      req(input$PI_name)
+
+      username <- as.character(Sys.getenv(c('SHINYPROXY_USERNAME')))
+      query <- query_table(connec(), profiling_parameters)
+      user_query <- subset(query, user == username)
+      prop_num_sub <- subset(user_query, proposal_number == input$proposal_num)
+      proj_name_sub <- subset(prop_num_sub, project_name == input$PI_name)
+      proj_names <- lapply(proj_name_sub$project_name, as.character)
+
+      selectizeInput(NS(id, "project_name"), label = "Project Name",
+                     options=list(create=TRUE),
+                     choices = Reduce("c", proj_names), multiple = FALSE)
+
+    })
+
+    #observer to update expt metadata with option to create new rather than pull old
+    observe({
+      proposal_number <- Reduce("c", provide.expt.metadata("proposal_number"))
+      updateSelectizeInput(session, inputId = "proposal_num", choices=proposal_number)
+    })
+
+
     # Define reactive object containing all user supplied experimental data
     # First argument of eventReactive() describes the dependencies of the reactive expression.
     # If any one of the specified objects changes,
@@ -186,11 +231,11 @@ xpmt_data_uploadServer <- function(id, connec){
                                         {
                                           req(input$process_exp_inputs > 0)
 
-                                          req(input$project_name)
-                                          full_query <- query_table(connec(), "profiling_parameters")
-                                          shinyFeedback::feedbackDanger("project_name",
-                                                                        any(input$project_name == full_query['project_name']),
-                                                                        text = "Please provide a unique project name.")
+                                          # req(input$project_name)
+                                          # full_query <- query_table(connec(), "profiling_parameters")
+                                          # shinyFeedback::feedbackDanger("project_name",
+                                          #                               any(input$project_name == full_query['project_name']),
+                                          #                               text = "Please provide a unique project name.")
                                           #req(!(any(input$project_name == full_query['project_name'])))
 
 
