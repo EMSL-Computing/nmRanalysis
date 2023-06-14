@@ -207,7 +207,7 @@ xpmt_data_uploadServer <- function(id, connec){
       query <- query_table(connec(), profiling_parameters)
       user_query <- subset(query, user == username)
       prop_num_sub <- subset(user_query, proposal_number == input$proposal_num)
-      proj_name_sub <- subset(prop_num_sub, project_name == input$PI_name)
+      proj_name_sub <- subset(prop_num_sub, PI_name == input$PI_name)
       proj_names <- lapply(proj_name_sub$project_name, as.character)
 
       selectizeInput(NS(id, "project_name"), label = "Project Name",
