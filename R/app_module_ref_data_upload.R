@@ -179,7 +179,21 @@ ref_data_uploadServer <- function(id, xpmt_data, ref_db, connec){
                            choices = unique(ref_db$Solute))
     })
 
+    observeEvent(input$ref_upload_method, {
+      if(input$process_ref_inputs > 0){
+        shinyWidgets::show_alert(
+          title = "Selection cannot be changed",
+          text = "The metabolite upload method cannot be changed once selected. Please use the \"Add/Remove Metabolites\"
+          tab or start a new session.",
+          type = "error"
+        )
+      }
+    }, ignoreInit = T)
+
     output$process_ref_inputs <- renderUI({
+      if(!is.null(input$process_ref_inputs)){
+        req(input$process_ref_inputs == 0)
+      }
       if(input$ref_upload_method == "prevsesh"){
         shinyWidgets::actionBttn(inputId = NS(id, "process_ref_inputs"),
                                  label = "Load Session Data",
@@ -198,6 +212,9 @@ ref_data_uploadServer <- function(id, xpmt_data, ref_db, connec){
     # Observer to control which set of options for refmet upload are displayed: file upload or manual specification
     observeEvent(c(input$ref_upload_method),
                  {
+                   if(!is.null(input$process_ref_inputs)){
+                     req(input$process_ref_inputs == 0)
+                   }
                    req(xpmt_data())
 
                    updateTabsetPanel(inputId = "refmet_upload", selected = input$ref_upload_method)
@@ -212,6 +229,9 @@ ref_data_uploadServer <- function(id, xpmt_data, ref_db, connec){
 
     #observer to check for project name and query of user ref db
     observe({
+      if(!is.null(isolate(input$process_ref_inputs))){
+        req(isolate(input$process_ref_inputs == 0))
+      }
       req(input$ref_upload_method == "prevsesh")
       req(xpmt_data())
 

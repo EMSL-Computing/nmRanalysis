@@ -110,6 +110,8 @@ profiling_completeviewUI <- function(id){
   ns <- NS(id)
   tagList(
     shinycssloaders::withSpinner(trelliscopejs::trelliscopeOutput(ns("trelliscope"))),
+    uiOutput(ns("trelvizoptions_ui")),
+    br(),
     DT::dataTableOutput(ns("complete_profres_tab"))
   )
 }
@@ -235,7 +237,7 @@ profilingServer <- function(id, xpmt_data, ref_data, connec){
                    if(any(temp$`Chemical shift tolerance (ppm)` > round(abs(temp$`ROI right edge (ppm)` - temp$`Chemical shift(ppm)`), 3)) |
                       any(temp$`Chemical shift tolerance (ppm)` > round(abs(temp$`ROI left edge (ppm)` - temp$`Chemical shift(ppm)`), 3))){
                      badsignals <- paste(temp$SigName[(temp$`Chemical shift tolerance (ppm)` > round(abs(temp$`ROI right edge (ppm)` - temp$`Chemical shift(ppm)`), 3)) |
-                                                         (temp$`Chemical shift tolerance (ppm)` > round(abs(temp$`ROI left edge (ppm)` - temp$`Chemical shift(ppm)`), 3))], collapse = "; ")
+                                                        (temp$`Chemical shift tolerance (ppm)` > round(abs(temp$`ROI left edge (ppm)` - temp$`Chemical shift(ppm)`), 3))], collapse = "; ")
 
                      shinyWidgets::show_alert(
                        title = "Fitting parameter error.",
@@ -355,7 +357,8 @@ profilingServer <- function(id, xpmt_data, ref_data, connec){
                       .data$`Half bandwidth (Hz)`, .data$Multiplicity, .data$`J coupling (Hz)`, .data$`J coupling 2 (Hz)`,
                       .data$`Roof effect`, .data$`Roof effect 2`, .data$`Frequency (MHz)`, .data$`pH`, .data$`Concentration (mM)`,
                       .data$`Temperature (K)`, .data$`Solvent`)
-
+      # temp2 <- dplyr::mutate(temp2, `Quantification Mode` = as.character(selectInput("sel", "", choices = c("Baseline Fitting", "Baseline Sum"))))
+      #temp2 <- dplyr::mutate(`Quantification Mode` = as.character(for(i in 1:nrow(temp2$Signal)){selectInput(paste0("sel", i), "", choices = c("Baseline Fitting", "Baseline Sum"))}))
       temp2 %>%
         DT::datatable(rownames   = FALSE,
                       editable   = FALSE,
@@ -872,13 +875,10 @@ profilingServer <- function(id, xpmt_data, ref_data, connec){
     rv <- reactiveValues(obs_show_subplot_suspend = TRUE,
                          new_profiling = FALSE)
 
-    output$trelliscope <- trelliscopejs::renderTrelliscope({
-
+    plot.data <- reactive({
       req(user_profiling())
+      # browser()
       # Create a new directory in the temp directory for each new instance of this trelliscope.
-      treldir <- file.path(tempdir(), paste0("Result_", format(Sys.time(), format = "%H-%m-%s", tz = "UTC")))
-      dir.create(treldir)
-      #browser()
       user_profiling <- user_profiling()
       profiling_data = user_profiling
       signals_to_plot = NULL
@@ -891,6 +891,10 @@ profilingServer <- function(id, xpmt_data, ref_data, connec){
 
       # list of number of samples
       p <- vector(mode = "list", length = nrow(profiling_data$final_output$quantification))
+      user_profiling$final_output$quantification <- 1
+      #user_profiling$final_output$fitting_error <- user_profiling$final_output$fitting_error[which(user_profiling$final_output$fitting_error > 5)]
+
+      # user_profiling$final_output <- user_profiling$final_output[which(user_profiling$final_output$fitting_error > 0.05)]
 
       plotdataall.out <- list()
 
@@ -1007,16 +1011,48 @@ profilingServer <- function(id, xpmt_data, ref_data, connec){
 
 
       # Add Quantification, Signal to Area Ratio, Fitting Error, Chemical Shift, Intensity, Half Bandwidth
-      plotdataall2 <- plotdataall %>% dplyr::full_join(temp_quantdat, by = c("Sample", "Signal")) %>%
+      plot.data <- plotdataall %>% dplyr::full_join(temp_quantdat, by = c("Sample", "Signal")) %>%
         dplyr::full_join(temp_sardat, by = c("Sample", "Signal")) %>%
         dplyr::full_join(temp_fedat, by = c("Sample", "Signal")) %>%
         dplyr::full_join(temp_csdat, by = c("Sample", "Signal")) %>%
         dplyr::full_join(temp_intdat, by = c("Sample", "Signal")) %>%
         dplyr::full_join(temp_hwdat, by = c("Sample", "Signal"))
-      ##############################
 
-      # plot.data <- format_plotting(profiling_data = user_profiling)
-      plot.data <- plotdataall2
+      return(plot.data)
+    })
+    ##############################
+
+    # plot.data <- format_plotting(profiling_data = user_profiling)
+    # plot.data <- plotdataall2
+    output$trelliscope <- trelliscopejs::renderTrelliscope({
+      #creating temp dir for telliscope
+      treldir <- file.path(tempdir(), paste0("Result_", format(Sys.time(), format = "%H-%m-%s", tz = "UTC")))
+      dir.create(treldir)
+      filter_trel <- input$filter_trel
+      isolate(trel_samp <- input$trel_samp)
+      isolate(trel_fethresh <- input$trel_fethresh)
+      plot.data <- plot.data()
+      plot.data <- plot.data[which(plot.data$Sample == trel_samp),]
+      plot.data <- plot.data[which(plot.data$`Fitting Error` >= trel_fethresh[1] & plot.data$`Fitting Error` <= trel_fethresh[2]),]
+      if(length(plot.data[,1]) == 0){
+        if(filter_trel > 0){
+          shinyWidgets::show_alert(
+            title = "No Data Within Range",
+            text = "There are no trelliscopes that fit the parameters that you've given. Please change them and Apply Filters",
+            type = "error"
+          )
+      }}
+      # if(length(unique(plot.data$Signal) > 1000)){
+      #   if(filter_trel > 0){
+      #     shinyWidgets::show_alert(
+      #       title = "Too Many Trelliscopes in Memory",
+      #       text = "The parameters you've given (or the default parameters) generate too many trelliscopes at once (>1000). Please change the parameters and Apply Filters",
+      #       type = "error"
+      #     )
+      # }}
+      req(length(plot.data[,1]) > 0)
+      # req(length(unique(plot.data$Signal) <= 1000))
+
       plot.data %>%
         tidyr::nest(data = !tidyselect::one_of(c("Sample", "Signal"))) %>%
         dplyr::mutate(
@@ -1190,11 +1226,17 @@ profilingServer <- function(id, xpmt_data, ref_data, connec){
         h4(),
 
         # Toggle for subplot display
-        shinyWidgets::materialSwitch(inputId = NS(id, "show_subplot"),
-                                     label   = "Show subplot on box select",
-                                     value   = FALSE,
-                                     status  = "primary",
-                                     right   = TRUE),
+        fluidRow(column(9, shinyWidgets::materialSwitch(inputId = NS(id, "show_subplot"),
+                                                        label   = "Show subplot on box select",
+                                                        value   = FALSE,
+                                                        status  = "primary",
+                                                        right   = TRUE)),
+                 column(3, actionButton(inputId = NS(id, "show_subplot_help"),
+                                        label = "?"))),
+        shinyBS::bsTooltip(id = NS(id, "show_subplot_help"),
+                           title     = "Use the Box Select tool in the upper-right corner of the plot to select a region to be shown in a subplot.",
+                           placement = "bottom",
+                           trigger   = "hover"),
 
         # HTML output to display the filters currently applied
         htmlOutput(NS(id, "applied_filters_text")),
@@ -1205,6 +1247,33 @@ profilingServer <- function(id, xpmt_data, ref_data, connec){
         tooltip = shinyWidgets::tooltipOptions(title = "Plot Options")
       )
     })
+
+    output$trelvizoptions_ui <- renderUI({
+
+      req(xpmt_data())
+      req(ref_data())
+      plot.data <- plot.data()
+      req(!is.null(plot.data))
+      #browser()
+      # Allows users to select which sample spectrum to display.
+      fluidRow(
+        column(4,
+               selectInput(inputId = NS(id, "trel_samp"),
+                           label   = "Choose a spectrum to display in the trelliscope",
+                           choices = unique(plot.data$Sample),
+                           selected = unique(plot.data$Sample)[1])),
+        column(3,
+               shinyWidgets::numericRangeInput(inputId = NS(id, "trel_fethresh"),
+                                               label = "Specify a filter range:",
+                                               value = c(0.5,100))),
+        column(5,
+               br(),
+               actionButton(inputId = NS(id, "filter_trel"),
+                            label = "Apply Filter",
+                            style="color: #fff; background-color: #337ab7; border-color: #2e6da4")),
+      )
+    })
+
 
     # Output (in HTML format) to display the filters that are currently applied to the data.
     output$applied_filters_text <- renderUI({
@@ -1707,6 +1776,7 @@ profilingServer <- function(id, xpmt_data, ref_data, connec){
 
       # Begin direct pull from rDolphin source code.
       # We pull directly from source so that we could generate progress bars
+
       signals_names <- make.names(paste(ROI_data[,4], ROI_data[,5], sep='_'))
       dummy <- matrix(NaN, nrow(imported_data$dataset), length(signals_names),
                       dimnames = list(imported_data$Experiments, signals_names))
@@ -1828,7 +1898,7 @@ profilingServer <- function(id, xpmt_data, ref_data, connec){
                                 signal_index         = NULL)
           # Note that Ydata is internally defined by profiling function despite
           # what is supplied to the argument above. See automatic_profiling.R and
-          # profiling_func().
+          # profiling_func()
           final_output <- output$final_output
           reproducibility_data <- output$reproducibility_data
           sumit <- sumit + 1
