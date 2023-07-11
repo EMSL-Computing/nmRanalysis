@@ -29,6 +29,7 @@ connect_db <- function(){
     # dsn_database = "nmRanalysis"
     # dsn_port = "5432"
     # dsn_hostname = "localhost"
+    # dsn_uid = "postgres"
     # dsn_uid = "developer"
     # dsn_pwd = "developer"
 
