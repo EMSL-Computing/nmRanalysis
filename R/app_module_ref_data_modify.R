@@ -129,7 +129,7 @@ ref_data_add_delUI <- function(id){
         uiOutput(ns("ui_refmet_add_new_entry"))
       )
     ),
-    actionButton(ns("refmet_add"), "Add"),
+    actionButton(ns("refmet_add"), "Add", style="color: #fff; background-color: #337ab7; border-color: #2e6da4"),
     h4(""),
 
     fluidRow(
@@ -138,7 +138,7 @@ ref_data_add_delUI <- function(id){
         uiOutput(ns("ui_refmet_remove_options"))
       )
     ),
-    actionButton(ns("refmet_remove"), "Remove"),
+    actionButton(ns("refmet_remove"), "Remove", style="color: #fff; background-color: #337ab7; border-color: #2e6da4"),
     h4(""),
 
     DT::dataTableOutput(ns("refmet_database"))
@@ -666,11 +666,17 @@ ref_data_editingServer <- function(id, xpmt_data, ref_data, ref_db, connec){
                        choices = unique(ref_data()$bestmatch_ref_data$Metabolite)),
 
         # Toggle for subplot display
-        shinyWidgets::materialSwitch(inputId = NS(id, "show_subplot"),
-                                     label   = "Show subplot on box select",
-                                     value   = FALSE,
-                                     status  = "primary",
-                                     right   = TRUE),
+        fluidRow(column(9, shinyWidgets::materialSwitch(inputId = NS(id, "show_subplot"),
+                                                        label   = "Show subplot on box select",
+                                                        value   = FALSE,
+                                                        status  = "primary",
+                                                        right   = TRUE)),
+                 column(3, actionButton(inputId = NS(id, "show_subplot_help"),
+                                        label = "?"))),
+        shinyBS::bsTooltip(id = NS(id, "show_subplot_help"),
+                           title     = "Use the Box Select tool in the upper-right corner of the plot to select a region to be shown in a subplot.",
+                           placement = "bottom",
+                           trigger   = "hover"),
 
 
         # HTML output to display the filters currently applied
@@ -816,7 +822,7 @@ ref_data_editingServer <- function(id, xpmt_data, ref_data, ref_db, connec){
       req(rv$unsaved_change[[input$which_refmet_dspedt]])
 
       actionButton(NS(id, "save_refmet_plot_changes"),
-                   label = "Save")
+                   label = "Save", style="color: #fff; background-color: #337ab7; border-color: #2e6da4")
     })
 
     # Dynamic action button to revert save changes made to plot of reference metabolite
@@ -827,7 +833,7 @@ ref_data_editingServer <- function(id, xpmt_data, ref_data, ref_db, connec){
       req(rv$change_counter[[input$which_refmet_dspedt]] > 0)
 
       actionButton(NS(id, "revert_last_refmet_save_changes"),
-                   label = "Revert Last Save")
+                   label = "Revert Last Save", style="color: #fff; background-color: #337ab7; border-color: #2e6da4")
     })
 
     # Dynamic action button to revert all save changes made to plot of reference metabolite
@@ -846,7 +852,7 @@ ref_data_editingServer <- function(id, xpmt_data, ref_data, ref_db, connec){
       req(!identical(og_version, curr_version))
 
       actionButton(NS(id, "revert_all_refmet_save_changes"),
-                   label = "Revert All Saves")
+                   label = "Revert All Saves", style="color: #fff; background-color: #337ab7; border-color: #2e6da4")
     })
 
     #----------------------------------------------------------------------------------------------------------
@@ -1318,7 +1324,7 @@ ref_data_editingServer <- function(id, xpmt_data, ref_data, ref_db, connec){
         ),
         column(
           width = 2,
-          actionButton(NS(id, "show_metquant"), label = "Check Signal Fit")
+          actionButton(NS(id, "show_metquant"), label = "Check Signal Fit", style="color: #fff; background-color: #337ab7; border-color: #2e6da4")
         )
       )
 
@@ -1950,7 +1956,7 @@ ref_data_editingServer <- function(id, xpmt_data, ref_data, ref_db, connec){
       req(ref_data())
 
       shinyBS::bsCollapse(id = NS(id, "global_fitting_params"),
-                          shinyBS::bsCollapsePanel(title = "Global Profiling Parameters",
+                          shinyBS::bsCollapsePanel(title = "▽ Global Profiling Parameters",
                                                    # These are never used by rDolphin...not sure why they are defined
                                                    # fluidRow(
                                                    #   column(width = 6,
@@ -2213,7 +2219,7 @@ ref_data_editingServer <- function(id, xpmt_data, ref_data, ref_db, connec){
                       `Spectrometer Frequency (MHz)` = .data$Field_strength,
                       `Metabolite` = .data$Solute) %>%
         DT::datatable(rownames   = FALSE,
-                      options = list(scrollX = TRUE))
+                      options = list(scrollX = TRUE, selection = "none"))
     })
 
     # Options for metabolite signals
@@ -2221,11 +2227,11 @@ ref_data_editingServer <- function(id, xpmt_data, ref_data, ref_db, connec){
       req(ref_data())
 
       shinyBS::bsCollapse(id = NS(id, "metabolite_signal_options"),
-                          shinyBS::bsCollapsePanel(title = "Metabolite Signal Options",
+                          shinyBS::bsCollapsePanel(title = "▽ Metabolite Signal Options",
 
                                                    fluidRow(
                                                      column(width = 2,
-                                                            actionButton(NS(id, "signal_add"), "Add New Signal")),
+                                                            actionButton(NS(id, "signal_add"), "Add New Signal", style="color: #fff; background-color: #337ab7; border-color: #2e6da4")),
                                                      column(width = 3,
                                                             uiOutput(NS(id, "ui_remove_signal"))),
                                                      column(width = 3,
@@ -2308,7 +2314,7 @@ ref_data_editingServer <- function(id, xpmt_data, ref_data, ref_db, connec){
       req(nrow(rv$user_reference_data %>% dplyr::filter(.data$Metabolite %in% input$which_refmet_dspedt)) >
             nrow(temp))
 
-      actionButton(NS(id, "signal_remove"), "Remove Last Added Signal")
+      actionButton(NS(id, "signal_remove"), "Remove Last Added Signal", style="color: #fff; background-color: #337ab7; border-color: #2e6da4")
     })
 
     # Add Signal
