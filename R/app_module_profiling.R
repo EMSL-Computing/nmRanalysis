@@ -361,8 +361,16 @@ profilingServer <- function(id, xpmt_data, ref_data, connec){
       #temp2 <- dplyr::mutate(`Quantification Mode` = as.character(for(i in 1:nrow(temp2$Signal)){selectInput(paste0("sel", i), "", choices = c("Baseline Fitting", "Baseline Sum"))}))
       temp2 %>%
         DT::datatable(rownames   = FALSE,
-                      editable   = FALSE,
-                      options = list(scrollX = TRUE)) %>%
+                      editable   = TRUE,
+                      options = list(dom = 't', scrollX = TRUE),
+                      # callback = DT::JS("table.rows().every(function(i, tab, row) {
+                      #               var $this = $(this.node());
+                      #               $this.attr('id', this.data()[0]);
+                      #               $this.addClass('shiny-input-container');
+                      #             });
+                      #             Shiny.unbindAll(table.table().node());
+                      #             Shiny.bindAll(table.table().node());")
+        ) %>%
         DT::formatRound(columns = c("Chemical shift(ppm)", "Half bandwidth (Hz)", "J coupling (Hz)", "J coupling 2 (Hz)",
                                     "Roof effect", "Roof effect 2", "Frequency (MHz)", "pH", "Concentration (mM)",
                                     "Temperature (K)"),
@@ -875,207 +883,209 @@ profilingServer <- function(id, xpmt_data, ref_data, connec){
     rv <- reactiveValues(obs_show_subplot_suspend = TRUE,
                          new_profiling = FALSE)
 
-    plot.data <- reactive({
-      req(user_profiling())
-      # browser()
-      # Create a new directory in the temp directory for each new instance of this trelliscope.
-      user_profiling <- user_profiling()
-      profiling_data = user_profiling
-      signals_to_plot = NULL
-
-      ############################## # Within this chunk is code adapted from format_plotting()
-      # plot all metabolites where there's at least one non-missing value
-      if (is.null(signals_to_plot)){
-        signals_to_plot <- which(apply(profiling_data$final_output$quantification, 2, function(x){all(is.na(x))}) == F)
-      }
-
-      # list of number of samples
-      p <- vector(mode = "list", length = nrow(profiling_data$final_output$quantification))
-      user_profiling$final_output$quantification <- 1
-      #user_profiling$final_output$fitting_error <- user_profiling$final_output$fitting_error[which(user_profiling$final_output$fitting_error > 5)]
-
-      # user_profiling$final_output <- user_profiling$final_output[which(user_profiling$final_output$fitting_error > 0.05)]
-
-      plotdataall.out <- list()
-
-      # loops for plotting
-      # for each metabolite
-      for (ind2 in signals_to_plot) {
-
-        plotdataall.in <- list()
-
-        # for each sample
-        for (ind in 1:nrow(profiling_data$final_output$quantification)) {
-
-          # x-axis data
-          Xdata <- profiling_data$reproducibility_data[[ind]][[ind2]]$Xdata
-
-          # if no data, move on
-          if(is.null(Xdata)){
-            next
-          }
-
-          # y-axis data
-          Ydata <- profiling_data$reproducibility_data[[ind]][[ind2]]$Ydata
-
-          # plot data
-          plot_data <- profiling_data$reproducibility_data[[ind]][[ind2]]$plot_data
-
-          # ROI profile
-          ROI_profile <- profiling_data$reproducibility_data[[ind]][[ind2]]$ROI_profile
-
-          # combine
-          plotdata2 <- data.frame(Xdata        = Xdata,
-                                  Ydata        = Ydata,
-                                  fitted_sum   = plot_data[3, ] , # fitted_sum
-                                  baseline_sum = plot_data[2, ]) # baseline_sum
-
-          # make long
-          plotdata3 <- reshape2::melt(plotdata2, id = "Xdata")
-
-          # specify variables
-          plotdata3$variable <- c(
-            rep('Original Spectrum', length(Ydata)),
-            rep('Generated Spectrum', length(Ydata)),
-            rep('Generated Background', length(Ydata))
-          )
-
-          r <- which(make.names(paste(ROI_profile[,4],ROI_profile[,5],sep='_')) == colnames(profiling_data$final_output$quantification)[ind2])
-          if(length(r) == 0){
-            next
-          }
-          plotdata <- data.frame(Xdata, signals = plot_data[3 + r,] )
-
-          # format plotdata3
-          plotdata3$variable2 <- plotdata3$variable
-
-          # format plotdata
-          colnames(plotdata)[which(colnames(plotdata) == "signals")] <- "value"
-          plotdata$variable  <- "Quantified Signal"
-          plotdata$variable2 <- "Quantified Signal"
-
-          # combine
-          temp                  <- rbind(plotdata, plotdata3)
-          temp$Sample           <- rownames(profiling_data$final_output$quantification)[ind]
-          plotdataall.in[[ind]] <- temp
-
-        }
-
-        tempdat <- ref_data()$quantdata %>%
-          dplyr::mutate(SigName = make.names(paste0(.data$Metabolite, "_", .data$`Quantification Signal`)),
-                        Signal = paste0(.data$Metabolite, " [", .data$`Quantification Signal`, "]"))
-
-        temp2               <- do.call(rbind, plotdataall.in)
-        temp2$Signal        <- tempdat$Signal[which(tempdat$SigName == colnames(profiling_data$final_output$quantification)[ind2])]
-        plotdataall.out[[ind2]] <- temp2
-      }
-
-      plotdataall <- do.call(rbind, plotdataall.out)
-
-      # Used to fix Signal names to be more consistent with UI display formatting
-      tempdat <- ref_data()$quantdata %>%
-        dplyr::mutate(SigName = make.names(paste0(.data$Metabolite, "_", .data$`Quantification Signal`)),
-                      Signal = paste0(.data$Metabolite, " [", .data$`Quantification Signal`, "]")) %>%
-        dplyr::ungroup() %>%
-        dplyr::select(.data$SigName, .data$Signal)
-
-      # Quantification data
-      temp_quantdat <- data.frame(Sample = rownames(profiling_data$final_output$quantification), profiling_data$final_output$quantification) %>%
-        tidyr::pivot_longer(-.data$Sample, names_to = "SigName", values_to = "Quantification") %>%
-        dplyr::left_join(tempdat, by = "SigName") %>% dplyr::select(-.data$SigName)
-
-      # Signal to Area Ratio
-      temp_sardat <- data.frame(Sample = rownames(profiling_data$final_output$signal_area_ratio), profiling_data$final_output$signal_area_ratio) %>%
-        tidyr::pivot_longer(-.data$Sample, names_to = "SigName", values_to = "Signal to Area Ratio") %>%
-        dplyr::left_join(tempdat, by = "SigName") %>% dplyr::select(-.data$SigName)
-
-      # Fitting Error
-      temp_fedat <- data.frame(Sample = rownames(profiling_data$final_output$fitting_error), profiling_data$final_output$fitting_error) %>%
-        tidyr::pivot_longer(-.data$Sample, names_to = "SigName", values_to = "Fitting Error") %>%
-        dplyr::left_join(tempdat, by = "SigName") %>% dplyr::select(-.data$SigName)
-
-      # Chemical Shift
-      temp_csdat <- data.frame(Sample = rownames(profiling_data$final_output$chemical_shift), profiling_data$final_output$chemical_shift) %>%
-        tidyr::pivot_longer(-.data$Sample, names_to = "SigName", values_to = "Chemical Shift") %>%
-        dplyr::left_join(tempdat, by = "SigName") %>% dplyr::select(-.data$SigName)
-
-      # Intensity
-      temp_intdat <- data.frame(Sample = rownames(profiling_data$final_output$intensity), profiling_data$final_output$intensity) %>%
-        tidyr::pivot_longer(-.data$Sample, names_to = "SigName", values_to = "Intensity") %>%
-        dplyr::left_join(tempdat, by = "SigName") %>% dplyr::select(-.data$SigName)
-
-      # Half bandwidth
-      temp_hwdat <- data.frame(Sample = rownames(profiling_data$final_output$half_bandwidth), profiling_data$final_output$half_bandwidth) %>%
-        tidyr::pivot_longer(-.data$Sample, names_to = "SigName", values_to = "Half Bandwidth") %>%
-        dplyr::left_join(tempdat, by = "SigName") %>% dplyr::select(-.data$SigName)
-
-
-      # Add Quantification, Signal to Area Ratio, Fitting Error, Chemical Shift, Intensity, Half Bandwidth
-      plot.data <- plotdataall %>% dplyr::full_join(temp_quantdat, by = c("Sample", "Signal")) %>%
-        dplyr::full_join(temp_sardat, by = c("Sample", "Signal")) %>%
-        dplyr::full_join(temp_fedat, by = c("Sample", "Signal")) %>%
-        dplyr::full_join(temp_csdat, by = c("Sample", "Signal")) %>%
-        dplyr::full_join(temp_intdat, by = c("Sample", "Signal")) %>%
-        dplyr::full_join(temp_hwdat, by = c("Sample", "Signal"))
-
-      return(plot.data)
-    })
-    ##############################
-
-    # plot.data <- format_plotting(profiling_data = user_profiling)
-    # plot.data <- plotdataall2
-    output$trelliscope <- trelliscopejs::renderTrelliscope({
-      #creating temp dir for telliscope
-      treldir <- file.path(tempdir(), paste0("Result_", format(Sys.time(), format = "%H-%m-%s", tz = "UTC")))
-      dir.create(treldir)
-      filter_trel <- input$filter_trel
-      isolate(trel_samp <- input$trel_samp)
-      isolate(trel_fethresh <- input$trel_fethresh)
-      plot.data <- plot.data()
-      plot.data <- plot.data[which(plot.data$Sample == trel_samp),]
-      plot.data <- plot.data[which(plot.data$`Fitting Error` >= trel_fethresh[1] & plot.data$`Fitting Error` <= trel_fethresh[2]),]
-      if(length(plot.data[,1]) == 0){
-        if(filter_trel > 0){
-          shinyWidgets::show_alert(
-            title = "No Data Within Range",
-            text = "There are no trelliscopes that fit the parameters that you've given. Please change them and Apply Filters",
-            type = "error"
-          )
-      }}
-      # if(length(unique(plot.data$Signal) > 1000)){
-      #   if(filter_trel > 0){
-      #     shinyWidgets::show_alert(
-      #       title = "Too Many Trelliscopes in Memory",
-      #       text = "The parameters you've given (or the default parameters) generate too many trelliscopes at once (>1000). Please change the parameters and Apply Filters",
-      #       type = "error"
-      #     )
-      # }}
-      req(length(plot.data[,1]) > 0)
-      # req(length(unique(plot.data$Signal) <= 1000))
-
-      plot.data %>%
-        tidyr::nest(data = !tidyselect::one_of(c("Sample", "Signal"))) %>%
-        dplyr::mutate(
-          Quantification = purrr::map_dbl(.data$data, ~ unique(.$Quantification)),
-          Signal_Area_Ratio = purrr::map_dbl(.data$data, ~ unique(.$`Signal to Area Ratio`)),
-          Fitting_Error = purrr::map_dbl(.data$data, ~ unique(.$`Fitting Error`)),
-          Chemical_Shift = purrr::map_dbl(.data$data, ~ unique(.$`Chemical Shift`)),
-          Intensity = purrr::map_dbl(.data$data, ~ unique(.$Intensity)),
-          Half_Bandwidth = purrr::map_dbl(.data$data, ~ unique(.$`Half Bandwidth`)),
-          panel = trelliscopejs::map_plot(.data$data, function(x){
-            tempdat <- x %>% dplyr::filter(.data$variable != "Quantified Signal")
-            ggplot2::ggplot(data = tempdat, ggplot2::aes(x = Xdata, y = .data$value, color = .data$variable))+
-              ggplot2::geom_line() +
-              ggplot2::geom_line(data = tempdat, ggplot2::aes(x = Xdata, y = .data$value, color= .data$variable), alpha = 0.5)+
-              ggplot2::xlab('PPM') + ggplot2::ylab('Intensity') + ggplot2::theme_bw() #+ ggplot2::theme(legend.position = "none")
-          })
-        ) %>%
-        trelliscopejs::trelliscope(name           = "Results",
-                                   path           = treldir,
-                                   self_contained = TRUE,
-                                   state = list(labels = c("Sample", "Signal")))
-
-    })
+    # plot.data <- reactive({
+    #   req(user_profiling())
+    #   # browser()
+    #   # Create a new directory in the temp directory for each new instance of this trelliscope.
+    #   user_profiling <- user_profiling()
+    #   profiling_data = user_profiling
+    #   signals_to_plot = NULL
+    #
+    #   ############################## # Within this chunk is code adapted from format_plotting()
+    #   # plot all metabolites where there's at least one non-missing value
+    #   if (is.null(signals_to_plot)){
+    #     signals_to_plot <- which(apply(profiling_data$final_output$quantification, 2, function(x){all(is.na(x))}) == F)
+    #   }
+    #
+    #   # list of number of samples
+    #   p <- vector(mode = "list", length = nrow(profiling_data$final_output$quantification))
+    #   user_profiling$final_output$quantification <- 1
+    #   #user_profiling$final_output$fitting_error <- user_profiling$final_output$fitting_error[which(user_profiling$final_output$fitting_error > 5)]
+    #
+    #   # user_profiling$final_output <- user_profiling$final_output[which(user_profiling$final_output$fitting_error > 0.05)]
+    #
+    #   plotdataall.out <- list()
+    #
+    #   # loops for plotting
+    #   # for each metabolite
+    #   for (ind2 in signals_to_plot) {
+    #
+    #     plotdataall.in <- list()
+    #
+    #     # for each sample
+    #     for (ind in 1:nrow(profiling_data$final_output$quantification)) {
+    #
+    #       # x-axis data
+    #       Xdata <- profiling_data$reproducibility_data[[ind]][[ind2]]$Xdata
+    #
+    #       # if no data, move on
+    #       if(is.null(Xdata)){
+    #         next
+    #       }
+    #
+    #       # y-axis data
+    #       Ydata <- profiling_data$reproducibility_data[[ind]][[ind2]]$Ydata
+    #
+    #       # plot data
+    #       plot_data <- profiling_data$reproducibility_data[[ind]][[ind2]]$plot_data
+    #
+    #       # ROI profile
+    #       ROI_profile <- profiling_data$reproducibility_data[[ind]][[ind2]]$ROI_profile
+    #
+    #       # combine
+    #       plotdata2 <- data.frame(Xdata        = Xdata,
+    #                               Ydata        = Ydata,
+    #                               fitted_sum   = plot_data[3, ] , # fitted_sum
+    #                               baseline_sum = plot_data[2, ]) # baseline_sum
+    #
+    #       # make long
+    #       plotdata3 <- reshape2::melt(plotdata2, id = "Xdata")
+    #
+    #       # specify variables
+    #       plotdata3$variable <- c(
+    #         rep('Original Spectrum', length(Ydata)),
+    #         rep('Generated Spectrum', length(Ydata)),
+    #         rep('Generated Background', length(Ydata))
+    #       )
+    #
+    #       r <- which(make.names(paste(ROI_profile[,4],ROI_profile[,5],sep='_')) == colnames(profiling_data$final_output$quantification)[ind2])
+    #       if(length(r) == 0){
+    #         next
+    #       }
+    #       plotdata <- data.frame(Xdata, signals = plot_data[3 + r,] )
+    #
+    #       # format plotdata3
+    #       plotdata3$variable2 <- plotdata3$variable
+    #
+    #       # format plotdata
+    #       colnames(plotdata)[which(colnames(plotdata) == "signals")] <- "value"
+    #       plotdata$variable  <- "Quantified Signal"
+    #       plotdata$variable2 <- "Quantified Signal"
+    #
+    #       # combine
+    #       temp                  <- rbind(plotdata, plotdata3)
+    #       temp$Sample           <- rownames(profiling_data$final_output$quantification)[ind]
+    #       plotdataall.in[[ind]] <- temp
+    #
+    #     }
+    #
+    #     tempdat <- ref_data()$quantdata %>%
+    #       dplyr::mutate(SigName = make.names(paste0(.data$Metabolite, "_", .data$`Quantification Signal`)),
+    #                     Signal = paste0(.data$Metabolite, " [", .data$`Quantification Signal`, "]"))
+    #
+    #     temp2               <- do.call(rbind, plotdataall.in)
+    #     temp2$Signal        <- tempdat$Signal[which(tempdat$SigName == colnames(profiling_data$final_output$quantification)[ind2])]
+    #     plotdataall.out[[ind2]] <- temp2
+    #   }
+    #
+    #   plotdataall <- do.call(rbind, plotdataall.out)
+    #
+    #   # Used to fix Signal names to be more consistent with UI display formatting
+    #   tempdat <- ref_data()$quantdata %>%
+    #     dplyr::mutate(SigName = make.names(paste0(.data$Metabolite, "_", .data$`Quantification Signal`)),
+    #                   Signal = paste0(.data$Metabolite, " [", .data$`Quantification Signal`, "]")) %>%
+    #     dplyr::ungroup() %>%
+    #     dplyr::select(.data$SigName, .data$Signal)
+    #
+    #   # Quantification data
+    #   temp_quantdat <- data.frame(Sample = rownames(profiling_data$final_output$quantification), profiling_data$final_output$quantification) %>%
+    #     tidyr::pivot_longer(-.data$Sample, names_to = "SigName", values_to = "Quantification") %>%
+    #     dplyr::left_join(tempdat, by = "SigName") %>% dplyr::select(-.data$SigName)
+    #
+    #   # Signal to Area Ratio
+    #   temp_sardat <- data.frame(Sample = rownames(profiling_data$final_output$signal_area_ratio), profiling_data$final_output$signal_area_ratio) %>%
+    #     tidyr::pivot_longer(-.data$Sample, names_to = "SigName", values_to = "Signal to Area Ratio") %>%
+    #     dplyr::left_join(tempdat, by = "SigName") %>% dplyr::select(-.data$SigName)
+    #
+    #   # Fitting Error
+    #   temp_fedat <- data.frame(Sample = rownames(profiling_data$final_output$fitting_error), profiling_data$final_output$fitting_error) %>%
+    #     tidyr::pivot_longer(-.data$Sample, names_to = "SigName", values_to = "Fitting Error") %>%
+    #     dplyr::left_join(tempdat, by = "SigName") %>% dplyr::select(-.data$SigName)
+    #
+    #   # Chemical Shift
+    #   temp_csdat <- data.frame(Sample = rownames(profiling_data$final_output$chemical_shift), profiling_data$final_output$chemical_shift) %>%
+    #     tidyr::pivot_longer(-.data$Sample, names_to = "SigName", values_to = "Chemical Shift") %>%
+    #     dplyr::left_join(tempdat, by = "SigName") %>% dplyr::select(-.data$SigName)
+    #
+    #   # Intensity
+    #   temp_intdat <- data.frame(Sample = rownames(profiling_data$final_output$intensity), profiling_data$final_output$intensity) %>%
+    #     tidyr::pivot_longer(-.data$Sample, names_to = "SigName", values_to = "Intensity") %>%
+    #     dplyr::left_join(tempdat, by = "SigName") %>% dplyr::select(-.data$SigName)
+    #
+    #   # Half bandwidth
+    #   temp_hwdat <- data.frame(Sample = rownames(profiling_data$final_output$half_bandwidth), profiling_data$final_output$half_bandwidth) %>%
+    #     tidyr::pivot_longer(-.data$Sample, names_to = "SigName", values_to = "Half Bandwidth") %>%
+    #     dplyr::left_join(tempdat, by = "SigName") %>% dplyr::select(-.data$SigName)
+    #
+    #
+    #   # Add Quantification, Signal to Area Ratio, Fitting Error, Chemical Shift, Intensity, Half Bandwidth
+    #   plot.data <- plotdataall %>% dplyr::full_join(temp_quantdat, by = c("Sample", "Signal")) %>%
+    #     dplyr::full_join(temp_sardat, by = c("Sample", "Signal")) %>%
+    #     dplyr::full_join(temp_fedat, by = c("Sample", "Signal")) %>%
+    #     dplyr::full_join(temp_csdat, by = c("Sample", "Signal")) %>%
+    #     dplyr::full_join(temp_intdat, by = c("Sample", "Signal")) %>%
+    #     dplyr::full_join(temp_hwdat, by = c("Sample", "Signal"))
+    #
+    #   return(plot.data)
+    # })
+    # ##############################
+    #
+    # # plot.data <- format_plotting(profiling_data = user_profiling)
+    # # plot.data <- plotdataall2
+    # output$trelliscope <- trelliscopejs::renderTrelliscope({
+    #   #creating temp dir for telliscope
+    #   treldir <- file.path(tempdir(), paste0("Result_", format(Sys.time(), format = "%H-%m-%s", tz = "UTC")))
+    #   dir.create(treldir)
+    #   filter_trel <- input$filter_trel
+    #   isolate(trel_samp <- input$trel_samp)
+    #   isolate(trel_fethresh <- input$trel_fethresh)
+    #   plot.data <- plot.data()
+    #   print(object.size(plot.data))
+    #   plot.data <- plot.data[which(plot.data$Sample == trel_samp),]
+    #   plot.data <- plot.data[which(plot.data$`Fitting Error` >= trel_fethresh[1] & plot.data$`Fitting Error` <= trel_fethresh[2]),]
+    #   if(length(plot.data[,1]) == 0){
+    #     if(!is.null(filter_trel)){
+    #       if(filter_trel > 0){
+    #         shinyWidgets::show_alert(
+    #           title = "No Data Within Range",
+    #           text = "There are no trelliscopes that fit the parameters that you've given. Please change them and Apply Filters",
+    #           type = "error"
+    #         )
+    #   }}}
+    #   # if(length(unique(plot.data$Signal) > 1000)){
+    #   #   if(filter_trel > 0){
+    #   #     shinyWidgets::show_alert(
+    #   #       title = "Too Many Trelliscopes in Memory",
+    #   #       text = "The parameters you've given (or the default parameters) generate too many trelliscopes at once (>1000). Please change the parameters and Apply Filters",
+    #   #       type = "error"
+    #   #     )
+    #   # }}
+    #   req(length(plot.data[,1]) > 0)
+    #   # req(length(unique(plot.data$Signal) <= 1000))
+    #
+    #   plot.data %>%
+    #     tidyr::nest(data = !tidyselect::one_of(c("Sample", "Signal"))) %>%
+    #     dplyr::mutate(
+    #       Quantification = purrr::map_dbl(.data$data, ~ unique(.$Quantification)),
+    #       Signal_Area_Ratio = purrr::map_dbl(.data$data, ~ unique(.$`Signal to Area Ratio`)),
+    #       Fitting_Error = purrr::map_dbl(.data$data, ~ unique(.$`Fitting Error`)),
+    #       Chemical_Shift = purrr::map_dbl(.data$data, ~ unique(.$`Chemical Shift`)),
+    #       Intensity = purrr::map_dbl(.data$data, ~ unique(.$Intensity)),
+    #       Half_Bandwidth = purrr::map_dbl(.data$data, ~ unique(.$`Half Bandwidth`)),
+    #       panel = trelliscopejs::map_plot(.data$data, function(x){
+    #         tempdat <- x %>% dplyr::filter(.data$variable != "Quantified Signal")
+    #         ggplot2::ggplot(data = tempdat, ggplot2::aes(x = Xdata, y = .data$value, color = .data$variable))+
+    #           ggplot2::geom_line() +
+    #           ggplot2::geom_line(data = tempdat, ggplot2::aes(x = Xdata, y = .data$value, color= .data$variable), alpha = 0.5)+
+    #           ggplot2::xlab('PPM') + ggplot2::ylab('Intensity') + ggplot2::theme_bw() #+ ggplot2::theme(legend.position = "none")
+    #       })
+    #     ) %>%
+    #     trelliscopejs::trelliscope(name           = "Results",
+    #                                path           = treldir,
+    #                                self_contained = TRUE,
+    #                                state = list(labels = c("Sample", "Signal")))
+    #
+    # })
 
     # complete_profres_tab
     output$complete_profres_tab <- DT::renderDataTable(server = FALSE, {
@@ -1728,7 +1738,7 @@ profilingServer <- function(id, xpmt_data, ref_data, connec){
       req(xpmt_data())
       req(ref_data())
       req(input$profile_confirm)
-      #browser()
+      browser()
 
       shinyWidgets::progressSweetAlert(
         session = shiny::getDefaultReactiveDomain(),
@@ -1849,7 +1859,11 @@ profilingServer <- function(id, xpmt_data, ref_data, connec){
         program_parameters$buck_step   <- imported_data$buck_step
 
         Xdata        <- imported_data$ppm[ROI_buckets]
+
+        #Read df column 'Quantification Mode'
         fitting_type <- as.character(ROI_profile[1, 3])
+        print(fitting_type)
+
         if (length(grep("Clean",fitting_type)) == 1) {
           program_parameters$clean_fit <- "Y"
         } else {
