@@ -109,9 +109,9 @@ profiling_prequantUI <- function(id){
 profiling_completeviewUI <- function(id){
   ns <- NS(id)
   tagList(
-    shinycssloaders::withSpinner(trelliscopejs::trelliscopeOutput(ns("trelliscope"))),
-    uiOutput(ns("trelvizoptions_ui")),
-    br(),
+    # shinycssloaders::withSpinner(trelliscopejs::trelliscopeOutput(ns("trelliscope"))),
+    # uiOutput(ns("trelvizoptions_ui")),
+    # br(),
     DT::dataTableOutput(ns("complete_profres_tab"))
   )
 }
@@ -1258,31 +1258,31 @@ profilingServer <- function(id, xpmt_data, ref_data, connec){
       )
     })
 
-    output$trelvizoptions_ui <- renderUI({
-
-      req(xpmt_data())
-      req(ref_data())
-      plot.data <- plot.data()
-      req(!is.null(plot.data))
-      #browser()
-      # Allows users to select which sample spectrum to display.
-      fluidRow(
-        column(4,
-               selectInput(inputId = NS(id, "trel_samp"),
-                           label   = "Choose a spectrum to display in the trelliscope",
-                           choices = unique(plot.data$Sample),
-                           selected = unique(plot.data$Sample)[1])),
-        column(3,
-               shinyWidgets::numericRangeInput(inputId = NS(id, "trel_fethresh"),
-                                               label = "Specify a filter range:",
-                                               value = c(0.5,100))),
-        column(5,
-               br(),
-               actionButton(inputId = NS(id, "filter_trel"),
-                            label = "Apply Filter",
-                            style="color: #fff; background-color: #337ab7; border-color: #2e6da4")),
-      )
-    })
+    # output$trelvizoptions_ui <- renderUI({
+    #
+    #   req(xpmt_data())
+    #   req(ref_data())
+    #   plot.data <- plot.data()
+    #   req(!is.null(plot.data))
+    #   #browser()
+    #   # Allows users to select which sample spectrum to display.
+    #   fluidRow(
+    #     column(4,
+    #            selectInput(inputId = NS(id, "trel_samp"),
+    #                        label   = "Choose a spectrum to display in the trelliscope",
+    #                        choices = unique(plot.data$Sample),
+    #                        selected = unique(plot.data$Sample)[1])),
+    #     column(3,
+    #            shinyWidgets::numericRangeInput(inputId = NS(id, "trel_fethresh"),
+    #                                            label = "Specify a filter range:",
+    #                                            value = c(0.5,100))),
+    #     column(5,
+    #            br(),
+    #            actionButton(inputId = NS(id, "filter_trel"),
+    #                         label = "Apply Filter",
+    #                         style="color: #fff; background-color: #337ab7; border-color: #2e6da4")),
+    #   )
+    # })
 
 
     # Output (in HTML format) to display the filters that are currently applied to the data.
@@ -1738,7 +1738,7 @@ profilingServer <- function(id, xpmt_data, ref_data, connec){
       req(xpmt_data())
       req(ref_data())
       req(input$profile_confirm)
-      browser()
+      #browser()
 
       shinyWidgets::progressSweetAlert(
         session = shiny::getDefaultReactiveDomain(),
