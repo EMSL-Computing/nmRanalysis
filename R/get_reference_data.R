@@ -369,7 +369,6 @@ get_spectra_data <- function(ID_list){
         next
       }
 
-
       #count up the peak counts by grouping unique values (not ideal)
       peak_quant <- csdata %>%
         dplyr::group_by(.data$Val) %>%
@@ -551,6 +550,7 @@ get_spectra_data <- function(ID_list){
 
     # append df of each ID to the main DF
     spectra_data <- rbind(spectra_data, spectra_data_subset)
+
   }
 
 
