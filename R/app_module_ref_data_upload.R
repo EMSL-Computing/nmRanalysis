@@ -164,9 +164,10 @@ ref_data_uploadUI <- function(id){
 #' @importFrom magrittr %>%
 #' @importFrom rlang .data
 #'
-ref_data_uploadServer <- function(id, xpmt_data, ref_db, connec){
+ref_data_uploadServer <- function(id, xpmt_data, metids, ref_db, connec){
   stopifnot(is.reactive(ref_db))
   stopifnot(is.reactive(xpmt_data))
+  stopifnot(is.reactive(metids))
   stopifnot(is.reactive(connec))
 
   moduleServer(id, function(input, output, session){
@@ -206,6 +207,20 @@ ref_data_uploadServer <- function(id, xpmt_data, ref_db, connec){
                                  style = "unite",
                                  color = "primary",
                                  size = "sm")
+      }
+    })
+
+    observe({
+      req(xpmt_data())
+
+      if(length(metids()) > 0){
+        updateSelectInput(inputId = "ref_upload_method", selected = "list")
+        updateTabsetPanel(inputId = "refmet_upload", selected = "list")
+        updateSelectizeInput(inputId = "user_refmets", selected = metids())
+      } else{
+        updateSelectInput(inputId = "ref_upload_method", selected = "file")
+        updateTabsetPanel(inputId = "refmet_upload", selected = "file")
+        updateSelectizeInput(inputId = "user_refmets", selected = NULL)
       }
     })
 
