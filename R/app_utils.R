@@ -56,7 +56,11 @@
 #' @return A character-valued scalar.
 #'
 getmode <- function(x, ...){
-  names(which.max(table(x, ...)))
+  if(length(x) > 0){
+    names(which.max(table(x, ...)))
+  } else{
+    NA
+  }
 }
 
 
