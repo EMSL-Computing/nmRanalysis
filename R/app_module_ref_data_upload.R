@@ -336,6 +336,7 @@ ref_data_uploadServer <- function(id, xpmt_data, metids, ref_db, connec){
 
                                        {
                                          req(xpmt_data())
+                                         req(input$process_ref_inputs > 0)
 
                                          if (input$ref_upload_method == 'prevsesh') {
 
