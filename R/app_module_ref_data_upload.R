@@ -174,6 +174,7 @@ ref_data_uploadServer <- function(id, xpmt_data, metids, ref_db, connec){
 
     # Initialize reactiveValues needed by this module
     rv <- reactiveValues(casno_not_in_db = NULL)
+
     observe({
       ref_db <- ref_db()
       updateSelectizeInput(inputId = "user_refmets",
@@ -181,6 +182,8 @@ ref_data_uploadServer <- function(id, xpmt_data, metids, ref_db, connec){
     })
 
     observeEvent(input$ref_upload_method, {
+      req(input$process_ref_inputs)
+
       if(input$process_ref_inputs > 0){
         shinyWidgets::show_alert(
           title = "Selection cannot be changed",
@@ -192,6 +195,7 @@ ref_data_uploadServer <- function(id, xpmt_data, metids, ref_db, connec){
     }, ignoreInit = T)
 
     output$process_ref_inputs <- renderUI({
+
       if(!is.null(input$process_ref_inputs)){
         req(input$process_ref_inputs == 0)
       }
@@ -258,7 +262,6 @@ ref_data_uploadServer <- function(id, xpmt_data, metids, ref_db, connec){
       user.data <- xpmt_data()
       updateSelectizeInput(inputId = "user_timestamps", choices = attr(user.data, "session_info")$project_name)
     })
-
 
     # reactive to read in refmet file (when supplied)
     refmet_file <- reactive({
