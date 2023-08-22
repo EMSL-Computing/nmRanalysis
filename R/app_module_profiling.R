@@ -109,8 +109,10 @@ profiling_prequantUI <- function(id){
 profiling_completeviewUI <- function(id){
   ns <- NS(id)
   tagList(
-    shinycssloaders::withSpinner(trelliscopejs::trelliscopeOutput(ns("trelliscope"))),
+    #shinycssloaders::withSpinner(trelliscopejs::trelliscopeOutput(ns("trelliscope"))),
+    shinycssloaders::withSpinner(plotOutput(ns("trelliscope"))),
     uiOutput(ns("trelvizoptions_ui")),
+    uiOutput(ns("spectra_ui")),
     br(),
     DT::dataTableOutput(ns("complete_profres_tab"))
   )
@@ -1041,26 +1043,26 @@ profilingServer <- function(id, xpmt_data, ref_data, connec){
     #
     # # plot.data <- format_plotting(profiling_data = user_profiling)
     # # plot.data <- plotdataall2
-    output$trelliscope <- trelliscopejs::renderTrelliscope({
+    plot.data2 <- reactive({
       #creating temp dir for telliscope
+      #browser()
       treldir <- file.path(tempdir(), paste0("Result_", format(Sys.time(), format = "%H-%m-%s", tz = "UTC")))
-      dir.create(treldir)
-      filter_trel <- input$filter_trel
-      isolate(trel_samp <- input$trel_samp)
-      isolate(trel_fethresh <- input$trel_fethresh)
+      # dir.create(treldir)
+      # trel_samp <- input$trel_samp
+      trel_fethresh <- input$trel_fethresh
       plot.data <- plot.data()
-      print(object.size(plot.data))
-      plot.data <- plot.data[which(plot.data$Sample == trel_samp),]
+      # plot.data <- plot.data[which(plot.data$Sample == trel_samp),]
       plot.data <- plot.data[which(plot.data$`Fitting Error` >= trel_fethresh[1] & plot.data$`Fitting Error` <= trel_fethresh[2]),]
-      if(length(plot.data[,1]) == 0){
-        if(!is.null(filter_trel)){
-          if(filter_trel > 0){
-            shinyWidgets::show_alert(
-              title = "No Data Within Range",
-              text = "There are no trelliscopes that fit the parameters that you've given. Please change them and Apply Filters",
-              type = "error"
-            )
-      }}}
+      plot.data
+      # if(length(plot.data[,1]) == 0){
+      #   if(!is.null(filter_trel)){
+      #     if(filter_trel > 0){
+      #       shinyWidgets::show_alert(
+      #         title = "No Data Within Range",
+      #         text = "There are no trelliscopes that fit the parameters that you've given. Please change them and Apply Filters",
+      #         type = "error"
+      #       )
+      # }}}
       # if(length(unique(plot.data$Signal) > 1000)){
       #   if(filter_trel > 0){
       #     shinyWidgets::show_alert(
@@ -1069,30 +1071,92 @@ profilingServer <- function(id, xpmt_data, ref_data, connec){
       #       type = "error"
       #     )
       # }}
-      req(length(plot.data[,1]) > 0)
+      # req(length(plot.data[,1]) > 0)
       # req(length(unique(plot.data$Signal) <= 1000))
+    })
+    output$trelliscope <- renderPlot({
+      #browser()
+      plot.data2 <- plot.data2()
+      signal <- input$trel_sign
+      sample <- input$trel_samp
+      num_samps <- length(sample)
+      if(num_samps > 6){
+        for(i in 1:(6 - length(sample)))
+          sample <- c(sample, NA)
+      }
+      filt_samp <- plot.data2 %>% dplyr::filter(plot.data2$Signal == signal)
 
-      plot.data %>%
-        tidyr::nest(data = !tidyselect::one_of(c("Sample", "Signal"))) %>%
-        dplyr::mutate(
-          Quantification = purrr::map_dbl(.data$data, ~ unique(.$Quantification)),
-          Signal_Area_Ratio = purrr::map_dbl(.data$data, ~ unique(.$`Signal to Area Ratio`)),
-          Fitting_Error = purrr::map_dbl(.data$data, ~ unique(.$`Fitting Error`)),
-          Chemical_Shift = purrr::map_dbl(.data$data, ~ unique(.$`Chemical Shift`)),
-          Intensity = purrr::map_dbl(.data$data, ~ unique(.$Intensity)),
-          Half_Bandwidth = purrr::map_dbl(.data$data, ~ unique(.$`Half Bandwidth`)),
-          panel = trelliscopejs::map_plot(.data$data, function(x){
-            tempdat <- x %>% dplyr::filter(.data$variable != "Quantified Signal")
-            ggplot2::ggplot(data = tempdat, ggplot2::aes(x = Xdata, y = .data$value, color = .data$variable))+
+      filt_temp <- filt_samp %>% dplyr::filter(filt_samp$Sample == sample[1])
+      p1 <- ggplot2::ggplot(data = filt_temp, ggplot2::aes(x = Xdata, y = .data$value, color = .data$variable))+
               ggplot2::geom_line() +
-              ggplot2::geom_line(data = tempdat, ggplot2::aes(x = Xdata, y = .data$value, color= .data$variable), alpha = 0.5)+
-              ggplot2::xlab('PPM') + ggplot2::ylab('Intensity') + ggplot2::theme_bw() #+ ggplot2::theme(legend.position = "none")
-          })
-        ) %>%
-        trelliscopejs::trelliscope(name           = "Results",
-                                   path           = treldir,
-                                   self_contained = TRUE,
-                                   state = list(labels = c("Sample", "Signal")))
+              ggplot2::geom_line(data = filt_temp, ggplot2::aes(x = Xdata, y = .data$value, color= .data$variable), alpha = 0.5)+
+              ggplot2::xlab('PPM') + ggplot2::ylab('Intensity') + ggplot2::theme_bw() + ggplot2::ggtitle(sample[1])
+
+      filt_temp <- filt_samp %>% dplyr::filter(filt_samp$Sample == sample[2])
+      p2 <- ggplot2::ggplot(data = filt_temp, ggplot2::aes(x = Xdata, y = .data$value, color = .data$variable))+
+        ggplot2::geom_line() +
+        ggplot2::geom_line(data = filt_temp, ggplot2::aes(x = Xdata, y = .data$value, color= .data$variable), alpha = 0.5)+
+        ggplot2::xlab('PPM') + ggplot2::ylab('Intensity') + ggplot2::theme_bw() + ggplot2::ggtitle(sample[2])
+
+      filt_temp <- filt_samp %>% dplyr::filter(filt_samp$Sample == sample[3])
+      p3 <- ggplot2::ggplot(data = filt_temp, ggplot2::aes(x = Xdata, y = .data$value, color = .data$variable))+
+        ggplot2::geom_line() +
+        ggplot2::geom_line(data = filt_temp, ggplot2::aes(x = Xdata, y = .data$value, color= .data$variable), alpha = 0.5)+
+        ggplot2::xlab('PPM') + ggplot2::ylab('Intensity') + ggplot2::theme_bw() + ggplot2::ggtitle(sample[3])
+
+      filt_temp <- filt_samp %>% dplyr::filter(filt_samp$Sample == sample[4])
+      p4 <- ggplot2::ggplot(data = filt_temp, ggplot2::aes(x = Xdata, y = .data$value, color = .data$variable))+
+        ggplot2::geom_line() +
+        ggplot2::geom_line(data = filt_temp, ggplot2::aes(x = Xdata, y = .data$value, color= .data$variable), alpha = 0.5)+
+        ggplot2::xlab('PPM') + ggplot2::ylab('Intensity') + ggplot2::theme_bw() + ggplot2::ggtitle(sample[4])
+
+      filt_temp <- filt_samp %>% dplyr::filter(filt_samp$Sample == sample[5])
+      p5 <- ggplot2::ggplot(data = filt_temp, ggplot2::aes(x = Xdata, y = .data$value, color = .data$variable))+
+        ggplot2::geom_line() +
+        ggplot2::geom_line(data = filt_temp, ggplot2::aes(x = Xdata, y = .data$value, color= .data$variable), alpha = 0.5)+
+        ggplot2::xlab('PPM') + ggplot2::ylab('Intensity') + ggplot2::theme_bw() + ggplot2::ggtitle(sample[5])
+
+      filt_temp <- filt_samp %>% dplyr::filter(filt_samp$Sample == sample[6])
+      p6 <- ggplot2::ggplot(data = filt_temp, ggplot2::aes(x = Xdata, y = .data$value, color = .data$variable))+
+        ggplot2::geom_line() +
+        ggplot2::geom_line(data = filt_temp, ggplot2::aes(x = Xdata, y = .data$value, color= .data$variable), alpha = 0.5)+
+        ggplot2::xlab('PPM') + ggplot2::ylab('Intensity') + ggplot2::theme_bw() + ggplot2::ggtitle(sample[6])
+
+      gridExtra::grid.arrange(p1,p2,p3,p4,p5,p6, ncol = 2)
+
+      # plist <- list()
+      # for(i in 1:num_samps){
+      #   filt_temp <- filt_samp %>% dplyr::filter(filt_samp$Sample == sample[i])
+      #
+      #   if(!length(filt_temp[,1]) == 0){
+      #
+      #     p <- ggplot2::ggplot(data = filt_temp, ggplot2::aes(x = Xdata, y = .data$value, color = .data$variable))+
+      #       ggplot2::geom_line() +
+      #       ggplot2::geom_line(data = filt_temp, ggplot2::aes(x = Xdata, y = .data$value, color= .data$variable), alpha = 0.5)+
+      #       ggplot2::xlab('PPM') + ggplot2::ylab('Intensity') + ggplot2::theme_bw() + ggplot2::ggtitle(sample[i])
+      #     plist <- append(plist, ggplotify::as.ggplot(p))
+      #   }}
+      # cowplot::plot_grid(plotlist = plist, ncol = 2)
+      # plot.data <- plot.data %>%
+      #   tidyr::nest(data = !tidyselect::one_of(c("Sample", "Signal"))) %>%
+      #   dplyr::mutate(
+      #     Quantification = purrr::map_dbl(.data$data, ~ unique(.$Quantification)),
+      #     Signal_Area_Ratio = purrr::map_dbl(.data$data, ~ unique(.$`Signal to Area Ratio`)),
+      #     Fitting_Error = purrr::map_dbl(.data$data, ~ unique(.$`Fitting Error`)),
+      #     Chemical_Shift = purrr::map_dbl(.data$data, ~ unique(.$`Chemical Shift`)),
+      #     Intensity = purrr::map_dbl(.data$data, ~ unique(.$Intensity)),
+      #     Half_Bandwidth = purrr::map_dbl(.data$data, ~ unique(.$`Half Bandwidth`)),
+      #     panel = lapply(.data$data, function(x){
+      #       tempdat <- x %>% dplyr::filter(.data$variable != "Quantified Signal")
+      #       ggplot2::ggplot(data = tempdat, ggplot2::aes(x = Xdata, y = .data$value, color = .data$variable))+
+      #         ggplot2::geom_line() +
+      #         ggplot2::geom_line(data = tempdat, ggplot2::aes(x = Xdata, y = .data$value, color= .data$variable), alpha = 0.5)+
+      #         ggplot2::xlab('PPM') + ggplot2::ylab('Intensity') + ggplot2::theme_bw() #+ ggplot2::theme(legend.position = "none")
+      #     })
+      #   ) #%>%
+        # trelliscopejs::trelliscope(name           = "Results",
+        #                            path           = treldir,
+        #                            self_contained = TRUE,
 
     })
 
@@ -1267,31 +1331,47 @@ profilingServer <- function(id, xpmt_data, ref_data, connec){
       )
     })
 
-    # output$trelvizoptions_ui <- renderUI({
-    #
-    #   req(xpmt_data())
-    #   req(ref_data())
-    #   plot.data <- plot.data()
-    #   req(!is.null(plot.data))
-    #   #browser()
-    #   # Allows users to select which sample spectrum to display.
-    #   fluidRow(
-    #     column(4,
-    #            selectInput(inputId = NS(id, "trel_samp"),
-    #                        label   = "Choose a spectrum to display in the trelliscope",
-    #                        choices = unique(plot.data$Sample),
-    #                        selected = unique(plot.data$Sample)[1])),
-    #     column(3,
-    #            shinyWidgets::numericRangeInput(inputId = NS(id, "trel_fethresh"),
-    #                                            label = "Specify a filter range:",
-    #                                            value = c(0.5,100))),
-    #     column(5,
-    #            br(),
-    #            actionButton(inputId = NS(id, "filter_trel"),
-    #                         label = "Apply Filter",
-    #                         style="color: #fff; background-color: #337ab7; border-color: #2e6da4")),
-    #   )
-    # })
+    output$trelvizoptions_ui <- renderUI({
+
+      req(xpmt_data())
+      req(ref_data())
+      plot.data <- plot.data()
+      print(unique(plot.data$Sample))
+      # req(!is.null(plot.data))
+      #browser()
+      # Allows users to select which sample spectrum to display.
+      fluidRow(
+        column(4,
+               shinyWidgets::numericRangeInput(inputId = NS(id, "trel_fethresh"),
+                                               label = "Specify a Fitting Error range:",
+                                               value = c(0.5,100))),
+        column(4,
+               selectizeInput(inputId = NS(id, "trel_samp"),
+                           label   = "Select a sample ",
+                           choices = unique(plot.data$Sample),
+                           selected = unique(plot.data$Sample),
+                           multiple = T)
+      ))
+    })
+    output$spectra_ui <- renderUI({
+
+      req(xpmt_data())
+      req(ref_data())
+      plot.data2 <- plot.data2()
+      req(!is.null(plot.data2))
+      #browser()
+      # Allows users to select which sample spectrum to display.
+      fluidRow(
+        column(4,
+          selectInput(inputId = NS(id, "trel_sign"),
+                      label   = "Select a signal",
+                      choices = unique(plot.data2$Signal)),
+                      selected = unique(plot.data2$Signal)[1]),
+        column(4,
+          actionButton(inputId = NS(id, "filter_plot"),
+                       label = "Apply Filter",
+                       style="color: #fff; background-color: #337ab7; border-color: #2e6da4")))
+    })
 
 
     # Output (in HTML format) to display the filters that are currently applied to the data.
