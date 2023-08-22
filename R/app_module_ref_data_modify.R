@@ -240,6 +240,7 @@ ref_data_editingServer <- function(id, xpmt_data, ref_data, ref_db, connec){
                    req(ref_data())
                    req(xpmt_data())
 
+
                    # Check if any existing metabolites are being added
                    if(!is.null(input$refmet_toadd)){
 
@@ -354,9 +355,13 @@ ref_data_editingServer <- function(id, xpmt_data, ref_data, ref_db, connec){
 
 
                      added_reference_data_bestmatch$`Quantification Signal` <- as.character(added_reference_data_bestmatch$`Quantification Signal`)
+                     rv$user_reference_data$`Quantification Signal` <- as.character(rv$user_reference_data$`Quantification Signal`)
                      rv$user_reference_data <- dplyr::bind_rows(rv$user_reference_data, added_reference_data_bestmatch)
 
                      added_reference_data$`Quantification Signal` <- as.character(added_reference_data$`Quantification Signal`)
+                     rv$full_reference_data$`Quantification Signal` <- as.character(rv$full_reference_data$`Quantification Signal`)
+                     rv$unedited_bestmatch_ref_data$`Quantification Signal` <- as.character(rv$unedited_bestmatch_ref_data$`Quantification Signal`)
+
                      rv$full_reference_data <- dplyr::bind_rows(rv$full_reference_data, added_reference_data)
                      rv$unedited_bestmatch_ref_data <- dplyr::bind_rows(rv$unedited_bestmatch_ref_data, added_reference_data_bestmatch)
                    }
