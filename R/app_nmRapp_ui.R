@@ -181,22 +181,22 @@ nmRapp_ui <- function(request){
                     value = "sigview_hide"
                   )
                 )
-              ),
-              tabPanel(
-                title = "Metabolite View",
-                tabsetPanel(
-                  id = "metview_tab1",
-                  type = "hidden",
-                  selected = "metview_hide",
-                  tabPanelBody(
-                    value = "metview_show",
-                    profiling_detailedviewUI(id = "profiling")
-                  ),
-                  tabPanelBody(
-                    value = "metview_hide"
-                  )
-                )
               )
+              # tabPanel(
+              #   title = "Metabolite View",
+              #   tabsetPanel(
+              #     id = "metview_tab1",
+              #     type = "hidden",
+              #     selected = "metview_hide",
+              #     tabPanelBody(
+              #       value = "metview_show",
+              #       profiling_detailedviewUI(id = "profiling")
+              #     ),
+              #     tabPanelBody(
+              #       value = "metview_hide"
+              #     )
+              #   )
+              # )
             )
           )
         )
