@@ -338,7 +338,8 @@ metid_Server <- function(id, xpmt_data){
 
     observe({
 
-      modfits_files <- list.files(path = "C:\\Users\\flor829\\local_projectdir\\NMR\\recommender_modeling\\Results\\model_fits")
+      # modfits_files <- list.files(path = "C:\\Users\\flor829\\local_projectdir\\NMR\\recommender_modeling\\Results\\model_fits")
+      modfits_files <- list.files(path = "/srv/shiny/model_fits")
       modfits_nameonly <- gsub("model_", "", modfits_files)
       modfits_nameonly <- gsub(".rds", "", modfits_nameonly)
 
@@ -407,7 +408,8 @@ metid_Server <- function(id, xpmt_data){
         req(input$recommender_metquery)
 
 
-        modfits_files <- list.files(path = "C:\\Users\\flor829\\local_projectdir\\NMR\\recommender_modeling\\Results\\model_fits")
+        # modfits_files <- list.files(path = "C:\\Users\\flor829\\local_projectdir\\NMR\\recommender_modeling\\Results\\model_fits")
+        modfits_files <- list.files(path = "/srv/shiny/model_fits")
         modfits_nameonly <- gsub("model_", "", modfits_files)
         modfits_nameonly <- gsub(".rds", "", modfits_nameonly)
 
@@ -458,7 +460,8 @@ metid_Server <- function(id, xpmt_data){
           modind <- which(modfits_nameonly == fmat_selmet)
           modfit_selmod_file <- modfits_files[modind]
 
-          modfit_selmod <- readRDS(paste0("C:\\Users\\flor829\\local_projectdir\\NMR\\recommender_modeling\\Results\\model_fits\\", modfit_selmod_file))
+          # modfit_selmod <- readRDS(paste0("C:\\Users\\flor829\\local_projectdir\\NMR\\recommender_modeling\\Results\\model_fits\\", modfit_selmod_file))
+          modfit_selmod <- readRDS(paste0("/srv/shiny/model_fits/", modfit_selmod_file))
           bw1_bins <- as.numeric(c("9.95", "9.85", "9.75", "9.65", "9.55", "9.45", "9.35", "9.25", "9.15",
                                    "9.05", "8.95", "8.85", "8.75", "8.65", "8.55", "8.45", "8.35", "8.25",
                                    "8.15", "8.05", "7.95", "7.85", "7.75", "7.65", "7.55", "7.45", "7.35",
@@ -540,7 +543,8 @@ metid_Server <- function(id, xpmt_data){
 
       query_tol <- input$metid_querytol
 
-      modfits_files <- list.files(path = "C:\\Users\\flor829\\local_projectdir\\NMR\\recommender_modeling\\Results\\model_fits")
+      # modfits_files <- list.files(path = "C:\\Users\\flor829\\local_projectdir\\NMR\\recommender_modeling\\Results\\model_fits")
+      modfits_files <- list.files(path = "/srv/shiny/model_fits")
       modfits_nameonly <- gsub("model_", "", modfits_files)
       modfits_nameonly <- gsub(".rds", "", modfits_nameonly)
 
@@ -578,7 +582,8 @@ metid_Server <- function(id, xpmt_data){
                 querymets$Probability[i] <- round(predprob_pres$.pred_Present[predprob_pres$sampnames == input$sample_to_plot],3)
 
               } else{
-                modfit_selmod <- readRDS(paste0("C:\\Users\\flor829\\local_projectdir\\NMR\\recommender_modeling\\Results\\model_fits\\", modfit_selmod_file))
+                # modfit_selmod <- readRDS(paste0("C:\\Users\\flor829\\local_projectdir\\NMR\\recommender_modeling\\Results\\model_fits\\", modfit_selmod_file))
+                modfit_selmod <- readRDS(paste0("/srv/shiny/model_fits/", modfit_selmod_file))
                 bw1_bins <- as.numeric(c("9.95", "9.85", "9.75", "9.65", "9.55", "9.45", "9.35", "9.25", "9.15",
                                          "9.05", "8.95", "8.85", "8.75", "8.65", "8.55", "8.45", "8.35", "8.25",
                                          "8.15", "8.05", "7.95", "7.85", "7.75", "7.65", "7.55", "7.45", "7.35",
@@ -680,7 +685,8 @@ metid_Server <- function(id, xpmt_data){
                 querymets$Probability[i] <- round(predprob_pres$.pred_Present[predprob_pres$sampnames == input$sample_to_plot],3)
 
               } else{
-                modfit_selmod <- readRDS(paste0("C:\\Users\\flor829\\local_projectdir\\NMR\\recommender_modeling\\Results\\model_fits\\", modfit_selmod_file))
+                # modfit_selmod <- readRDS(paste0("C:\\Users\\flor829\\local_projectdir\\NMR\\recommender_modeling\\Results\\model_fits\\", modfit_selmod_file))
+                modfit_selmod <- readRDS(paste0("/srv/shiny/model_fits/", modfit_selmod_file))
                 bw1_bins <- as.numeric(c("9.95", "9.85", "9.75", "9.65", "9.55", "9.45", "9.35", "9.25", "9.15",
                                          "9.05", "8.95", "8.85", "8.75", "8.65", "8.55", "8.45", "8.35", "8.25",
                                          "8.15", "8.05", "7.95", "7.85", "7.75", "7.65", "7.55", "7.45", "7.35",
@@ -799,7 +805,8 @@ metid_Server <- function(id, xpmt_data){
                         .data$pH, .data$`Concentration (mM)`, .data$`Temperature (K)`, .data$Solvent)
 
         # (6/6/23) check modfits files for metabolite
-        modfits_files <- list.files(path = "C:\\Users\\flor829\\local_projectdir\\NMR\\recommender_modeling\\Results\\model_fits")
+        # modfits_files <- list.files(path = "C:\\Users\\flor829\\local_projectdir\\NMR\\recommender_modeling\\Results\\model_fits")
+        modfits_files <- list.files(path = "/srv/shiny/model_fits")
         modfits_nameonly <- gsub("model_", "", modfits_files)
         modfits_nameonly <- gsub(".rds", "", modfits_nameonly)
 
