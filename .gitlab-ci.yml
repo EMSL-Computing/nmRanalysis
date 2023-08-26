@@ -39,3 +39,6 @@ deply-token-to-cluster:
     - k8s
     - rzr
     - nmranalysis
+  variables:
+    KUBERNETES_HELPER_MEMORY_REQUEST: 256Mi
+    KUBERNETES_HELPER_MEMORY_LIMIT: 256Mi
