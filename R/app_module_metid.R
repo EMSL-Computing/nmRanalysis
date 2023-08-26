@@ -342,6 +342,7 @@ metid_Server <- function(id, xpmt_data){
       modfits_files <- list.files(path = "/srv/shiny/model_fits")
       modfits_nameonly <- gsub("model_", "", modfits_files)
       modfits_nameonly <- gsub(".rds", "", modfits_nameonly)
+      modfits_nameonly <- tolower(modfits_nameonly)
 
       temp <- bmse_associations %>%
         dplyr::select(-Entry_ID, -CASno) %>%
@@ -353,7 +354,13 @@ metid_Server <- function(id, xpmt_data){
         dplyr::select(Metabolite, `Probability Available`) %>%
         dplyr::distinct()
 
+      shinyFeedback::feedbackDanger("recommender_metquery",
+                                    nrow(temp) == 0,
+                                    "No metabolite recommendations available.")
+
       rv$mets_w_probs_available <- unique(temp$Metabolite)
+
+      req(nrow(temp) > 0)
 
       updateSelectizeInput(inputId = "recommender_metquery",
                            choices = c("All", unique(temp$Metabolite)))
@@ -407,11 +414,11 @@ metid_Server <- function(id, xpmt_data){
         req(xpmt_data())
         req(input$recommender_metquery)
 
-
         # modfits_files <- list.files(path = "C:\\Users\\flor829\\local_projectdir\\NMR\\recommender_modeling\\Results\\model_fits")
         modfits_files <- list.files(path = "/srv/shiny/model_fits")
         modfits_nameonly <- gsub("model_", "", modfits_files)
         modfits_nameonly <- gsub(".rds", "", modfits_nameonly)
+        modfits_nameonly <- tolower(modfits_nameonly)
 
 
         if("All" %in% input$recommender_metquery){
@@ -439,6 +446,12 @@ metid_Server <- function(id, xpmt_data){
                           PR_AUC = NA,
                           ROC_AUC = NA)
         }
+
+        shinyFeedback::feedbackDanger("recommender_metquery",
+                                      nrow(querymets) == 0,
+                                      "No metabolite recommendations available.")
+
+        req(nrow(querymets) > 0)
 
         shinyWidgets::progressSweetAlert(
           session = shiny::getDefaultReactiveDomain(),
@@ -514,6 +527,11 @@ metid_Server <- function(id, xpmt_data){
               model == "svm_rbf" ~ "SVM: Radial Basis Function"
             ))
 
+          # 8/26/23 Need to investigate why there may be multiple rows returned for some cases
+          if(nrow(modperf_train) > 1){
+            modperf_train <- modperf_train[1,]
+          }
+
           querymets$Model[i] <- modperf_train$modelname
 
           querymets$PR_AUC[i] <- round(modfit_selmod$test_perf$pr_auc, 3)
@@ -547,6 +565,7 @@ metid_Server <- function(id, xpmt_data){
       modfits_files <- list.files(path = "/srv/shiny/model_fits")
       modfits_nameonly <- gsub("model_", "", modfits_files)
       modfits_nameonly <- gsub(".rds", "", modfits_nameonly)
+      modfits_nameonly <- tolower(modfits_nameonly)
 
 
       if(input$metid_queryset == "cust"){
@@ -568,7 +587,7 @@ metid_Server <- function(id, xpmt_data){
           dplyr::relocate(`Probability Available`, `Probability`, `Metabolite`)
 
         if(nrow(querymets) > 0 & input$compute_probs == "Yes"){
-          # browser()
+
           for(i in 1:nrow(querymets)){
             if(querymets$`Probability Available`[i] == "Yes"){
 
@@ -809,6 +828,7 @@ metid_Server <- function(id, xpmt_data){
         modfits_files <- list.files(path = "/srv/shiny/model_fits")
         modfits_nameonly <- gsub("model_", "", modfits_files)
         modfits_nameonly <- gsub(".rds", "", modfits_nameonly)
+        modfits_nameonly <- tolower(modfits_nameonly)
 
         fmat_selmet <- tolower(make.names(unique(tempdat$Metabolite)))
         modind <- which(modfits_nameonly == fmat_selmet)
