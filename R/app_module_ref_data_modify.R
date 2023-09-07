@@ -1843,6 +1843,7 @@ ref_data_editingServer <- function(id, xpmt_data, ref_data, ref_db, connec){
 
       ROI_annots <- list(
         list(
+          y = 0,
           x = tempdat[sigidx,,drop = FALSE]$"Chemical shift(ppm)",
           text = paste0(sprintf("<b>%s</b>", paste0(input$signal_to_check, ": ")),
                         tempdat[sigidx,,drop = FALSE]$"Chemical shift(ppm)", " (",
