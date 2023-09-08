@@ -341,8 +341,8 @@ profilingServer <- function(id, xpmt_data, ref_data, connec){
                  })
 
     # This datatable corresponds to the reference metabolite data to be used for quantification
-    output$refmet_quant_table <- DT::renderDT({
-
+    ref_quant_table_data <- reactiveValues(data=NULL)
+    ref_quant_table_data_fill <- reactive({
       req(ref_data())
       req(input$ROI_to_plot_quantdat)
       #browser()
@@ -350,7 +350,7 @@ profilingServer <- function(id, xpmt_data, ref_data, connec){
       temp <- ref_data()$quantdata %>%
         dplyr::mutate(ROI = paste0("(", .data$`ROI right edge (ppm)`, ", ", .data$`ROI left edge (ppm)`, ")")) %>%
         dplyr::filter(.data$ROI %in% input$ROI_to_plot_quantdat)
-      temp2 <- ref_data()$user_edited_refdata %>% dplyr::ungroup() %>%
+      ref_quant_table_data$data <- ref_data()$user_edited_refdata %>% dplyr::ungroup() %>%
         dplyr::filter(.data$`Chemical shift(ppm)` %in% temp$`Chemical shift(ppm)`) %>%
         dplyr::mutate(Signal = paste0(.data$Metabolite, " [", .data$`Quantification Signal`, "]")) %>%
         dplyr::filter(.data$Quantify == 1) %>%
@@ -361,7 +361,10 @@ profilingServer <- function(id, xpmt_data, ref_data, connec){
                       .data$`Temperature (K)`, .data$`Solvent`)
       # temp2 <- dplyr::mutate(temp2, `Quantification Mode` = as.character(selectInput("sel", "", choices = c("Baseline Fitting", "Baseline Sum"))))
       #temp2 <- dplyr::mutate(`Quantification Mode` = as.character(for(i in 1:nrow(temp2$Signal)){selectInput(paste0("sel", i), "", choices = c("Baseline Fitting", "Baseline Sum"))}))
-      temp2 %>%
+    })
+    output$refmet_quant_table <- DT::renderDT({
+      ref_quant_table_data_fill()
+      ref_quant_table_data$data %>%
         DT::datatable(rownames   = FALSE,
                       editable   = TRUE,
                       options = list(dom = 't', scrollX = TRUE),
@@ -377,6 +380,15 @@ profilingServer <- function(id, xpmt_data, ref_data, connec){
                                     "Roof effect", "Roof effect 2", "Frequency (MHz)", "pH", "Concentration (mM)",
                                     "Temperature (K)"),
                         digits = 3)
+    })
+    observeEvent(input$refmet_quant_table_cell_edit, {
+      info = input$refmet_quant_table_cell_edit
+      str(info)
+      i = info$row
+      j = info$col
+      v = info$value
+
+      ref_quant_table_data$data[i, j] <<- DT::coerceValue(v, ref_quant_table_data$data[i, j])
     })
 
     # Output (in HTML format) to display the filters that are currently applied to the data.
@@ -893,9 +905,6 @@ profilingServer <- function(id, xpmt_data, ref_data, connec){
       profiling_data = user_profiling
       signals_to_plot = NULL
 
-      print("user_profiling size:")
-      print(object.size(user_profiling))
-
       ############################## # Within this chunk is code adapted from format_plotting()
       # plot all metabolites where there's at least one non-missing value
       if (is.null(signals_to_plot)){
@@ -985,9 +994,6 @@ profilingServer <- function(id, xpmt_data, ref_data, connec){
 
       plotdataall <- do.call(rbind, plotdataall.out)
 
-      print("plotdataall size:")
-      print(object.size(plotdataall))
-
       # Used to fix Signal names to be more consistent with UI display formatting
       tempdat <- ref_data()$quantdata %>%
         dplyr::mutate(SigName = make.names(paste0(.data$Metabolite, "_", .data$`Quantification Signal`)),
@@ -1034,9 +1040,6 @@ profilingServer <- function(id, xpmt_data, ref_data, connec){
         dplyr::full_join(temp_intdat, by = c("Sample", "Signal")) %>%
         dplyr::full_join(temp_hwdat, by = c("Sample", "Signal"))
 
-      print("plot.data objectsize:")
-      print(object.size(plot.data))
-
       return(plot.data)
     })
     # ##############################
@@ -1054,25 +1057,6 @@ profilingServer <- function(id, xpmt_data, ref_data, connec){
       # plot.data <- plot.data[which(plot.data$Sample == trel_samp),]
       plot.data <- plot.data[which(plot.data$`Fitting Error` >= trel_fethresh[1] & plot.data$`Fitting Error` <= trel_fethresh[2]),]
       plot.data
-      # if(length(plot.data[,1]) == 0){
-      #   if(!is.null(filter_trel)){
-      #     if(filter_trel > 0){
-      #       shinyWidgets::show_alert(
-      #         title = "No Data Within Range",
-      #         text = "There are no trelliscopes that fit the parameters that you've given. Please change them and Apply Filters",
-      #         type = "error"
-      #       )
-      # }}}
-      # if(length(unique(plot.data$Signal) > 1000)){
-      #   if(filter_trel > 0){
-      #     shinyWidgets::show_alert(
-      #       title = "Too Many Trelliscopes in Memory",
-      #       text = "The parameters you've given (or the default parameters) generate too many trelliscopes at once (>1000). Please change the parameters and Apply Filters",
-      #       type = "error"
-      #     )
-      # }}
-      # req(length(plot.data[,1]) > 0)
-      # req(length(unique(plot.data$Signal) <= 1000))
     })
     output$trelliscope <- renderPlot({
       #browser()
@@ -1122,7 +1106,21 @@ profilingServer <- function(id, xpmt_data, ref_data, connec){
         ggplot2::geom_line(data = filt_temp, ggplot2::aes(x = Xdata, y = .data$value, color= .data$variable), alpha = 0.5)+
         ggplot2::xlab('PPM') + ggplot2::ylab('Intensity') + ggplot2::theme_bw() + ggplot2::ggtitle(sample[6])
 
-      gridExtra::grid.arrange(p1,p2,p3,p4,p5,p6, ncol = 2)
+      g_legend<-function(a.gplot){
+        tmp <- ggplot2::ggplot_gtable(ggplot2::ggplot_build(a.gplot))
+        leg <- which(sapply(tmp$grobs, function(x) x$name) == "guide-box")
+        legend <- tmp$grobs[[leg]]
+        return(legend)}
+
+      mylegend<-g_legend(p1)
+
+      gridExtra::grid.arrange(gridExtra::arrangeGrob(p1 + ggplot2::theme(legend.position="none"),
+                                          p2 + ggplot2::theme(legend.position="none"),
+                                          p3 + ggplot2::theme(legend.position="none"),
+                                          p4 + ggplot2::theme(legend.position="none"),
+                                          p5 + ggplot2::theme(legend.position="none"),
+                                          p6 + ggplot2::theme(legend.position="none"),
+                                          ncol = 2), mylegend, ncol=2, widths=c(10, 2))
 
       # plist <- list()
       # for(i in 1:num_samps){
@@ -1336,7 +1334,6 @@ profilingServer <- function(id, xpmt_data, ref_data, connec){
       req(xpmt_data())
       req(ref_data())
       plot.data <- plot.data()
-      print(unique(plot.data$Sample))
       # req(!is.null(plot.data))
       #browser()
       # Allows users to select which sample spectrum to display.
@@ -1346,11 +1343,10 @@ profilingServer <- function(id, xpmt_data, ref_data, connec){
                                                label = "Specify a Fitting Error range:",
                                                value = c(0.5,100))),
         column(4,
-               selectizeInput(inputId = NS(id, "trel_samp"),
-                           label   = "Select a sample ",
-                           choices = unique(plot.data$Sample),
-                           selected = unique(plot.data$Sample),
-                           multiple = T)
+               selectInput(inputId = NS(id, "trel_sign"),
+                           label   = "Select a signal",
+                           choices = unique(plot.data$Signal),
+                           selected = unique(plot.data$Signal)[1]),
       ))
     })
     output$spectra_ui <- renderUI({
@@ -1362,11 +1358,14 @@ profilingServer <- function(id, xpmt_data, ref_data, connec){
       #browser()
       # Allows users to select which sample spectrum to display.
       fluidRow(
-        column(4,
-          selectInput(inputId = NS(id, "trel_sign"),
-                      label   = "Select a signal",
-                      choices = unique(plot.data2$Signal)),
-                      selected = unique(plot.data2$Signal)[1]),
+        column(8,
+               selectizeInput(inputId = NS(id, "trel_samp"),
+                                               label   = "Select a sample ",
+                                               choices = unique(plot.data2$Sample),
+                                               selected = unique(plot.data2$Sample),
+                                               multiple = T,
+                                               size = 8)),
+
         column(4,
           actionButton(inputId = NS(id, "filter_plot"),
                        label = "Apply Filter",
@@ -1950,8 +1949,22 @@ profilingServer <- function(id, xpmt_data, ref_data, connec){
         Xdata        <- imported_data$ppm[ROI_buckets]
 
         #Read df column 'Quantification Mode'
-        fitting_type <- as.character(ROI_profile[1, 3])
+        fitting_type <- as.character(ref_quant_table_data$data$`Quantification Mode`[1])
         print(fitting_type)
+        print("")
+        print(ref_quant_table_data$data)
+        print("")
+        print(ref_quant_table_data$data$`Quantification Mode`)
+        possible_fit_types <- c("baseline fitting", "baseline sum")
+        if(!(tolower(fitting_type) %in% possible_fit_types)){
+          shinyWidgets::show_alert(
+            title = "Quantification Mode not supported.",
+            text = "\"Baseline Fitting\" and \"Baseline Sum\" are the only supported quantification mode.
+            Please make sure every row in the Quantification Mode column contains one of these. This entry will be skipped",
+            type = "error"
+          )
+          next
+        }
 
         if (length(grep("Clean",fitting_type)) == 1) {
           program_parameters$clean_fit <- "Y"
