@@ -676,7 +676,7 @@ ref_data_editingServer <- function(id, xpmt_data, ref_data, ref_db, connec){
         shinyBS::bsTooltip(id = NS(id, "show_subplot_help"),
                            title     = "Use the Box Select tool in the upper-right corner of the plot to select a region to be shown in a subplot.",
                            placement = "bottom",
-                           trigger   = "hover"),
+                           trigger   = "click"),
 
 
         # HTML output to display the filters currently applied
