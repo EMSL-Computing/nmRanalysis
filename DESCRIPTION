@@ -62,7 +62,8 @@ Imports:
     minpack.lm,
     reshape2,
     rlist,
-    shinyBS
+    shinyBS,
+    parsnip
 Suggests:
     knitr,
     rmarkdown,

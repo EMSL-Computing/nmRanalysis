@@ -1,4 +1,4 @@
-FROM code-registry.emsl.pnl.gov/emslc60117/nmranalysisappbaseimage:main-0.0.1
+FROM code-registry.emsl.pnl.gov/emslc60117/nmranalysisappbaseimage:main-1.0.0
 
 COPY . /srv/shiny/nmRanalysis/
 

@@ -284,6 +284,14 @@ xpmt_data_uploadServer <- function(id, connec){
                                           # Fill in all NA intensity values with 0 (as per RY)
                                           xpmt.e_data <- xpmt.e_data %>% dplyr::mutate_at(c(2:ncol(xpmt.e_data)), ~replace(., is.na(.), 0))
 
+
+                                          # Force numeric values and remove rows with NAs in PPM column
+                                          suppressWarnings({
+                                            xpmt.e_data <- xpmt.e_data %>% dplyr::mutate_at(c(2:ncol(xpmt.e_data)), ~as.numeric(.))
+                                            xpmt.e_data <- xpmt.e_data %>% dplyr::filter(!is.na(PPM))
+                                          })
+
+
                                           # Check that no column names are strictly numeric, which may imply a lack of headers
                                           fmtcheck1   <- all(is.na(suppressWarnings(as.numeric(gsub("X", "", colnames(xpmt.e_data)[-1])))))
                                           if(!fmtcheck1){
@@ -305,6 +313,7 @@ xpmt_data_uploadServer <- function(id, connec){
 
                                           # Check that the column values are all numeric, or may be represented as numeric.
                                           fmtcheck2   <- all(apply(xpmt.e_data,2,function(x){all(!is.na(suppressWarnings(as.numeric(x))))}))
+
 
                                           if(!fmtcheck2){
                                             shinyWidgets::show_alert(

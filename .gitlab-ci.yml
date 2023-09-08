@@ -5,11 +5,10 @@ include:
 stages:
 - check
 - build
-
-variables:
   CONTAINER_VERSION: 1.0.14
   CONTAINER_TAG: $CI_COMMIT_BRANCH-$CONTAINER_VERSION
   KANIKO_EXTRA_ARGS: --git branch=$CI_COMMIT_BRANCH
+  GIT_DEPTH: 10
 
 #Check to see if the image already exists and blocks overwriting an existing image. (New image = new tag, never overwrite, is a best practice.)
 verify-new-image:
@@ -39,3 +38,6 @@ deply-token-to-cluster:
     - k8s
     - rzr
     - nmranalysis
+  variables:
+    KUBERNETES_HELPER_MEMORY_REQUEST: 256Mi
+    KUBERNETES_HELPER_MEMORY_LIMIT: 256Mi
