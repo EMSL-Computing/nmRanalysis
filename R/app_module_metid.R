@@ -641,7 +641,16 @@ metid_Server <- function(id, xpmt_data){
                                 PPM = ifelse(PPM == "3.75", "3.7500000000000004", PPM)) %>%
                   dplyr::relocate(PPM) %>%
                   as.data.frame()
+
+                # check which bw1_bins are not in edat, and add them in if not present
+                miss_ppms <- bw1_bins[!(bw1_bins %in% edat$PPM)]
+                miss_ppms <- miss_ppms[miss_ppms != "3.75"]
+                edat[(nrow(edat)+1):(nrow(edat)+length(miss_ppms)), 1] <- miss_ppms
+                edat[is.na(edat)] <- 0
+                edat <- edat %>%
+                  dplyr::arrange(desc(PPM))
                 rownames(edat) <- edat$PPM
+
                 edat <- edat %>%
                   dplyr::select(-PPM) %>%
                   t() %>%
@@ -744,7 +753,16 @@ metid_Server <- function(id, xpmt_data){
                                 PPM = ifelse(PPM == "3.75", "3.7500000000000004", PPM)) %>%
                   dplyr::relocate(PPM) %>%
                   as.data.frame()
+
+                # check which bw1_bins are not in edat, and add them in if not present
+                miss_ppms <- bw1_bins[!(bw1_bins %in% edat$PPM)]
+                miss_ppms <- miss_ppms[miss_ppms != "3.75"]
+                edat[(nrow(edat)+1):(nrow(edat)+length(miss_ppms)), 1] <- miss_ppms
+                edat[is.na(edat)] <- 0
+                edat <- edat %>%
+                  dplyr::arrange(desc(PPM))
                 rownames(edat) <- edat$PPM
+
                 edat <- edat %>%
                   dplyr::select(-PPM) %>%
                   t() %>%
