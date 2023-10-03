@@ -631,7 +631,7 @@ ref_data_uploadServer <- function(id, xpmt_data, metids, ref_db, connec){
 
                                              user_reference_data <- user_reference_data %>%
                                                dplyr::group_by(.data$`Quantification Mode`, .data$`Metabolite`, .data$`Quantification Signal`, .data$`Frequency (MHz)`,
-                                                               .data$`pH`, .data$`Concentration (mM)`, .data$`Temperature (K)`, .data$`Solvent`, .data$`user`) %>%
+                                                               .data$`pH`, .data$`Concentration (mM)`, .data$`Temperature (K)`, .data$`Solvent`) %>%
                                                dplyr::summarise(dplyr::across(dplyr::all_of(c('ROI left edge (ppm)', 'ROI right edge (ppm)', 'Chemical shift(ppm)',	'Chemical shift tolerance (ppm)',
                                                                                               'Half bandwidth (Hz)', 'J coupling (Hz)',	'Roof effect', 'J coupling 2 (Hz)',
                                                                                               'Roof effect 2')), mean, na.rm = TRUE),
