@@ -2331,6 +2331,8 @@ ref_data_editingServer <- function(id, xpmt_data, ref_data, ref_db, connec){
                    req(input$which_refmet_dspedt)
                    req(input$signal_add > 0)
 
+                   #browser()
+
                    # Count the number of existing signals for the given metabolite
                    numSigs <- nrow(rv$user_reference_data %>% dplyr::filter(.data$Metabolite %in% input$which_refmet_dspedt))
 
@@ -2360,6 +2362,9 @@ ref_data_editingServer <- function(id, xpmt_data, ref_data, ref_db, connec){
                                                                                             NA, attr(xpmt_data(), "exp_info")$solvent),
                                                   `rowid`                          = paste0(input$which_refmet_dspedt, numSigs + 1),
                                                   check.names = FALSE)
+
+                   rv$user_reference_data$`Quantification Signal` <- as.character(rv$user_reference_data$`Quantification Signal`)
+                   rv$unedited_bestmatch_ref_data$`Quantification Signal` <- as.character(rv$unedited_bestmatch_ref_data$`Quantification Signal`)
 
                    rv$user_reference_data <- dplyr::bind_rows(rv$user_reference_data, added_entry_data)
                    rv$unedited_bestmatch_ref_data <- dplyr::bind_rows(rv$unedited_bestmatch_ref_data, added_entry_data)
