@@ -614,19 +614,39 @@ ref_data_uploadServer <- function(id, xpmt_data, metids, ref_db, connec){
                                              profiling.df <- query_table(db_connection = connec(), table_name="profiling_parameters")
                                              user.name <- Sys.getenv(c("SHINYPROXY_USERNAME"))
                                              #specify authorized user group to subset on
-                                             user_authparameter_data <- subset(profiling.df, user=user.name)
-                                             user_authparameter_data <- profiling.df %>% dplyr::filter(.data$Metabolite %in% input$user_refmets) %>%
-                                               dplyr::select(-user, -rowid, -id, -Quantify)
+                                             auth.users <- c('anastasiya.prymolenna@pnnl.gov',
+                                                             'elizabeth.eder@pnnl.gov',
+                                                             'javier.flores@pnnl.gov',
+                                                             'logan.lewis@pnnl.gov',
+                                                             'robert.young@pnnl.gov',
+                                                             'william.kew@pnnl.gov',
+                                                             'david.hoyt@pnnl.gov')
+
+                                             # replace the next two lines with subset code
+                                             user_authparameter_data <- profiling.df[profiling.df$user %in% auth.users,]
                                              # rbind the two dataframes
                                              user_reference_data <- rbind.data.frame(user_reference_data,
                                                                                      user_authparameter_data)
                                              # final step = average like in commented code below.
 
+                                             user_reference_data <- user_reference_data %>%
+                                               dplyr::group_by(.data$`Quantification Mode`, .data$`Metabolite`, .data$`Quantification Signal`, .data$`Frequency (MHz)`,
+                                                               .data$`pH`, .data$`Concentration (mM)`, .data$`Temperature (K)`, .data$`Solvent`) %>%
+                                               dplyr::summarise(dplyr::across(dplyr::all_of(c('ROI left edge (ppm)', 'ROI right edge (ppm)', 'Chemical shift(ppm)',	'Chemical shift tolerance (ppm)',
+                                                                                              'Half bandwidth (Hz)', 'J coupling (Hz)',	'Roof effect', 'J coupling 2 (Hz)',
+                                                                                              'Roof effect 2')), mean, na.rm = TRUE),
+                                                                dplyr::across(dplyr::all_of(c('Multiplicity')), getmode, useNA = "no")) %>%
+                                               dplyr::select(.data$`ROI left edge (ppm)`, .data$`ROI right edge (ppm)`, .data$`Quantification Mode`,
+                                                             .data$`Metabolite`,	.data$`Quantification Signal`, .data$`Chemical shift(ppm)`,
+                                                             .data$`Chemical shift tolerance (ppm)`, .data$`Half bandwidth (Hz)`, .data$`Multiplicity`,
+                                                             .data$`J coupling (Hz)`,	.data$`Roof effect`, .data$`J coupling 2 (Hz)`, .data$`Roof effect 2`,
+                                                             .data$`Frequency (MHz)`, .data$`pH`, .data$`Concentration (mM)`, .data$`Temperature (K)`, .data$`Solvent`) %>%
+                                               dplyr::arrange(.data$`ROI left edge (ppm)`)
                                            }
 
                                             user_reference_data <- user_reference_data %>%
                                               dplyr::group_by(.data$`Quantification Mode`, .data$`Metabolite`, .data$`Quantification Signal`, .data$`Frequency (MHz)`,
-                                                              .data$`pH`, .data$`Concentration (mM)`, .data$`Temperature (K)`, .data$`Solvent`) %>%
+                                                              .data$`pH`, .data$`Concentration (mM)`, .data$`Temperature (K)`, .data$`Solvent`, .data$`user`) %>%
                                               dplyr::summarise(dplyr::across(dplyr::all_of(c('ROI left edge (ppm)', 'ROI right edge (ppm)', 'Chemical shift(ppm)',	'Chemical shift tolerance (ppm)',
                                                                                              'Half bandwidth (Hz)', 'J coupling (Hz)',	'Roof effect', 'J coupling 2 (Hz)',
                                                                                              'Roof effect 2')), mean, na.rm = TRUE),
