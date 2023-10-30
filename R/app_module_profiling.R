@@ -30,6 +30,7 @@ profiling_quant_sidebarUI <- function(id){
   ns <- NS(id)
   tagList(
     uiOutput(ns("ui_global_profiling_parameters")),
+    uiOutput(ns("prof_type_select")),
     uiOutput(ns("ui_auto_profile"))
   )
 }
@@ -111,7 +112,7 @@ profiling_completeviewUI <- function(id){
   tagList(
     #shinycssloaders::withSpinner(trelliscopejs::trelliscopeOutput(ns("trelliscope"))),
     shinycssloaders::withSpinner(plotOutput(ns("trelliscope"))),
-    uiOutput(ns("trelvizoptions_ui")),
+    uiOutput(ns("graph_switch_ui")),
     uiOutput(ns("spectra_ui")),
     br(),
     DT::dataTableOutput(ns("complete_profres_tab"))
@@ -546,11 +547,27 @@ profilingServer <- function(id, xpmt_data, ref_data, connec){
       )
     })
 
+    #Select input to let users choose whether to run signals as BL Fitting or BL Sum
+    output$prof_type_select <- renderUI({
+      req(ref_data())
+      # #grabing relevant signals
+      # temp <- ref_data()$user_edited_refdata[,c("Metabolite", "Quantification Signal", "Quantify")]
+      # temp$Signal <- paste0(temp$Metabolite, " [", temp$`Quantification Signal`, "]")
+      # temp <- dplyr::filter(temp, Quantify >= 1)
+
+      ROIvec <- unique(paste0("(", ref_data()$quantdata$`ROI right edge (ppm)`, ", ", ref_data()$quantdata$`ROI left edge (ppm)`, ")"))
+      #browser()
+      selectizeInput(inputId = NS(id, "select_bs_sum"),
+                     label = "Choose which signals to profile using Baseline Sum instead of Baseline Fitting.",
+                     choices = ROIvec,
+                     width = "100%",
+                     multiple = TRUE)
+    })
+
     # Dynamic action button to automatically profile reference metabolite data. Only appears after
     # reference metabolite data are uploaded.
     output$ui_auto_profile <- renderUI({
       req(ref_data())
-      #browser()
       # clickable button
       shinyWidgets::actionBttn(inputId = NS(id, "auto_profile"),
                                label = "Profile",
@@ -565,7 +582,7 @@ profilingServer <- function(id, xpmt_data, ref_data, connec){
       #browser()
       if(any(Reduce("c", lapply(ref_data()$global_parameters, is.null)))){
         shinyBS::bsCollapse(id = NS(id, "global_fitting_params"),
-                            shinyBS::bsCollapsePanel(title = "Global Profiling Parameters",
+                            shinyBS::bsCollapsePanel(title = "▽ Global Profiling Parameters",
                                                      # These are never used by rDolphin...not sure why they are defined
                                                      # fluidRow(
                                                      #   column(width = 6,
@@ -723,7 +740,7 @@ profilingServer <- function(id, xpmt_data, ref_data, connec){
                             ))
       } else{
         shinyBS::bsCollapse(id = NS(id, "global_fitting_params"),
-                            shinyBS::bsCollapsePanel(title = "Global Profiling Parameters",
+                            shinyBS::bsCollapsePanel(title = "▽ Global Profiling Parameters",
                                                      # These are never used by rDolphin...not sure why they are defined
                                                      # fluidRow(
                                                      #   column(width = 6,
@@ -1043,68 +1060,82 @@ profilingServer <- function(id, xpmt_data, ref_data, connec){
       return(plot.data)
     })
     # ##############################
-    #
-    # # plot.data <- format_plotting(profiling_data = user_profiling)
-    # # plot.data <- plotdataall2
     plot.data2 <- reactive({
-      #creating temp dir for telliscope
-      #browser()
-      treldir <- file.path(tempdir(), paste0("Result_", format(Sys.time(), format = "%H-%m-%s", tz = "UTC")))
-      # dir.create(treldir)
-      # trel_samp <- input$trel_samp
-      trel_fethresh <- input$trel_fethresh
+      # trel_fethresh <- input$trel_fethresh
       plot.data <- plot.data()
-      # plot.data <- plot.data[which(plot.data$Sample == trel_samp),]
-      plot.data <- plot.data[which(plot.data$`Fitting Error` >= trel_fethresh[1] & plot.data$`Fitting Error` <= trel_fethresh[2]),]
+      # #Grabbing signals that were profiled with Baseline Sum, since they have "NA" fitting error
+      # plot.data_BLS <- plot.data[which(is.na(plot.data$`Fitting Error`)),]
+      # plot.data <- plot.data[which(plot.data$`Fitting Error` >= trel_fethresh[1] & plot.data$`Fitting Error` <= trel_fethresh[2]),]
+      # #Adding Baseline Sum profiled signals
+      # plot.data <- rbind(plot.data, plot.data_BLS)
       plot.data
     })
-    output$trelliscope <- renderPlot({
-      #browser()
+    plot.data3 <- reactive({
+      # browser()
       plot.data2 <- plot.data2()
       signal <- input$trel_sign
+      filt_range_low <-input$trel_fethresh[1]
+      filt_range_high <- input$trel_fethresh[2]
+      shown_prof_type <- isolate(input$shown_prof_type)
+      if(shown_prof_type == "Baseline Fitting"){
+        choices2 <- unique(plot.data2$Sample[which(plot.data2$`Fitting Error` >= filt_range_low & plot.data2$`Fitting Error` <= filt_range_high & signal == plot.data2$Signal)])
+        updateSelectizeInput(session, "trel_samp",
+                     choices = choices2,
+                     selected = choices2[1:6])
+      }
+      plot.data2
+    })
+      
+    output$trelliscope <- renderPlot({
+      
+      plot.data3 <- plot.data3()
+      filter_plot <- input$filter_plot
+      signal <- input$trel_sign
       sample <- input$trel_samp
+      
       num_samps <- length(sample)
       if(num_samps > 6){
         for(i in 1:(6 - length(sample)))
           sample <- c(sample, NA)
       }
-      filt_samp <- plot.data2 %>% dplyr::filter(plot.data2$Signal == signal)
+      
+      filt_samp <- plot.data3 %>% dplyr::filter(plot.data3$Signal == signal)
 
       filt_temp <- filt_samp %>% dplyr::filter(filt_samp$Sample == sample[1])
       p1 <- ggplot2::ggplot(data = filt_temp, ggplot2::aes(x = Xdata, y = .data$value, color = .data$variable))+
               ggplot2::geom_line() +
               ggplot2::geom_line(data = filt_temp, ggplot2::aes(x = Xdata, y = .data$value, color= .data$variable), alpha = 0.5)+
-              ggplot2::xlab('PPM') + ggplot2::ylab('Intensity') + ggplot2::theme_bw() + ggplot2::ggtitle(sample[1])
+              ggplot2::xlab('PPM') + ggplot2::ylab('Intensity') + ggplot2::theme_bw() + ggplot2::ggtitle(paste0(sample[1], "  Fitting Error: ", filt_temp$`Fitting Error`[1]))
 
       filt_temp <- filt_samp %>% dplyr::filter(filt_samp$Sample == sample[2])
       p2 <- ggplot2::ggplot(data = filt_temp, ggplot2::aes(x = Xdata, y = .data$value, color = .data$variable))+
         ggplot2::geom_line() +
         ggplot2::geom_line(data = filt_temp, ggplot2::aes(x = Xdata, y = .data$value, color= .data$variable), alpha = 0.5)+
-        ggplot2::xlab('PPM') + ggplot2::ylab('Intensity') + ggplot2::theme_bw() + ggplot2::ggtitle(sample[2])
+        ggplot2::xlab('PPM') + ggplot2::ylab('Intensity') + ggplot2::theme_bw() + ggplot2::ggtitle(paste0(sample[2], "  Fitting Error: ", filt_temp$`Fitting Error`[1]))
 
       filt_temp <- filt_samp %>% dplyr::filter(filt_samp$Sample == sample[3])
       p3 <- ggplot2::ggplot(data = filt_temp, ggplot2::aes(x = Xdata, y = .data$value, color = .data$variable))+
         ggplot2::geom_line() +
         ggplot2::geom_line(data = filt_temp, ggplot2::aes(x = Xdata, y = .data$value, color= .data$variable), alpha = 0.5)+
-        ggplot2::xlab('PPM') + ggplot2::ylab('Intensity') + ggplot2::theme_bw() + ggplot2::ggtitle(sample[3])
+        ggplot2::xlab('PPM') + ggplot2::ylab('Intensity') + ggplot2::theme_bw() + ggplot2::ggtitle(paste0(sample[3], "  Fitting Error: ", filt_temp$`Fitting Error`[1]))
 
       filt_temp <- filt_samp %>% dplyr::filter(filt_samp$Sample == sample[4])
       p4 <- ggplot2::ggplot(data = filt_temp, ggplot2::aes(x = Xdata, y = .data$value, color = .data$variable))+
         ggplot2::geom_line() +
         ggplot2::geom_line(data = filt_temp, ggplot2::aes(x = Xdata, y = .data$value, color= .data$variable), alpha = 0.5)+
-        ggplot2::xlab('PPM') + ggplot2::ylab('Intensity') + ggplot2::theme_bw() + ggplot2::ggtitle(sample[4])
+        ggplot2::xlab('PPM') + ggplot2::ylab('Intensity') + ggplot2::theme_bw() + ggplot2::ggtitle(paste0(sample[4], "  Fitting Error: ", filt_temp$`Fitting Error`[1]))
 
       filt_temp <- filt_samp %>% dplyr::filter(filt_samp$Sample == sample[5])
       p5 <- ggplot2::ggplot(data = filt_temp, ggplot2::aes(x = Xdata, y = .data$value, color = .data$variable))+
         ggplot2::geom_line() +
         ggplot2::geom_line(data = filt_temp, ggplot2::aes(x = Xdata, y = .data$value, color= .data$variable), alpha = 0.5)+
-        ggplot2::xlab('PPM') + ggplot2::ylab('Intensity') + ggplot2::theme_bw() + ggplot2::ggtitle(sample[5])
+        ggplot2::xlab('PPM') + ggplot2::ylab('Intensity') + ggplot2::theme_bw() + ggplot2::ggtitle(paste0(sample[5], "  Fitting Error: ", filt_temp$`Fitting Error`[1]))
 
       filt_temp <- filt_samp %>% dplyr::filter(filt_samp$Sample == sample[6])
       p6 <- ggplot2::ggplot(data = filt_temp, ggplot2::aes(x = Xdata, y = .data$value, color = .data$variable))+
         ggplot2::geom_line() +
         ggplot2::geom_line(data = filt_temp, ggplot2::aes(x = Xdata, y = .data$value, color= .data$variable), alpha = 0.5)+
-        ggplot2::xlab('PPM') + ggplot2::ylab('Intensity') + ggplot2::theme_bw() + ggplot2::ggtitle(sample[6])
+        ggplot2::xlab('PPM') + ggplot2::ylab('Intensity') + ggplot2::theme_bw() + ggplot2::ggtitle(paste0(sample[6], "  Fitting Error: ", filt_temp$`Fitting Error`[1]))
 
       g_legend<-function(a.gplot){
         tmp <- ggplot2::ggplot_gtable(ggplot2::ggplot_build(a.gplot))
@@ -1113,6 +1144,14 @@ profilingServer <- function(id, xpmt_data, ref_data, connec){
         return(legend)}
 
       mylegend<-g_legend(p1)
+
+      # gridExtra::grid.arrange(gridExtra::arrangeGrob(p1 + ggplot2::theme(legend.position="none"),
+      #                                                p2 + ggplot2::theme(legend.position="none"),
+      #                                                p3 + ggplot2::theme(legend.position="none"),
+      #                                                p4 + ggplot2::theme(legend.position="none"),
+      #                                                p5 + ggplot2::theme(legend.position="none"),
+      #                                                p6 + ggplot2::theme(legend.position="none"),
+      #                                                ncol = 2))
 
       gridExtra::grid.arrange(gridExtra::arrangeGrob(p1 + ggplot2::theme(legend.position="none"),
                                           p2 + ggplot2::theme(legend.position="none"),
@@ -1329,7 +1368,7 @@ profilingServer <- function(id, xpmt_data, ref_data, connec){
       )
     })
 
-    output$trelvizoptions_ui <- renderUI({
+    output$graph_switch_ui <- renderUI({
 
       req(xpmt_data())
       req(ref_data())
@@ -1337,40 +1376,67 @@ profilingServer <- function(id, xpmt_data, ref_data, connec){
       # req(!is.null(plot.data))
       #browser()
       # Allows users to select which sample spectrum to display.
-      fluidRow(
-        column(4,
-               shinyWidgets::numericRangeInput(inputId = NS(id, "trel_fethresh"),
-                                               label = "Specify a Fitting Error range:",
-                                               value = c(0.5,100))),
-        column(4,
-               selectInput(inputId = NS(id, "trel_sign"),
-                           label   = "Select a signal",
-                           choices = unique(plot.data$Signal),
-                           selected = unique(plot.data$Signal)[1]),
-      ))
+        selectInput(inputId = NS(id, "shown_prof_type"),
+                    label   = "Show Baseline Fitting or Baseline Sum metabolite Outputs",
+                    choices = c("Baseline Fitting", "Baseline Sum"),
+                    selected = "Baseline Fitting")
     })
+    
     output$spectra_ui <- renderUI({
 
       req(xpmt_data())
       req(ref_data())
-      plot.data2 <- plot.data2()
+      isolate(plot.data2 <- plot.data2())
       req(!is.null(plot.data2))
+      req(input$shown_prof_type)
       #browser()
       # Allows users to select which sample spectrum to display.
-      fluidRow(
-        column(8,
-               selectizeInput(inputId = NS(id, "trel_samp"),
-                                               label   = "Select a sample ",
-                                               choices = unique(plot.data2$Sample),
-                                               selected = unique(plot.data2$Sample),
-                                               multiple = T,
-                                               size = 8)),
-
-        column(4,
-          actionButton(inputId = NS(id, "filter_plot"),
-                       label = "Apply Filter",
-                       style="color: #fff; background-color: #337ab7; border-color: #2e6da4")))
-    })
+      if(input$shown_prof_type == "Baseline Fitting"){
+        plot.data2 <- plot.data2[which(!is.na(plot.data2$`Fitting Error`)),]
+        fluidRow(
+          column(3,
+                 shinyWidgets::numericRangeInput(inputId = NS(id, "trel_fethresh"),
+                                                 label = "Specify a Fitting Error range:",
+                                                 value = c(0.5,100))),
+          column(3,
+                 selectizeInput(inputId = NS(id, "trel_sign"),
+                             label   = "Select a signal",
+                             choices = plot.data2$Signal,
+                             selected = plot.data2$Signal[1],
+                             multiple = F,
+                             size = 1),
+          ),
+          column(3,
+                 selectizeInput(inputId = NS(id, "trel_samp"),
+                                                 label   = "Select a sample ",
+                                                 choices = plot.data2$Sample,
+                                                 selected = unique(plot.data2$Sample),
+                                                 multiple = T,
+                                                 size = 8)),
+          column(3,
+            actionButton(inputId = NS(id, "filter_plot"),
+                         label = "Apply Filter",
+                         style="color: #fff; background-color: #337ab7; border-color: #2e6da4")))
+      } else{
+        fluidRow(
+          column(4,
+                 selectInput(inputId = NS(id, "trel_sign"),
+                             label   = "Select a signal",
+                             choices = unique(plot.data2$Signal[which(is.na(plot.data2$`Fitting Error`))],),
+                             selected = unique(plot.data2$Signal)[1]),
+          ),
+          column(4,
+                 selectizeInput(inputId = NS(id, "trel_samp"),
+                                label   = "Select a sample ",
+                                choices = unique(plot.data2$Sample),
+                                selected = unique(plot.data2$Sample),
+                                multiple = T,
+                                size = 8)),
+          column(4,
+                 actionButton(inputId = NS(id, "filter_plot"),
+                              label = "Apply Filter",
+                              style="color: #fff; background-color: #337ab7; border-color: #2e6da4")))
+      }})
 
 
     # Output (in HTML format) to display the filters that are currently applied to the data.
@@ -1826,7 +1892,7 @@ profilingServer <- function(id, xpmt_data, ref_data, connec){
       req(xpmt_data())
       req(ref_data())
       req(input$profile_confirm)
-      # browser()
+      #browser()
 
       shinyWidgets::progressSweetAlert(
         session = shiny::getDefaultReactiveDomain(),
@@ -1948,23 +2014,24 @@ profilingServer <- function(id, xpmt_data, ref_data, connec){
 
         Xdata        <- imported_data$ppm[ROI_buckets]
 
-        #Read df column 'Quantification Mode'
-        fitting_type <- as.character(ref_quant_table_data$data$`Quantification Mode`[1])
-        print(fitting_type)
-        print("")
-        print(ref_quant_table_data$data)
-        print("")
-        print(ref_quant_table_data$data$`Quantification Mode`)
-        possible_fit_types <- c("baseline fitting", "baseline sum")
-        if(!(tolower(fitting_type) %in% possible_fit_types)){
-          shinyWidgets::show_alert(
-            title = "Quantification Mode not supported.",
-            text = "\"Baseline Fitting\" and \"Baseline Sum\" are the only supported quantification mode.
-            Please make sure every row in the Quantification Mode column contains one of these. This entry will be skipped",
-            type = "error"
-          )
-          next
+
+        # signal <- paste0(ROI_profile$Metabolite, " [", ROI_profile$`Quantification.Signal`, "]")
+        signal <-unique(paste0("(", ROI_profile$ROI.right.edge..ppm., ", ", ROI_profile$ROI.left.edge..ppm., ")"))
+        if(signal %in% input$select_bs_sum){
+          fitting_type <- "Baseline Sum"
+        } else{
+          fitting_type <- "Baseline Fitting"
         }
+        # possible_fit_types <- c("baseline fitting", "baseline sum")
+        # if(!(tolower(fitting_type) %in% possible_fit_types)){
+        #   shinyWidgets::show_alert(
+        #     title = "Quantification Mode not supported.",
+        #     text = "\"Baseline Fitting\" and \"Baseline Sum\" are the only supported quantification mode.
+        #     Please make sure every row in the Quantification Mode column contains one of these. This entry will be skipped",
+        #     type = "error"
+        #   )
+        #   next
+        # }
 
         if (length(grep("Clean",fitting_type)) == 1) {
           program_parameters$clean_fit <- "Y"

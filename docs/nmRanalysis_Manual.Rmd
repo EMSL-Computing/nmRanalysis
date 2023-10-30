@@ -1,6 +1,6 @@
 ---
 title: "nmRanalysis Manual"
-author: "Javier E. Flores, Anastasiya V. Prymolenna, Natalie M. Winans, Allison Thompson, William R. Kew, Robert P. Young, Lisa M. Bramer"
+author: "Javier E. Flores, Anastasiya V. Prymolenna, Natalie M. Winans, Logan A. Lewis, Allison Thompson, William R. Kew, Robert P. Young, Lisa M. Bramer"
 date: "Last updated: 09/28/2021"
 output:
   BiocStyle::html_document:
@@ -110,11 +110,13 @@ include_graphics("CluPA.png")
 
 Enter values for the experimental conditions Temperature (K), Spectrometer Frequency (MHz), Solvent, and, if known, pH and Concentration (mM). Note that “Concentration (mM)” refers to the concentration of the standard (e.g., DSS) in the sample. 
 
-When all required files and options have been provided/specified, click the “Process Data” button. Keep in mind that if “Align Spectra” is set to “ON”, this process will take several minutes.
-
 ```{r, echo = F}
 include_graphics("upload_data.gif")
 ```
+
+In the "Experiment Metadata" tab, enter your proposal number and PI Name, or select from the dropdown if you have entered these before. These will be saved to a database as a profile, in order to save settings and selections between sessions. Select a project name from the dropdown to make edits to a previous saved session or click the text box to name a new session.
+
+When all required files and options have been provided/specified, click the “Process Data” button. Keep in mind that if “Align Spectra” is set to “ON”, this process will take several minutes.
 
 ## Plots and Tables
 
@@ -134,15 +136,21 @@ include_graphics("subplot_box_select.gif")
 
 Chemical shift filters are applied by specifying a range of chemical shift values (in PPM) to omit from the plot. There is no limit to the number of filters that may be applied. To remove a filter, the user must type the exact chemical shift values that were initially specified for the desired filter.
 
-Progress to the next step by clicking the "Reference Data Editing" button.
+Progress to the next step by clicking the "Metabolite Identification" button.
+
+# Metabolite Identification
+
+
 
 # Reference Data Editing
 
-On this page, the user is prompted to select an import method for reference metabolite(s), either through uploading a file or specifying from list.
+On this page, the user is prompted to select an import method for reference metabolite(s), either through uploading a file, specifying from list, or loading data from a previous session.
 
-* **To specify reference metabolites using an uploaded file**, the file must be in the format of Chenomx ouput. These are tabular XLSX files in which the column names are located in the third row and the data begin on the sixth row. This file must include a column containing the CAS numbers of the relevant metabolites. An example of this file format can be downloaded [here](./ref_metab_CAS_list.xlsx).
+* **To specify reference metabolites using an uploaded file**, the file must be in the format of Chenomx output. These are tabular XLSX files in which the column names are located in the third row and the data begin on the sixth row. This file must include a column containing the CAS numbers of the relevant metabolites. An example of this file format can be downloaded [here](./ref_metab_CAS_list.xlsx).
 
 * **To specify metabolites from a list**, click the "List reference metabolite(s) of interest" box, where you can type the names of metabolites or scroll through the options to select metabolites present in the reference database. Once satisfied with your selection, click the "Query Reference Database" button. This initiates a search against our database(s) for entries corresponding to the provided list of metabolites.
+
+* **To load from a previous save**, click the "Choose a previous session:" box to show a drop down of the previous sessions tied to your user profile. Select the one you wish to load and click load previous session. The metabolites you selected in that session and the edits you made to those metabolites will populate on the right of the screen.
 
 ## Plots and Tables
 
@@ -209,27 +217,27 @@ When finished editing reference data and adjusting the signal fits, click the "P
 
 The signal fits and corresponding fitting error calculated by *nmRanalysis* are obtained using the quantitative algorithm from the package [*rDolphin*](https://link.springer.com/article/10.1007/s11306-018-1319-y). However, in *nmRanalysis*, rDolphin's original algorithm has been extended to accommodate a common additional splitting pattern, namely the doublet of doublets (dd).
 
+You can choose metabolite you wish to profile using [*rDolphin's Baseline Sum profiling function*](https://github.com/danielcanueto/rDolphin/blob/master/R/integration.R) instead of the default Baseline Fitting. Profiling with Baseline Sum does not return a Fitting Error.
+
 ## Quantification Data
 
 Upon clicking through to the "Profiling" page, the user will see a summary plot and data table of all of the edits made on the previous pages but with peaks aggregated into regions of interest (ROIs). These ROIs combine signals close to one another and group them into a single region. These groupings account for overlapping or non-overlapping signals.
 
-The "Signal View" and "Metabolite View" tabs are empty until profiling is performed, at which time they will be populated with final results and visualizations.
-
-Clicking on the gear icon at the top left of the spectral plot brings up drop-down menus allowing the user to select the spectrum to plot and the region of interest (ROI) whose fitting data should be displayed. The ROIs are represented by ordered pairs of PPM values. 
+The "Signal View" tab is empty until profiling is performed, at which time it will be populated with final results and visualizations.
 
 The [Global Profiling Parameters] values from the previous page will be carried over to the profiling page. However, these values can be adjusted from the drop-down panel on the left before profiling (e.g., to specify leeway in bandwidth or J-coupling tolerance, etc.). When satisfied with your selections, click the "Profile" button. This process takes longer when there are more metabolites to profile. When profiling is complete, the display automatically switches to the "Signal View" tab.
 
 ## Signal View
 
-The signal view tab contains a customizable [Trelliscope](https://hafen.github.io/trelliscopejs/index.html) display of metabolite peaks, which can be enlarged by clicking the diagonal opposing arrows icon in gray at the bottom right of the plot pane. These plots consist of signal-by-signal fits of a signal to particular spectrum region.
+The signal view tab contains 6 ggplot displays of metabolite peaks. These plots consist of signal-by-signal fits of a signal to particular spectrum region.
 
-The user can change number of plots viewed at once by adjusting parameters in the "Grid" menu on the left side of the plot pane. Choose which data to display by adjusting the "Labels" parameters. Filtering and sorting can be performed on the basis of sample, signal, fitting error, etc. 
+Filtering and sorting can be performed on the basis of sample, signal, and fitting error using the options below the plots and then clicking "Apply Filter". 
 
 ```{r, echo = F, out.width='120%'}
 include_graphics("trelliscope.gif")
 ```
 
-The individual plots in the Trelliscope display each show four lines:
+The individual plots in the display each show four lines:
 
 * **Generated Background:** akin to residual signal (described in [Check Signal Fit])
 * **Generated Spectrum:** sum of quantified signal, background signal, and any surrounding signals (not necessarily displayed here - can be found in metabolite view)
@@ -246,13 +254,4 @@ A data table containing the **full profiling results** with rows corresponding t
 
 ```{r, echo = F}
 include_graphics("signal_view_dt.gif")
-```
-
-
-## Metabolite View
-
-This tab displays an interactive plot showing the entirety of each spectrum, with all regions of interest associated with each profiled metabolite. Each metabolite signal annotation points to the center of its corresponding signal. By clicking on the blue and white cog icon on the top left of the plot, the user can select which spectrum and metabolites to view. As in previous panels, there is an option to view fits across sample spectra by toggling "Show subplot on box select" in the cog icon menu.
-
-```{r, echo = F}
-include_graphics("metab_view.gif")
 ```

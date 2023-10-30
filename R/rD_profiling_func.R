@@ -33,13 +33,14 @@ profiling_func <- function(spectrum_index, signals_codes, imported_data,ROI_buck
                            reproducibility_data, ROI_profile, baselinedataset, signals_to_quantify,
                            pb = NULL, reimplementation = F, max_shift = NULL, min_shift = NULL, max_intensity = NULL,
                            min_intensity = NULL, max_width = NULL, min_width = NULL, signal_index = NULL){
+  # browser()
   #Preparation of necessary variables to store figures and information of the fitting
   Ydata <- as.numeric(imported_data$dataset[spectrum_index, ROI_buckets])
 
   #If the quantification is through integration with or without baseline
   if (fitting_type == "Clean Sum" || fitting_type == "Baseline Sum") {
 
-    dummy <- integration(program_parameters$clean_fit, Xdata, Ydata, program_parameters$buck_step)
+    dummy <- integration(program_parameters$clean_fit, Xdata, Ydata, program_parameters$buck_step, interface='T')
 
     results_to_save <- dummy$results_to_save
     #Generation of useful variables specific of every quantification
@@ -109,7 +110,7 @@ profiling_func <- function(spectrum_index, signals_codes, imported_data,ROI_buck
     rownames(signals_parameters) <- c('intensity', '$chemical_shift', 'half_bandwidth', 'gaussian', 'J_coupling', 'J_coupling2')
     signals_parameters           <- rbind(signals_parameters, multiplicities, roof_effect, roof_effect2)
 
-    #Generation of output data about the fitting and of the necessary variables for the generation ofa figure
+    #Generation of output data about the fitting and of the necessary variables for the generation of a figure
     dummy <- output_generator(signals_to_quantify = signals_to_quantify,
                               fitted_signals      = fitted_signals,
                               Ydata               = Ydata_2,
