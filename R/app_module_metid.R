@@ -339,6 +339,7 @@ metid_Server <- function(id, xpmt_data){
     observe({
 
       # modfits_files <- list.files(path = "C:\\Users\\flor829\\local_projectdir\\NMR\\recommender_modeling\\Results\\model_fits")
+      # modfits_files <- list.files(path = "/Users/lewi052/model_fits")
       modfits_files <- list.files(path = "/srv/shiny/model_fits")
       modfits_nameonly <- gsub("model_", "", modfits_files)
       modfits_nameonly <- gsub(".rds", "", modfits_nameonly)
@@ -414,7 +415,9 @@ metid_Server <- function(id, xpmt_data){
         req(xpmt_data())
         req(input$recommender_metquery)
 
+        #Change to local file
         # modfits_files <- list.files(path = "C:\\Users\\flor829\\local_projectdir\\NMR\\recommender_modeling\\Results\\model_fits")
+        # modfits_files <- list.files(path = "/Users/lewi052/model_fits")
         modfits_files <- list.files(path = "/srv/shiny/model_fits")
         modfits_nameonly <- gsub("model_", "", modfits_files)
         modfits_nameonly <- gsub(".rds", "", modfits_nameonly)
@@ -474,6 +477,7 @@ metid_Server <- function(id, xpmt_data){
           modfit_selmod_file <- modfits_files[modind]
 
           # modfit_selmod <- readRDS(paste0("C:\\Users\\flor829\\local_projectdir\\NMR\\recommender_modeling\\Results\\model_fits\\", modfit_selmod_file))
+          # modfit_selmod <- list.files(path = paste0("/Users/lewi052/model_fits", modfit_selmod_file))
           modfit_selmod <- readRDS(paste0("/srv/shiny/model_fits/", modfit_selmod_file))
           bw1_bins <- as.numeric(c("9.95", "9.85", "9.75", "9.65", "9.55", "9.45", "9.35", "9.25", "9.15",
                                    "9.05", "8.95", "8.85", "8.75", "8.65", "8.55", "8.45", "8.35", "8.25",
@@ -573,6 +577,7 @@ metid_Server <- function(id, xpmt_data){
       query_tol <- input$metid_querytol
 
       # modfits_files <- list.files(path = "C:\\Users\\flor829\\local_projectdir\\NMR\\recommender_modeling\\Results\\model_fits")
+      # modfits_files <- list.files(path = "/Users/lewi052/model_fits")
       modfits_files <- list.files(path = "/srv/shiny/model_fits")
       modfits_nameonly <- gsub("model_", "", modfits_files)
       modfits_nameonly <- gsub(".rds", "", modfits_nameonly)
@@ -613,6 +618,7 @@ metid_Server <- function(id, xpmt_data){
 
               } else{
                 # modfit_selmod <- readRDS(paste0("C:\\Users\\flor829\\local_projectdir\\NMR\\recommender_modeling\\Results\\model_fits\\", modfit_selmod_file))
+                # modfit_selmod <- readRDS(paste0("/Users/lewi052/model_fits", modfit_selmod_file))
                 modfit_selmod <- readRDS(paste0("/srv/shiny/model_fits/", modfit_selmod_file))
                 bw1_bins <- as.numeric(c("9.95", "9.85", "9.75", "9.65", "9.55", "9.45", "9.35", "9.25", "9.15",
                                          "9.05", "8.95", "8.85", "8.75", "8.65", "8.55", "8.45", "8.35", "8.25",
@@ -684,9 +690,26 @@ metid_Server <- function(id, xpmt_data){
           dplyr::rename(`Peak Location` = `Chemical shift(ppm)`) %>%
           DT::datatable(rownames = FALSE,
                         filter = "top",
+                        extensions = c("Buttons"),
                         selection = "single",
                         options = exprToFunction(
                           list(dom = 'Bfrtip',
+                               buttons = list(
+                                 list(extend = 'csv', text = "Download Current Page (CSV)",
+                                      filename =  paste0(lubridate::year(lubridate::now()), "-",
+                                                         lubridate::month(lubridate::now()), "-",
+                                                         lubridate::day(lubridate::now()), "_",
+                                                         "Detailed_Model_Results_Filtered.csv"),
+                                      exportOptions = list(
+                                        modifier = list(page = "current")
+                                      )),
+                                 list(extend = 'csv', text = "Download Full Results (CSV)",
+                                      filename =  paste0(lubridate::year(lubridate::now()), "-",
+                                                         lubridate::month(lubridate::now()), "-",
+                                                         lubridate::day(lubridate::now()), "_",
+                                                         "Detailed_Model_Results_Full.csv"),
+                                      exportOptions = list(
+                                        modifier = list(page = "all")))),
                                scrollX = TRUE)),
                         class = 'display') %>%
           DT::formatRound(columns = c("Peak Location", "Frequency (MHz)",
@@ -727,6 +750,7 @@ metid_Server <- function(id, xpmt_data){
 
               } else{
                 # modfit_selmod <- readRDS(paste0("C:\\Users\\flor829\\local_projectdir\\NMR\\recommender_modeling\\Results\\model_fits\\", modfit_selmod_file))
+                # modfit_selmod <- readRDS(paste0("/Users/lewi052/model_fits", modfit_selmod_file))
                 modfit_selmod <- readRDS(paste0("/srv/shiny/model_fits/", modfit_selmod_file))
                 bw1_bins <- as.numeric(c("9.95", "9.85", "9.75", "9.65", "9.55", "9.45", "9.35", "9.25", "9.15",
                                          "9.05", "8.95", "8.85", "8.75", "8.65", "8.55", "8.45", "8.35", "8.25",
@@ -798,9 +822,26 @@ metid_Server <- function(id, xpmt_data){
           dplyr::rename(`Peak Location` = `Chemical shift(ppm)`) %>%
           DT::datatable(rownames = FALSE,
                         filter = "top",
+                        extensions = c("Buttons"),
                         selection = "single",
                         options = exprToFunction(
                           list(dom = 'Bfrtip',
+                               buttons = list(
+                                 list(extend = 'csv', text = "Download Current Page (CSV)",
+                                      filename =  paste0(lubridate::year(lubridate::now()), "-",
+                                                         lubridate::month(lubridate::now()), "-",
+                                                         lubridate::day(lubridate::now()), "_",
+                                                         "Detailed_Model_Results_Filtered.csv"),
+                                      exportOptions = list(
+                                        modifier = list(page = "current")
+                                      )),
+                                 list(extend = 'csv', text = "Download Full Results (CSV)",
+                                      filename =  paste0(lubridate::year(lubridate::now()), "-",
+                                                         lubridate::month(lubridate::now()), "-",
+                                                         lubridate::day(lubridate::now()), "_",
+                                                         "Detailed_Model_Results_Full.csv"),
+                                      exportOptions = list(
+                                        modifier = list(page = "all")))),
                                scrollX = TRUE)),
                         class = 'display') %>%
           DT::formatRound(columns = c("Peak Location", "Frequency (MHz)",
@@ -858,6 +899,7 @@ metid_Server <- function(id, xpmt_data){
 
         # (6/6/23) check modfits files for metabolite
         # modfits_files <- list.files(path = "C:\\Users\\flor829\\local_projectdir\\NMR\\recommender_modeling\\Results\\model_fits")
+        # modfits_files <- list.files(path = "/Users/lewi052/model_fits")
         modfits_files <- list.files(path = "/srv/shiny/model_fits")
         modfits_nameonly <- gsub("model_", "", modfits_files)
         modfits_nameonly <- gsub(".rds", "", modfits_nameonly)
