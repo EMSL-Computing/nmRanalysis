@@ -560,8 +560,25 @@ metid_Server <- function(id, xpmt_data){
           DT::datatable(rownames = FALSE,
                         filter = "top",
                         selection = "single",
+                        extensions = c("Buttons"),
                         options = exprToFunction(
                           list(dom = 'Bfrtip',
+                               buttons = list(
+                                 list(extend = 'csv', text = "Download Current Page (CSV)",
+                                      filename =  paste0(lubridate::year(lubridate::now()), "-",
+                                                         lubridate::month(lubridate::now()), "-",
+                                                         lubridate::day(lubridate::now()), "_",
+                                                         "Detailed_Model_Results_Filtered.csv"),
+                                      exportOptions = list(
+                                        modifier = list(page = "current")
+                                      )),
+                                 list(extend = 'csv', text = "Download Full Results (CSV)",
+                                      filename =  paste0(lubridate::year(lubridate::now()), "-",
+                                                         lubridate::month(lubridate::now()), "-",
+                                                         lubridate::day(lubridate::now()), "_",
+                                                         "Detailed_Model_Results_Full.csv"),
+                                      exportOptions = list(
+                                        modifier = list(page = "all")))),
                                scrollX = TRUE)),
                         class = 'display') %>%
           DT::formatRound(columns = c("Probability", "PR_AUC","ROC_AUC"),
