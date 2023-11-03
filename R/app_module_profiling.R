@@ -1092,9 +1092,18 @@ profilingServer <- function(id, xpmt_data, ref_data, connec){
       filter_plot <- input$filter_plot
       signal <- input$trel_sign
       sample <- input$trel_samp
+      req(!is.null(input$trel_sign))
       
-      num_samps <- length(sample)
-      if(num_samps > 6){
+      if(length(sample) == 0){
+        shinyWidgets::show_alert(
+          title = "No applicable graphs",
+          text = "There are no applicable graphs based on the filters selected. Please change the settings and try again.",
+          type = "error"
+        )
+      }
+      req(length(sample) > 0)
+      
+      if(length(sample) > 6){
         for(i in 1:(6 - length(sample)))
           sample <- c(sample, NA)
       }
@@ -1401,15 +1410,15 @@ profilingServer <- function(id, xpmt_data, ref_data, connec){
           column(3,
                  selectizeInput(inputId = NS(id, "trel_sign"),
                              label   = "Select a signal",
-                             choices = plot.data2$Signal,
-                             selected = plot.data2$Signal[1],
+                             choices = unique(plot.data2$Signal),
+                             selected = unique(plot.data2$Signal)[1],
                              multiple = F,
                              size = 1),
           ),
           column(3,
                  selectizeInput(inputId = NS(id, "trel_samp"),
                                                  label   = "Select a sample ",
-                                                 choices = plot.data2$Sample,
+                                                 choices = unique(plot.data2$Sample),
                                                  selected = unique(plot.data2$Sample),
                                                  multiple = T,
                                                  size = 8)),
