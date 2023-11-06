@@ -65,6 +65,8 @@ nmRapp_server <- function(input, output, session) {
     query_table(db_connection=connec(), table_name="bmse_associations")
   })
 
+  nospec_metabs <- reactive({load("data/nospec_metabs.rda")})
+
   xpmt_data       <- xpmt_data_uploadServer(id = "xpmt",
                                             connec = connec)
 

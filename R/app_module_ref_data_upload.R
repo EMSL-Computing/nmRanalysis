@@ -177,6 +177,8 @@ ref_data_uploadServer <- function(id, xpmt_data, metids, ref_db, connec){
 
     observe({
       ref_db <- ref_db()
+      #subset unavailable metabs out of ref_db using df from sysdata
+      ref_db <- ref_db[!(ref_db$Entry_ID %in% nospec_metabs$df2), ]
       updateSelectizeInput(inputId = "user_refmets",
                            choices = unique(ref_db$Solute))
     })
