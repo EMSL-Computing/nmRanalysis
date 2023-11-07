@@ -109,7 +109,7 @@ nmRapp_server <- function(input, output, session) {
   ### Tab: Metabolite Identification ------------------------------------------
 
 
-  metid_list <- metid_Server(id = "metid", xpmt_data = mod_xpmt_data)
+  metid_list <- metid_Server(id = "metid", xpmt_data = mod_xpmt_data, connec = connec)
 
   # Wizard buttons to navigate from reference data editing page to metabolite identification page OR from
   # reference data editing page to profiling page

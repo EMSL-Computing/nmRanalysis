@@ -255,19 +255,41 @@ metid_mainUI <- function(id){
       tabPanel(
         title = "Identified Metabolites",
         h4(""),
-        fluidRow(
-          column(width = 3,
-                 selectInput(inputId = ns("metids_list"),
-                             label   = "Identified Metabolites",
-                             choices = NULL)
-          ),
-          column(width = 2,
-                 actionButton(ns("metid_remove"), htmltools::HTML("<b>Remove selection from identifications</b>"))
+        tabsetPanel(
+          id = ns("metid_identified_metabs"),
+          tabPanel(
+            title = "Current Session",
+            h4(""),
+            fluidRow(
+              column(width = 3,
+                     selectInput(inputId = ns("metids_list"),
+                                 label   = "Identified Metabolites",
+                                 choices = NULL)
+              ),
+              column(width = 2,
+                     actionButton(ns("metid_remove"), htmltools::HTML("<b>Remove selection from identifications</b>"))
+              )
           )
+        ),
+          tabPanel(
+            title = "Previous Session",
+            h4(""),
+            fluidRow(
+              column(width = 3,
+                     selectizeInput(inputId = ns("metids_list_prev_sesh"),
+                                 label   = "Previously Identified Metabolites",
+                                 choices = NULL, multiple = TRUE)
+
+                    ),
+              column(width = 2,
+                     actionButton(ns("use_prevsesh_metabs"), htmltools::HTML("<b>Use selected metabolites as reference</b>"))
+                    )
+                )
+            )
         )
-      )
     )
   )
+)
 }
 
 #' Module: UI elements specific to data visualization options
@@ -328,8 +350,9 @@ metid_vizoptionsUI <- function(id){
 #' @importFrom magrittr %>%
 #' @importFrom rlang .data
 #'
-metid_Server <- function(id, xpmt_data){
+metid_Server <- function(id, xpmt_data, connec){
   stopifnot(is.reactive(xpmt_data))
+  stopifnot(is.reactive(connec))
   moduleServer(id, function(input, output, session){
 
     rv <- reactiveValues(obs_show_subplot_suspend = TRUE,
@@ -340,6 +363,7 @@ metid_Server <- function(id, xpmt_data){
 
       # modfits_files <- list.files(path = "C:\\Users\\flor829\\local_projectdir\\NMR\\recommender_modeling\\Results\\model_fits")
       # modfits_files <- list.files(path = "/Users/lewi052/model_fits")
+      # modfits_files <- list.files(path = "C:/Users/prym311/Documents/NMRdatabase/bmrb_metabolomics/nmRanalysisAppBaseImage/model_fits")
       modfits_files <- list.files(path = "/srv/shiny/model_fits")
       modfits_nameonly <- gsub("model_", "", modfits_files)
       modfits_nameonly <- gsub(".rds", "", modfits_nameonly)
@@ -398,6 +422,25 @@ metid_Server <- function(id, xpmt_data){
     observeEvent(input$metid_add,{
       rv$metids <- unique(c(rv$metids, rv$entry_info$Metabolite))
       updateSelectInput(inputId = "metids_list", choices = rv$metids)
+
+      metid.entry <- data.frame("Metabolite"=character(),
+                             "user"=character(),
+                             "session"=character(),
+                             'proposal_number'=character(),
+                             'PI_name'=character(),
+                             'project_name'=character(),
+                             stringsAsFactors=FALSE,
+                             check.names = FALSE)
+
+      user.name <- Sys.getenv(c("SHINYPROXY_USERNAME"))
+      timestamp <- Sys.time()
+
+      metid.entry[nrow(metid.entry)+1,] <- c(rv$metids, user.name, timestamp,
+                                             attr(xpmt_data(), "session_info")$proposal_num,
+                                             attr(xpmt_data(), "session_info")$PI_name,
+                                             attr(xpmt_data(), "session_info")$project_name)
+
+      append_table(db_connection= connec(), table_name="recommended_metabs", df_object=metid.entry)
     })
 
     observeEvent(input$metid_remove,{
@@ -405,7 +448,27 @@ metid_Server <- function(id, xpmt_data){
       rmidx <- which(rv$metids == input$metids_list)
       rv$metids <- rv$metids[-rmidx]
       updateSelectInput(inputId = "metids_list", choices = rv$metids)
+
+      #delete row with extracted project ID
+      select_project_name <- attr(xpmt_data(), "session_info")$project_name
+      delete_queries = paste0("DELETE FROM recommended_metabs WHERE (project_name = '", select_project_name, "');")
+      DBI::dbExecute(connec(), delete_queries)
+
     })
+
+    observe({
+      #display previous sessions of identified metabs
+      metid.query <- query_table(db_connection = connec(), table_name="recommended_metabs")
+      project.name <- attr(xpmt_data(), "session_info")$project_name
+
+      metabs.list <- (subset(metid.query, project_name == project.name))
+      updateSelectizeInput(inputId = "metids_list_prev_sesh", choices = metabs.list$Metabolite)
+    })
+
+    observeEvent(input$use_prevsesh_metabs, {
+      rv$metids <- input$metids_list_prev_sesh
+    })
+
 
     output$recommender_metquery_table <- DT::renderDT({
 
@@ -418,6 +481,7 @@ metid_Server <- function(id, xpmt_data){
         #Change to local file
         # modfits_files <- list.files(path = "C:\\Users\\flor829\\local_projectdir\\NMR\\recommender_modeling\\Results\\model_fits")
         # modfits_files <- list.files(path = "/Users/lewi052/model_fits")
+        # modfits_files <- list.files(path = "C:/Users/prym311/Documents/NMRdatabase/bmrb_metabolomics/nmRanalysisAppBaseImage/model_fits")
         modfits_files <- list.files(path = "/srv/shiny/model_fits")
         modfits_nameonly <- gsub("model_", "", modfits_files)
         modfits_nameonly <- gsub(".rds", "", modfits_nameonly)
@@ -478,6 +542,7 @@ metid_Server <- function(id, xpmt_data){
 
           # modfit_selmod <- readRDS(paste0("C:\\Users\\flor829\\local_projectdir\\NMR\\recommender_modeling\\Results\\model_fits\\", modfit_selmod_file))
           # modfit_selmod <- list.files(path = paste0("/Users/lewi052/model_fits", modfit_selmod_file))
+          # modfit_selmod <- readRDS(paste0("C:/Users/prym311/Documents/NMRdatabase/bmrb_metabolomics/nmRanalysisAppBaseImage/model_fits/", modfit_selmod_file))
           modfit_selmod <- readRDS(paste0("/srv/shiny/model_fits/", modfit_selmod_file))
           bw1_bins <- as.numeric(c("9.95", "9.85", "9.75", "9.65", "9.55", "9.45", "9.35", "9.25", "9.15",
                                    "9.05", "8.95", "8.85", "8.75", "8.65", "8.55", "8.45", "8.35", "8.25",
@@ -636,6 +701,7 @@ metid_Server <- function(id, xpmt_data){
               } else{
                 # modfit_selmod <- readRDS(paste0("C:\\Users\\flor829\\local_projectdir\\NMR\\recommender_modeling\\Results\\model_fits\\", modfit_selmod_file))
                 # modfit_selmod <- readRDS(paste0("/Users/lewi052/model_fits", modfit_selmod_file))
+                # modfit_selmod <- readRDS(paste0("C:/Users/prym311/Documents/NMRdatabase/bmrb_metabolomics/nmRanalysisAppBaseImage/model_fits/", modfit_selmod_file))
                 modfit_selmod <- readRDS(paste0("/srv/shiny/model_fits/", modfit_selmod_file))
                 bw1_bins <- as.numeric(c("9.95", "9.85", "9.75", "9.65", "9.55", "9.45", "9.35", "9.25", "9.15",
                                          "9.05", "8.95", "8.85", "8.75", "8.65", "8.55", "8.45", "8.35", "8.25",
@@ -768,6 +834,7 @@ metid_Server <- function(id, xpmt_data){
               } else{
                 # modfit_selmod <- readRDS(paste0("C:\\Users\\flor829\\local_projectdir\\NMR\\recommender_modeling\\Results\\model_fits\\", modfit_selmod_file))
                 # modfit_selmod <- readRDS(paste0("/Users/lewi052/model_fits", modfit_selmod_file))
+                # modfit_selmod <- readRDS(paste0("C:/Users/prym311/Documents/NMRdatabase/bmrb_metabolomics/nmRanalysisAppBaseImage/model_fits/", modfit_selmod_file))
                 modfit_selmod <- readRDS(paste0("/srv/shiny/model_fits/", modfit_selmod_file))
                 bw1_bins <- as.numeric(c("9.95", "9.85", "9.75", "9.65", "9.55", "9.45", "9.35", "9.25", "9.15",
                                          "9.05", "8.95", "8.85", "8.75", "8.65", "8.55", "8.45", "8.35", "8.25",
