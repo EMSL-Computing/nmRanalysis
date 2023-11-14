@@ -1,6 +1,6 @@
 # nmRanalysis
   
-###  `1.0.22`
+###  `1.0.23`
 
 ### Services:
 
