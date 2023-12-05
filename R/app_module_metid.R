@@ -476,7 +476,7 @@ metid_Server <- function(id, xpmt_data, connec){
       user.name <- Sys.getenv(c("SHINYPROXY_USERNAME"))
       delete_queries = paste0("DELETE FROM recommended_metabs WHERE metabolite = '", metab_to_be_removed,
                               # uncomment for production where the user.name will return
-                              # "' AND user = '", user.name,
+                              "' AND user = '", user.name,
                               "' AND proposal_number = '", select_proposal_num,
                               "' AND pi_name = '", select_pi_name,
                               "' AND project_name = '", select_project_name,
@@ -505,7 +505,7 @@ metid_Server <- function(id, xpmt_data, connec){
       user.name <- Sys.getenv(c("SHINYPROXY_USERNAME"))
       delete_queries = paste0("DELETE FROM recommended_metabs WHERE metabolite = '", metab_to_be_removed,
                               # uncomment for production where the user.name will return
-                              # "' AND user = '", user.name,
+                              "' AND user = '", user.name,
                               "' AND proposal_number = '", select_proposal_num,
                               "' AND pi_name = '", select_pi_name,
                               "' AND project_name = '", select_project_name,
