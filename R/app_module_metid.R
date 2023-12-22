@@ -257,12 +257,14 @@ metid_mainUI <- function(id){
         h4(""),
         tabsetPanel(
           id = ns("metid_identified_metabs"),
+          type = "hidden",
           tabPanel(
+            value = "current_session",
             title = "Current Session",
             h4(""),
             fluidRow(
               column(width = 3,
-                     textOutput(ns("current_session"))
+                     textOutput(ns("current_session_text"))
               )
               ),
             fluidRow(
@@ -277,8 +279,14 @@ metid_mainUI <- function(id){
           )
         ),
           tabPanel(
+            value = "previous_session",
             title = "Previous Session",
             h4(""),
+            fluidRow(
+              column(width = 3,
+                     textOutput(ns("previous_session_text"))
+              )
+            ),
             fluidRow(
               column(width = 3,
                      selectizeInput(inputId = ns("metids_list_prev_sesh"),
@@ -286,8 +294,10 @@ metid_mainUI <- function(id){
                                  choices = NULL, multiple = TRUE)
 
                     ),
-              column(width = 2,
-                     actionButton(ns("use_prevsesh_metabs"), htmltools::HTML("<b>Add selected metabolites to current list</b>"))
+              column(width = 3,
+                     actionButton(ns("use_prevsesh_metabs"), htmltools::HTML("<b>Add selected metabolites to current list</b>")),
+                     actionButton(ns("use_all_prevsesh_metabs"), htmltools::HTML("<b>Add all metabolites from previous session to current list</b>")),
+                     actionButton(ns("metid_remove_previous"), htmltools::HTML("<b>Remove selection from identifications</b>"))
                     )
                 )
             )
@@ -424,7 +434,7 @@ metid_Server <- function(id, xpmt_data, connec){
 
     })
 
-    output$current_session <- renderText({
+    output$current_session_text <- renderText({
       paste('Project name used in this session: "', attr(xpmt_data(), "session_info")$project_name, '"')
     })
 
@@ -461,12 +471,45 @@ metid_Server <- function(id, xpmt_data, connec){
 
       #delete row with extracted project ID
       select_project_name <- attr(xpmt_data(), "session_info")$project_name
+      select_proposal_num <- attr(xpmt_data(), "session_info")$proposal_num
+      select_pi_name <- attr(xpmt_data(), "session_info")$PI_name
       user.name <- Sys.getenv(c("SHINYPROXY_USERNAME"))
-      delete_queries = paste0("DELETE FROM recommended_metabs WHERE metabolite = '", metab_to_be_removed,"' AND project_name = '", select_project_name, "';")
+      delete_queries = paste0("DELETE FROM recommended_metabs WHERE metabolite = '", metab_to_be_removed,
+                              # uncomment for production where the user.name will return
+                              "' AND user = '", user.name,
+                              "' AND proposal_number = '", select_proposal_num,
+                              "' AND pi_name = '", select_pi_name,
+                              "' AND project_name = '", select_project_name,
+                              "';")
+      DBI::dbExecute(connec(), delete_queries)
 
-      # test on production where the user.name will return
-      # delete_queries = paste0("DELETE FROM recommended_metabs WHERE metabolite = '", metab_to_be_removed,"' AND user = '", user.name, "' AND project_name = '", select_project_name, "';")
+      #requery for display of available metabolites from previous sessions
+      metid.query <- query_table(db_connection = connec(), table_name="recommended_metabs")
+      project.name <- attr(xpmt_data(), "session_info")$project_name
+      metabs.list <- (subset(metid.query, project_name == project.name))
+      updateSelectizeInput(inputId = "metids_list_prev_sesh", choices = metabs.list$metabolite)
 
+    })
+
+    observeEvent(input$metid_remove_previous,{
+      req(rv$metids)
+      rmidx <- which(rv$metids == input$metids_list)
+      metab_to_be_removed <- rv$metids[rmidx]
+      rv$metids <- rv$metids[-rmidx]
+      updateSelectInput(inputId = "metids_list_prev_sesh", choices = rv$metids)
+
+      #delete row with extracted project ID
+      select_project_name <- attr(xpmt_data(), "session_info")$project_name
+      select_proposal_num <- attr(xpmt_data(), "session_info")$proposal_num
+      select_pi_name <- attr(xpmt_data(), "session_info")$PI_name
+      user.name <- Sys.getenv(c("SHINYPROXY_USERNAME"))
+      delete_queries = paste0("DELETE FROM recommended_metabs WHERE metabolite = '", metab_to_be_removed,
+                              # uncomment for production where the user.name will return
+                              "' AND user = '", user.name,
+                              "' AND proposal_number = '", select_proposal_num,
+                              "' AND pi_name = '", select_pi_name,
+                              "' AND project_name = '", select_project_name,
+                              "';")
       DBI::dbExecute(connec(), delete_queries)
 
       #requery for display of available metabolites from previous sessions
@@ -478,12 +521,25 @@ metid_Server <- function(id, xpmt_data, connec){
     })
 
     observe({
-      #display previous sessions of identified metabs
+      # observer for seeing if there is a previous session to load
       metid.query <- query_table(db_connection = connec(), table_name="recommended_metabs")
       project.name <- attr(xpmt_data(), "session_info")$project_name
+      user.name <- Sys.getenv(c("SHINYPROXY_USERNAME"))
 
       metabs.list <- (subset(metid.query, project_name == project.name))
-      updateSelectizeInput(inputId = "metids_list_prev_sesh", choices = metabs.list$metabolite)
+      metabs.list.user <- (subset(metabs.list, user == user.name))
+
+    # Update the visibility of the conditionalTabPanel for previous session based on the condition
+      if (length(metabs.list.user) > 0){
+        updateTabsetPanel(inputId = "metid_identified_metabs", selected =  "previous_session")
+        updateSelectizeInput(inputId = "metids_list_prev_sesh", choices = metabs.list.user$metabolite)
+      } else {
+        updateTabsetPanel(inputId = "metid_identified_metabs", selected = "current_session")
+      }
+    })
+
+    output$previous_session_text <- renderText({
+      paste('Previous session detected: "', attr(xpmt_data(), "session_info")$project_name, '"')
     })
 
     observeEvent(input$use_prevsesh_metabs, {
@@ -492,6 +548,17 @@ metid_Server <- function(id, xpmt_data, connec){
 
     })
 
+    observeEvent(input$use_all_prevsesh_metabs, {
+      metid.query <- query_table(db_connection = connec(), table_name="recommended_metabs")
+      project.name <- attr(xpmt_data(), "session_info")$project_name
+      user.name <- Sys.getenv(c("SHINYPROXY_USERNAME"))
+
+      metabs.list <- (subset(metid.query, project_name == project.name))
+      metabs.list.user <- (subset(metabs.list, user == user.name))
+
+      rv$metids <- unique(c(rv$metids, metabs.list.user$metabolite))
+      updateSelectInput(inputId = "metids_list", choices = rv$metids)
+    })
 
     output$recommender_metquery_table <- DT::renderDT({
 

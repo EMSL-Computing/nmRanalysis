@@ -626,6 +626,7 @@ ref_data_uploadServer <- function(id, xpmt_data, metids, ref_db, connec){
 
                                              # replace the next two lines with subset code
                                              user_authparameter_data <- profiling.df[profiling.df$user %in% auth.users,]
+                                             user_authparameter_data<- cbind(user_authparameter_data[,2:14],user_authparameter_data[,16:20])
                                              # rbind the two dataframes
                                              user_reference_data <- rbind.data.frame(user_reference_data,
                                                                                      user_authparameter_data)
