@@ -2503,6 +2503,7 @@ ref_data_editingServer <- function(id, xpmt_data, ref_data, ref_db, connec){
         timestamp <- Sys.time()
 
         df <- user_edited_refdata
+        df['id'] <- uuid::UUIDgenerate(use.time = NA, n = 1L, output = c("string"))
         df['user'] <- user.name
         df['session'] <- timestamp
 
